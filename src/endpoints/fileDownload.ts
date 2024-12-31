@@ -155,7 +155,7 @@ export class FileDownload extends OpenAPIRoute {
             return c.json({
                 success: false,
                 error: 'Failed to find file by mnemonic'
-            });
+            }, 404);
         }
 
         // The IV is the first 12 bytes of the buffer
