@@ -2,23 +2,14 @@ import {Bool, OpenAPIRoute, Str} from "chanfana";
 import {z} from "zod";
 import {Context} from "hono";
 import {validateMnemonic, mnemonicToEntropy} from "bip39";
-import {bufferToHex, trimToCryptoKey} from "../util/buffer";
-import {extractContentPrefix, isPDF} from "../util/format";
+import {bufferToHex} from "../util/buffer";
 
 
-export class FileDownload extends OpenAPIRoute {
+export class FileDelete extends OpenAPIRoute {
     schema = {
         tags: ["File"],
-        summary: "Download a file",
+        summary: "Delete a file",
         request: {
-            query: z.object({
-               noRender: Bool({
-                   description: 'Disable rendering PDF files in-browser',
-                   default: false,
-                   example: true,
-                   required: false
-               })
-            }),
             body: {
                 content: {
                     "multipart/form-data": {
@@ -43,13 +34,17 @@ export class FileDownload extends OpenAPIRoute {
         },
         responses: {
             "200": {
-                description: "File successfully retrieved",
+                description: "File delete request successfully executed",
                 content: {
-                    "application/octet-stream": {
-                        schema: z.instanceof(File)
-                    },
-                    "application/pdf": {
-                        schema: z.instanceof(File)
+                    "application/json": {
+                        schema: z.object({
+                            success: Bool({
+                                description: 'Whether the delete operation succeeded; however, does not indicate that the file existed',
+                                required: true,
+                                default: true,
+                                example: true
+                            })
+                        })
                     }
                 }
             },
@@ -59,7 +54,7 @@ export class FileDownload extends OpenAPIRoute {
                     'application/json': {
                         schema: z.object({
                             success: Bool({
-                                description: 'Whether the download operation succeeded',
+                                description: 'Whether the delete operation succeeded',
                                 required: true,
                                 default: false,
                                 example: false
@@ -80,7 +75,7 @@ export class FileDownload extends OpenAPIRoute {
                     "application/json": {
                         schema: z.object({
                             success: Bool({
-                                description: 'Whether the download operation succeeded',
+                                description: 'Whether the delete operation succeeded',
                                 required: true,
                                 default: false,
                                 example: false
@@ -89,27 +84,6 @@ export class FileDownload extends OpenAPIRoute {
                                 default: 'Invalid mnemonic',
                                 description: 'Bad request error',
                                 example: 'Invalid mnemonic',
-                                required: true
-                            })
-                        })
-                    }
-                }
-            },
-            "404": {
-                description: "File not found",
-                content: {
-                    "application/json": {
-                        schema: z.object({
-                            success: Bool({
-                                description: 'Whether the download operation succeeded',
-                                required: true,
-                                default: false,
-                                example: false
-                            }),
-                            error: Str({
-                                default: 'Failed to find file by mnemonic',
-                                description: 'File not found error',
-                                example: 'Failed to find file by mnemonic',
                                 required: true
                             })
                         })
@@ -144,50 +118,10 @@ export class FileDownload extends OpenAPIRoute {
         const entropyShaDigest = bufferToHex(await crypto.subtle.digest({name: 'SHA-256'},
             entropyBytes));
 
-        const cryptoKey = await crypto.subtle.importKey('raw',
-            trimToCryptoKey(entropyBytes),
-            {name: 'AES-GCM', length: 128}, true, ['decrypt']);
-
-        // await (c.env.STORAGE as R2Bucket).put(entropyShaDigest, updatedFile);
-        const object = await (c.env.STORAGE as R2Bucket).get(entropyShaDigest);
-
-        // If the object does not exist...
-        if (!object) {
-            return c.json({
-                success: false,
-                error: 'Failed to find file by mnemonic'
-            });
-        }
-
-        // The IV is the first 12 bytes of the buffer
-        const cipherTextIVBuffer = await object.arrayBuffer();
-
-        // Decrypt the file using AES-GCM given the first 12 bytes of the stored file is the IV
-        const decryptedBuffer = new Uint8Array(await crypto.subtle.decrypt(
-            { name: "AES-GCM", iv: cipherTextIVBuffer.slice(0, 12) }, cryptoKey, cipherTextIVBuffer.slice(12)));
-
-        // The plaintext is prefixed by the file name and type, which needs to be extracted and removed.
-        const {name, type, contentStart} = extractContentPrefix(decryptedBuffer);
-
-        const headers = new Headers();
-        object.writeHttpMetadata(headers);
-        headers.set('etag', object.httpEtag);
-
-        let contentDisposition = 'attachment';
-        if (!data.query.noRender
-            && type == 'application/pdf'
-            && isPDF(decryptedBuffer.slice(contentStart, contentStart + 5))) {
-            contentDisposition = 'inline';
-        }
-
-        // TODO: Set the filename properly per RFC 5987
-        headers.set('Content-Disposition',
-            `${contentDisposition}; filename=${name.replaceAll(/[^\w. ]/g, '')}`);
-        headers.set('Content-Type', type ?? 'application/octet-stream');
-
-        // We've got the file and got this far...now to destroy it
         await (c.env.STORAGE as R2Bucket).delete(entropyShaDigest);
 
-        return new Response(decryptedBuffer.slice(contentStart), {headers});
+        return c.json({
+            success: true
+        });
     }
 }

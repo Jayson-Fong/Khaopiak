@@ -4,12 +4,6 @@ main = "src/index.ts"
 compatibility_date = "2024-12-24"
 compatibility_flags = [ "nodejs_compat" ]
 
-# Workers Logs
-# Docs: https://developers.cloudflare.com/workers/observability/logs/workers-logs/
-# Configuration: https://developers.cloudflare.com/workers/observability/logs/workers-logs/#enable-workers-logs
-[observability]
-enabled = true
-
 # Automatically place your workloads in an optimal location to minimize latency.
 # If you are running back-end logic in a Worker, running it closer to your back-end infrastructure
 # rather than the end user may result in better performance.
@@ -100,6 +94,7 @@ enabled = true
 [[r2_buckets]]
 binding = "STORAGE"
 bucket_name = "khaopiak"
+preview_bucket_name = "khaopiak-preview"
 
 # Bind another Worker service. Use this binding to call another Worker without network overhead.
 # Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings

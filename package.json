@@ -12,6 +12,7 @@
 		"bip39": "^3.1.0",
 		"chanfana": "^2.0.2",
 		"hono": "^4.4.7",
+		"js-yaml": "^4.1.0",
 		"zod": "^3.23.8"
 	},
 	"devDependencies": {
