@@ -66,6 +66,10 @@ export const bufferToNumber = (buffer: Uint8Array): number => {
     return num;
 }
 
+/**
+ * Takes a hex string and converts it into an ArrayBuffer
+ * @param hex A hexadecimal string
+ */
 export const hexToArrayBuffer = (hex: string): ArrayBuffer => {
     return Uint8Array.from(hex.match(/.{1,2}/g).map(b => parseInt(b, 16))).buffer;
 }
