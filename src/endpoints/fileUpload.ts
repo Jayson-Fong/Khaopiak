@@ -1,4 +1,4 @@
-import {Bool, Obj, OpenAPIRoute, Str} from "chanfana";
+import {Bool, OpenAPIRoute, Str} from "chanfana";
 import {z} from "zod";
 import {Context} from "hono";
 import {generateMnemonic, mnemonicToEntropy} from "bip39";
