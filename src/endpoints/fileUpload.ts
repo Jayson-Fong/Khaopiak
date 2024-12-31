@@ -10,6 +10,9 @@ import {
 } from '../util/buffer';
 import { digestToKey, fileToContentPrefix } from '../util/format';
 
+const MAX_QUEUE_RETRY_DELAY = 60 * 60 * 12;
+const MAX_QUEUE_RETRIES = 100;
+
 export class FileUpload extends OpenAPIRoute {
 	schema = {
 		tags: ['File'],
@@ -41,10 +44,14 @@ export class FileUpload extends OpenAPIRoute {
 									// TODO: Make the maximum and default (and later, minimum) configurable
 								})
 								.min(1)
-								.max(60 * 60 * 24 * 7)
+								// The max queue retry delay is 12 hours, with a max 100 retries
+								// as a result, the absolute maximum expiry is 1200 hours
+								.max(MAX_QUEUE_RETRY_DELAY * MAX_QUEUE_RETRIES)
 								.int()
 								.nonnegative()
-								.default(60 * 60 * 24)
+								// The max queue retry delay is 12 hours, so let's avoid
+								// using an operation if the user doesn't need to.
+								.default(MAX_QUEUE_RETRY_DELAY)
 						})
 					}
 				}
@@ -152,15 +159,27 @@ export class FileUpload extends OpenAPIRoute {
 		);
 
 		// Adding in 6 bytes to account for expiry time and 12 bytes to account for the IV
-		// TODO: Inject the file expiry at the beginning
+		const fileExpiryTime = Date.now() + data.body.expiry * 1000;
 		const ivInjectedFileBuffer = bufferConcat([
-			msTimeToBuffer(Date.now() + data.body.expiry * 1000),
+			msTimeToBuffer(fileExpiryTime),
 			iv,
 			cipherText
 		]);
 
-		// TODO: Use Queues to auto clean!
-		await (c.env.STORAGE as R2Bucket).put(objectKey, ivInjectedFileBuffer);
+		// Enqueue the file for deletion
+		await (c.env.DELETION_QUEUE as Queue).send(
+			{
+				key: objectKey,
+				expiry: fileExpiryTime
+			},
+			{
+				delaySeconds: Math.min(data.body.expiry, MAX_QUEUE_RETRY_DELAY),
+				contentType: 'json'
+			}
+		);
+
+		// Upload the ciphertext to Cloudflare R2
+		await c.env.STORAGE.put(objectKey, ivInjectedFileBuffer);
 
 		return c.json({ success: true, mnemonic: mnemonic });
 	}

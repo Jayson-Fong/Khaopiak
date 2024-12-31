@@ -137,7 +137,7 @@ export class FileExists extends OpenAPIRoute {
 			await crypto.subtle.digest({ name: 'SHA-256' }, entropyBytes)
 		);
 
-		const object = await (c.env.STORAGE as R2Bucket).get(objectKey);
+		const object = await c.env.STORAGE.get(objectKey);
 
 		const expiry = bufferToNumber(
 			new Uint8Array((await object.arrayBuffer()).slice(0, 6))
@@ -145,7 +145,7 @@ export class FileExists extends OpenAPIRoute {
 		if (expiry <= Date.now()) {
 			// Since the file is expired, it should be gone by now, so we pretend it's gone.
 			// And that's not wrong since it is indeed about to be gone...
-			await (c.env.STORAGE as R2Bucket).delete(objectKey);
+			await c.env.STORAGE.delete(objectKey);
 
 			return c.json({
 				success: true,

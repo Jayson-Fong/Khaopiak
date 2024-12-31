@@ -130,7 +130,7 @@ export class FileDelete extends OpenAPIRoute {
 			await crypto.subtle.digest({ name: 'SHA-256' }, entropyBytes)
 		);
 
-		await (c.env.STORAGE as R2Bucket).delete(objectKey);
+		await c.env.STORAGE.delete(objectKey);
 
 		return c.json({
 			success: true

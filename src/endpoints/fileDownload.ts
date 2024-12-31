@@ -177,7 +177,7 @@ export class FileDownload extends OpenAPIRoute {
 			['decrypt']
 		);
 
-		const object = await (c.env.STORAGE as R2Bucket).get(objectKey);
+		const object = await c.env.STORAGE.get(objectKey);
 
 		// If the object does not exist...
 		if (!object) {
@@ -200,7 +200,7 @@ export class FileDownload extends OpenAPIRoute {
 		if (expiry <= Date.now()) {
 			// Since the file is expired, it should be gone by now, so we pretend it's gone.
 			// And that's not wrong since it is indeed about to be gone...
-			await (c.env.STORAGE as R2Bucket).delete(objectKey);
+			await c.env.STORAGE.delete(objectKey);
 
 			return c.json(
 				{
@@ -245,7 +245,7 @@ export class FileDownload extends OpenAPIRoute {
 		headers.set('Content-Type', type ?? 'application/octet-stream');
 
 		// We've got the file and got this far...now to destroy it
-		await (c.env.STORAGE as R2Bucket).delete(objectKey);
+		await c.env.STORAGE.delete(objectKey);
 
 		return new Response(decryptedBuffer.slice(contentStart), { headers });
 	}
