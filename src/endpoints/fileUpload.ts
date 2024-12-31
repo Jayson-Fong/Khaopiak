@@ -2,7 +2,8 @@ import {Bool, OpenAPIRoute, Str} from "chanfana";
 import {z} from "zod";
 import {Context} from "hono";
 import {generateMnemonic, mnemonicToEntropy} from "bip39";
-import {trimToCryptoKey} from "../util/buffer";
+import {bufferConcat, bufferToHex, trimToCryptoKey} from "../util/buffer";
+import {fileToContentPrefix} from "../util/format";
 
 
 export class FileUpload extends OpenAPIRoute {
@@ -14,8 +15,9 @@ export class FileUpload extends OpenAPIRoute {
                 content: {
                     "multipart/form-data": {
                         schema: z.object({
-                            file: z.any(),
-                            filePath: Str(),
+                            file: z.instanceof(File)
+                                .describe('An uploaded file')
+                                .refine(x => x.size),
                             entropy: z.coerce.number({
                                 description: 'Bits of entropy for file identification. The highest level of entropy possible will be used for AES-GCM encryption.'
                             }).gte(128).lte(256)._addCheck({
@@ -35,7 +37,7 @@ export class FileUpload extends OpenAPIRoute {
         },
         responses: {
             "200": {
-                description: "Monitor successfully checked in",
+                description: "File successfully uploaded",
                 content: {
                     "application/json": {
                         schema: z.object({
@@ -44,6 +46,11 @@ export class FileUpload extends OpenAPIRoute {
                                 required: true,
                                 default: true,
                                 example: true
+                            }),
+                            mnemonic: Str({
+                                description: 'BIP39 mnemonic used for file retrieval and server-side decryption',
+                                required: true,
+                                example: 'pass frog invite more question expose nose start swarm quality unhappy steak'
                             })
                         })
                     }
@@ -98,6 +105,7 @@ export class FileUpload extends OpenAPIRoute {
         // Get the validated, typed data from the context.
         // TODO: Chanfana has a bug causing it not to parse the body with `this.getValidatedData`. Eventually, simplify.
         // Really this only depends on the body anyways, but nonetheless...
+        console.log(await c.req.parseBody());
         const data = {
             ...await this.getValidatedData<typeof this.schema>(),
             body: this.schema.request.body.content['multipart/form-data'].schema.parse(await c.req.parseBody())
@@ -113,38 +121,31 @@ export class FileUpload extends OpenAPIRoute {
         const entropyBytes = Buffer.from(entropy, 'hex').buffer;
 
         // Generate the file hash for generation of the R2 file path
-        // TODO: Stop using Buffer
-        const entropyShaDigest = Buffer.from(await crypto.subtle.digest({name: 'SHA-256'},
-            entropyBytes)).toString('hex');
+        const entropyShaDigest = bufferToHex(await crypto.subtle.digest({name: 'SHA-256'},
+            entropyBytes));
 
-        // Encrypt file using AES-GCM. All entropy bits are used and the checksum bits are sliced off.
-        // The checksum bits are only used to identify the file.
+        // For AES-GCM encryption, use the entropy bits as a key.
         const cryptoKey = await crypto.subtle.importKey('raw',
             trimToCryptoKey(entropyBytes),
             {name: 'AES-GCM', length: 128}, true, ['encrypt']);
+
         // The IV will be stored later as a prefix to the ciphertext
         const iv = crypto.getRandomValues(new Uint8Array(0xC));
 
-        // Since a File is a Blob...blob up the IV.
-        const file = data.body.file as File;
-
-        // TODO: Inject a sanitized file name as part of the plaintext
-        // TODO: Stop using Buffer
+        // Encrypt the file content prefixed with a null-separated name and type using AES-GCM
         const cipherText = await crypto.subtle.encrypt(
-            {name: 'AES-GCM', iv: iv}, cryptoKey, await file.arrayBuffer());
+            {name: 'AES-GCM', iv: iv}, cryptoKey, bufferConcat([
+                fileToContentPrefix(data.body.file), await data.body.file.arrayBuffer()]));
 
         // Adding in 12 bytes to account for the IV
-        const ivInjectedFileBuffer = new Uint8Array(cipherText.byteLength + 0xC);
-        ivInjectedFileBuffer.set(iv, 0);
-        ivInjectedFileBuffer.set(new Uint8Array(cipherText), 12);
+        const ivInjectedFileBuffer = bufferConcat([iv, cipherText]);
 
-        const updatedFile = new File([ivInjectedFileBuffer.buffer.slice(0)], file.name, {
-            lastModified: file.lastModified
-        });
+        // The file name prefixes the "plaintext", so there's no need for it here.
+        const updatedFile = new File([ivInjectedFileBuffer], entropyShaDigest);
 
         // TODO: Use Queues to auto clean!
         await (c.env.STORAGE as R2Bucket).put(entropyShaDigest, updatedFile);
 
-        return c.json({'mnemonic': mnemonic});
+        return c.json({success: true, mnemonic: mnemonic});
     }
 }
