@@ -1,6 +1,6 @@
 {
-  "requireAuth": {
-    "upload": false,
-    "download": false
-  }
+	"requireAuth": {
+		"upload": false,
+		"download": false
+	}
 }
