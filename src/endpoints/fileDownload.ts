@@ -2,7 +2,7 @@ import {Bool, OpenAPIRoute, Str} from "chanfana";
 import {z} from "zod";
 import {Context} from "hono";
 import {validateMnemonic, mnemonicToEntropy} from "bip39";
-import {trimToCryptoKey} from "../util/buffer";
+import {bufferToNumber, trimToCryptoKey} from "../util/buffer";
 import {digestToKey, extractContentPrefix, isPDF} from "../util/format";
 
 
@@ -158,12 +158,26 @@ export class FileDownload extends OpenAPIRoute {
             }, 404);
         }
 
-        // The IV is the first 12 bytes of the buffer
-        const cipherTextIVBuffer = await object.arrayBuffer();
+        // The object's body is composed of the expiry (6 bytes) + IV (12 bytes) + ciphertext
+        const cipherTextExpiryIVBuffer = await object.arrayBuffer();
 
-        // Decrypt the file using AES-GCM given the first 12 bytes of the stored file is the IV
+        // The first 6 bytes is the expiry
+        const expiry = bufferToNumber(new Uint8Array(cipherTextExpiryIVBuffer.slice(0, 6)));
+        if (expiry <= Date.now()) {
+            // Since the file is expired, it should be gone by now, so we pretend it's gone.
+            // And that's not wrong since it is indeed about to be gone...
+            await (c.env.STORAGE as R2Bucket).delete(objectKey);
+
+            return c.json({
+                success: false,
+                error: 'Failed to find file by mnemonic'
+            }, 404);
+        }
+
+
+        // Decrypt the file using AES-GCM given bytes 6 - 17 of the stored file is the IV
         const decryptedBuffer = new Uint8Array(await crypto.subtle.decrypt(
-            { name: "AES-GCM", iv: cipherTextIVBuffer.slice(0, 12) }, cryptoKey, cipherTextIVBuffer.slice(12)));
+            { name: "AES-GCM", iv: cipherTextExpiryIVBuffer.slice(6, 18) }, cryptoKey, cipherTextExpiryIVBuffer.slice(18)));
 
         // The plaintext is prefixed by the file name and type, which needs to be extracted and removed.
         const {name, type, contentStart} = extractContentPrefix(decryptedBuffer);

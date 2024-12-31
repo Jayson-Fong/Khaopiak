@@ -17,12 +17,11 @@ export const fileToContentPrefix = (file: File): Uint8Array => {
 }
 
 /**
- * Extracts the file name and type as encoded by filesToContentPrefix() and returns the content start index
+ * Extracts the file name, type, and expiry as encoded by filesToContentPrefix() and returns the content start index
  * @param buffer A buffer such that a file name and content type can be found prefixed, each suffixed with a null byte
  * @see fileToContentPrefix
- * TODO: Integrate file expiry!
  */
-export const extractContentPrefix = (buffer: Uint8Array): {contentStart: number, name: string, type: string} => {
+export const extractContentPrefix = (buffer: Uint8Array): { contentStart: number, name: string, type: string } => {
     let separatorIndices: number[] = [];
 
     for (let byteIndex = 0; byteIndex < buffer.byteLength && separatorIndices.length < 2; byteIndex++) {
@@ -32,7 +31,7 @@ export const extractContentPrefix = (buffer: Uint8Array): {contentStart: number,
     }
 
     if (separatorIndices.length < 2) {
-        throw Error('Failed to locate file name/type separators');
+        throw Error('Failed to locate file name/type/expiry separators');
     }
 
     const decoder = new TextDecoder();

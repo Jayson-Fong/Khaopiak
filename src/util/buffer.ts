@@ -36,3 +36,32 @@ export const bufferToHex = (buffer: ArrayBufferLike) => {
         .map(x => x.toString(16).padStart(2, '0'))
         .join('');
 }
+
+/**
+ * Takes the number of milliseconds since epoch and converts it into a Uint8Array of 6 bytes
+ * @param time The number of milliseconds since epoch
+ */
+export const msTimeToBuffer = (time: number): Uint8Array => {
+    let buffer = new Uint8Array(6);
+
+    for (let i = 0; i < buffer.byteLength; i++) {
+        buffer[i] = time % 256;
+        time = Math.floor(time / 256);
+    }
+
+    return buffer;
+}
+
+/**
+ * Takes a Uint8Array and converts it into a number
+ * @param buffer A Uint8Array
+ */
+export const bufferToNumber = (buffer: Uint8Array): number => {
+    let num = 0;
+
+    for (let i = buffer.length - 1; i >= 0; i--) {
+        num = num * 256 + buffer[i];
+    }
+
+    return num;
+}

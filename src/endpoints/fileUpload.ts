@@ -2,7 +2,7 @@ import {Bool, OpenAPIRoute, Str} from "chanfana";
 import {z} from "zod";
 import {Context} from "hono";
 import {generateMnemonic, mnemonicToEntropy} from "bip39";
-import {bufferConcat, trimToCryptoKey} from "../util/buffer";
+import {bufferConcat, msTimeToBuffer, trimToCryptoKey} from "../util/buffer";
 import {digestToKey, fileToContentPrefix} from "../util/format";
 
 
@@ -23,7 +23,11 @@ export class FileUpload extends OpenAPIRoute {
                             }).gte(128).lte(256)._addCheck({
                                 kind: 'multipleOf',
                                 value: 32
-                            })
+                            }),
+                            expiry: z.coerce.number({
+                                description: 'The number of seconds the file should be downloadable before the file is made unavailable or deleted.'
+                                // TODO: Make the maximum and default (and later, minimum) configurable
+                            }).min(1).max(60 * 60 * 24 * 7).int().nonnegative().default(60 * 60 * 24)
                         })
                     }
                 }
@@ -115,8 +119,10 @@ export class FileUpload extends OpenAPIRoute {
             {name: 'AES-GCM', iv: iv}, cryptoKey, bufferConcat([
                 fileToContentPrefix(data.body.file), await data.body.file.arrayBuffer()]));
 
-        // Adding in 12 bytes to account for the IV
-        const ivInjectedFileBuffer = bufferConcat([iv, cipherText]);
+        // Adding in 6 bytes to account for expiry time and 12 bytes to account for the IV
+        // TODO: Inject the file expiry at the beginning
+        const ivInjectedFileBuffer = bufferConcat(
+            [msTimeToBuffer(Date.now() + (data.body.expiry * 1000)), iv, cipherText]);
 
         // TODO: Use Queues to auto clean!
         await (c.env.STORAGE as R2Bucket).put(objectKey, ivInjectedFileBuffer);

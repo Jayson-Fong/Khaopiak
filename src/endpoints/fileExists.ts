@@ -3,6 +3,7 @@ import {z} from "zod";
 import {Context} from "hono";
 import {validateMnemonic, mnemonicToEntropy} from "bip39";
 import {digestToKey} from "../util/format";
+import {bufferToNumber} from "../util/buffer";
 
 
 export class FileExists extends OpenAPIRoute {
@@ -124,11 +125,23 @@ export class FileExists extends OpenAPIRoute {
         const objectKey = digestToKey(await crypto.subtle.digest({name: 'SHA-256'},
             entropyBytes));
 
-        const object = await (c.env.STORAGE as R2Bucket).head(objectKey);
+        const object = await (c.env.STORAGE as R2Bucket).get(objectKey);
+
+        const expiry = bufferToNumber(new Uint8Array((await object.arrayBuffer()).slice(0, 6)));
+        if (expiry <= Date.now()) {
+            // Since the file is expired, it should be gone by now, so we pretend it's gone.
+            // And that's not wrong since it is indeed about to be gone...
+            await (c.env.STORAGE as R2Bucket).delete(objectKey);
+
+            return c.json({
+                success: true,
+                exists: false
+            });
+        }
 
         return c.json({
             success: true,
             exists: !!object
-        })
+        });
     }
 }
