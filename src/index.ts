@@ -3,11 +3,16 @@ import { Hono } from "hono";
 import {FileUpload} from "./endpoints/fileUpload";
 import { Buffer } from "node:buffer";
 import {FileDownload} from "./endpoints/fileDownload";
+import {Content} from "./pages";
 
 globalThis.Buffer = Buffer;
 
 // Start a Hono app
 const app = new Hono();
+
+app.get('/', (c) => {
+	return c.html(Content());
+})
 
 // Setup OpenAPI registry
 const openapi = fromHono(app, {
