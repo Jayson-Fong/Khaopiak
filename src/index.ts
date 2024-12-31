@@ -19,7 +19,8 @@ app.get('/', (c) => {
 // Setup OpenAPI registry
 const openapi = fromHono(app, {
 	docs_url: "/api",
-	raiseUnknownParameters: true
+	raiseUnknownParameters: true,
+
 });
 
 openapi.post("/api/file/upload", FileUpload);

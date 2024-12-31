@@ -46,10 +46,18 @@ export class FileDownload extends OpenAPIRoute {
                 description: "File successfully retrieved",
                 content: {
                     "application/octet-stream": {
-                        schema: z.instanceof(File)
+                        schema: Str({
+                            description: 'A binary file, provided when the file Content-Type is not application/pdf, ' +
+                                'the file signature is not indicative of a PDF, or when noRender is true',
+                            required: true
+                        })
                     },
                     "application/pdf": {
-                        schema: z.instanceof(File)
+                        schema: Str({
+                            description: 'A binary PDF file, provided when the file Content-Type is application/pdf, ' +
+                                'the file signature is indicative of a PDF, and when noRender is not true',
+                            required: true
+                        })
                     }
                 }
             },

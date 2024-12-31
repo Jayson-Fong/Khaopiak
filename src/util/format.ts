@@ -63,6 +63,6 @@ export const isPDF = (view: Uint8Array): boolean => {
 export const digestToKey = (digest: ArrayBuffer): string => {
     const hexDigest = bufferToHex(digest);
 
-    return [...hexDigest.substring(0, 12).match(/.{1,4}/g),
+    return [...hexDigest.substring(0, 4).match(/.{1,2}/g),
         hexDigest].join('/');
 }
