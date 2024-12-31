@@ -2,8 +2,8 @@ import {Bool, OpenAPIRoute, Str} from "chanfana";
 import {z} from "zod";
 import {Context} from "hono";
 import {validateMnemonic, mnemonicToEntropy} from "bip39";
-import {bufferToHex, trimToCryptoKey} from "../util/buffer";
-import {extractContentPrefix, isPDF} from "../util/format";
+import {trimToCryptoKey} from "../util/buffer";
+import {digestToKey, extractContentPrefix, isPDF} from "../util/format";
 
 
 export class FileDownload extends OpenAPIRoute {
@@ -141,15 +141,14 @@ export class FileDownload extends OpenAPIRoute {
         const entropyBytes = Buffer.from(entropy, 'hex').buffer;
 
         // Generate the file hash for generation of the R2 file path
-        const entropyShaDigest = bufferToHex(await crypto.subtle.digest({name: 'SHA-256'},
+        const objectKey = digestToKey(await crypto.subtle.digest({name: 'SHA-256'},
             entropyBytes));
 
         const cryptoKey = await crypto.subtle.importKey('raw',
             trimToCryptoKey(entropyBytes),
             {name: 'AES-GCM', length: 128}, true, ['decrypt']);
 
-        // await (c.env.STORAGE as R2Bucket).put(entropyShaDigest, updatedFile);
-        const object = await (c.env.STORAGE as R2Bucket).get(entropyShaDigest);
+        const object = await (c.env.STORAGE as R2Bucket).get(objectKey);
 
         // If the object does not exist...
         if (!object) {
@@ -186,7 +185,7 @@ export class FileDownload extends OpenAPIRoute {
         headers.set('Content-Type', type ?? 'application/octet-stream');
 
         // We've got the file and got this far...now to destroy it
-        await (c.env.STORAGE as R2Bucket).delete(entropyShaDigest);
+        await (c.env.STORAGE as R2Bucket).delete(objectKey);
 
         return new Response(decryptedBuffer.slice(contentStart), {headers});
     }

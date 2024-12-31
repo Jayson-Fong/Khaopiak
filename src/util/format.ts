@@ -1,3 +1,5 @@
+import {bufferToHex} from "./buffer";
+
 /**
  * Remove all null characters from a string
  * @param str A string
@@ -18,9 +20,9 @@ export const fileToContentPrefix = (file: File): Uint8Array => {
  * Extracts the file name and type as encoded by filesToContentPrefix() and returns the content start index
  * @param buffer A buffer such that a file name and content type can be found prefixed, each suffixed with a null byte
  * @see fileToContentPrefix
- * TODO: Integrate file expiries!
+ * TODO: Integrate file expiry!
  */
-export const extractContentPrefix = (buffer: Uint8Array) => {
+export const extractContentPrefix = (buffer: Uint8Array): {contentStart: number, name: string, type: string} => {
     let separatorIndices: number[] = [];
 
     for (let byteIndex = 0; byteIndex < buffer.byteLength && separatorIndices.length < 2; byteIndex++) {
@@ -52,4 +54,16 @@ export const isPDF = (view: Uint8Array): boolean => {
         && view[2] == 0x44
         && view[3] == 0x46
         && view[4] == 0x2D;
+}
+
+/**
+ * Returns a Cloudflare R2 key based on a SHA256 hex digest where the first 12 characters are
+ * chunked into groups of 4 characters to form folders, with the object name as the full hex digest.
+ * @param digest A SHA256 digest as an ArrayBuffer
+ */
+export const digestToKey = (digest: ArrayBuffer): string => {
+    const hexDigest = bufferToHex(digest);
+
+    return [...hexDigest.substring(0, 12).match(/.{1,4}/g),
+        hexDigest].join('/');
 }

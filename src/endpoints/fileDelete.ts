@@ -2,7 +2,7 @@ import {Bool, OpenAPIRoute, Str} from "chanfana";
 import {z} from "zod";
 import {Context} from "hono";
 import {validateMnemonic, mnemonicToEntropy} from "bip39";
-import {bufferToHex} from "../util/buffer";
+import {digestToKey} from "../util/format";
 
 
 export class FileDelete extends OpenAPIRoute {
@@ -115,10 +115,10 @@ export class FileDelete extends OpenAPIRoute {
         const entropyBytes = Buffer.from(entropy, 'hex').buffer;
 
         // Generate the file hash for generation of the R2 file path
-        const entropyShaDigest = bufferToHex(await crypto.subtle.digest({name: 'SHA-256'},
+        const objectKey = digestToKey(await crypto.subtle.digest({name: 'SHA-256'},
             entropyBytes));
 
-        await (c.env.STORAGE as R2Bucket).delete(entropyShaDigest);
+        await (c.env.STORAGE as R2Bucket).delete(objectKey);
 
         return c.json({
             success: true

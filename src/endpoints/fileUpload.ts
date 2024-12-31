@@ -2,8 +2,8 @@ import {Bool, OpenAPIRoute, Str} from "chanfana";
 import {z} from "zod";
 import {Context} from "hono";
 import {generateMnemonic, mnemonicToEntropy} from "bip39";
-import {bufferConcat, bufferToHex, trimToCryptoKey} from "../util/buffer";
-import {fileToContentPrefix} from "../util/format";
+import {bufferConcat, trimToCryptoKey} from "../util/buffer";
+import {digestToKey, fileToContentPrefix} from "../util/format";
 
 
 export class FileUpload extends OpenAPIRoute {
@@ -99,7 +99,7 @@ export class FileUpload extends OpenAPIRoute {
         const entropyBytes = Buffer.from(entropy, 'hex').buffer;
 
         // Generate the file hash for generation of the R2 file path
-        const entropyShaDigest = bufferToHex(await crypto.subtle.digest({name: 'SHA-256'},
+        const objectKey = digestToKey(await crypto.subtle.digest({name: 'SHA-256'},
             entropyBytes));
 
         // For AES-GCM encryption, use the entropy bits as a key.
@@ -118,11 +118,8 @@ export class FileUpload extends OpenAPIRoute {
         // Adding in 12 bytes to account for the IV
         const ivInjectedFileBuffer = bufferConcat([iv, cipherText]);
 
-        // The file name prefixes the "plaintext", so there's no need for it here.
-        const updatedFile = new File([ivInjectedFileBuffer], entropyShaDigest);
-
         // TODO: Use Queues to auto clean!
-        await (c.env.STORAGE as R2Bucket).put(entropyShaDigest, updatedFile);
+        await (c.env.STORAGE as R2Bucket).put(objectKey, ivInjectedFileBuffer);
 
         return c.json({success: true, mnemonic: mnemonic});
     }
