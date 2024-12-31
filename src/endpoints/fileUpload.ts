@@ -76,27 +76,6 @@ export class FileUpload extends OpenAPIRoute {
                         })
                     }
                 }
-            },
-            "404": {
-                description: "Tenant or upload directory not found",
-                content: {
-                    "application/json": {
-                        schema: z.object({
-                            success: Bool({
-                                description: 'Whether the upload operation succeeded',
-                                required: true,
-                                default: false,
-                                example: false
-                            }),
-                            error: Str({
-                                default: 'Tenant not found',
-                                description: 'Tenant or upload directory not found error',
-                                example: 'Tenant not found',
-                                required: true
-                            })
-                        })
-                    }
-                }
             }
         }
     };
@@ -105,7 +84,6 @@ export class FileUpload extends OpenAPIRoute {
         // Get the validated, typed data from the context.
         // TODO: Chanfana has a bug causing it not to parse the body with `this.getValidatedData`. Eventually, simplify.
         // Really this only depends on the body anyways, but nonetheless...
-        console.log(await c.req.parseBody());
         const data = {
             ...await this.getValidatedData<typeof this.schema>(),
             body: this.schema.request.body.content['multipart/form-data'].schema.parse(await c.req.parseBody())

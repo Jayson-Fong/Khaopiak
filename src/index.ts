@@ -2,6 +2,7 @@ import { fromHono } from "chanfana";
 import { Hono } from "hono";
 import {FileUpload} from "./endpoints/fileUpload";
 import { Buffer } from "node:buffer";
+import {FileDownload} from "./endpoints/fileDownload";
 
 globalThis.Buffer = Buffer;
 
@@ -14,10 +15,10 @@ const openapi = fromHono(app, {
 	raiseUnknownParameters: true
 });
 
-// TODO: Download Endpoint
 // TODO: Delete Endpoint
 // TODO: HEAD Endpoint
 openapi.post("/api/file/upload", FileUpload);
+openapi.post("/api/file/download", FileDownload);
 
 // Export the Hono app
 export default app;
