@@ -2,7 +2,7 @@ import {Bool, OpenAPIRoute, Str} from "chanfana";
 import {z} from "zod";
 import {Context} from "hono";
 import {generateMnemonic, mnemonicToEntropy} from "bip39";
-import {bufferConcat, msTimeToBuffer, trimToCryptoKey} from "../util/buffer";
+import {bufferConcat, hexToArrayBuffer, msTimeToBuffer, trimToCryptoKey} from "../util/buffer";
 import {digestToKey, fileToContentPrefix} from "../util/format";
 
 
@@ -99,8 +99,7 @@ export class FileUpload extends OpenAPIRoute {
         const mnemonic = generateMnemonic(data.body.entropy);
         const entropy = mnemonicToEntropy(mnemonic);
 
-        // TODO: Stop using Buffer
-        const entropyBytes = Buffer.from(entropy, 'hex').buffer;
+        const entropyBytes = hexToArrayBuffer(entropy);
 
         // Generate the file hash for generation of the R2 file path
         const objectKey = digestToKey(await crypto.subtle.digest({name: 'SHA-256'},

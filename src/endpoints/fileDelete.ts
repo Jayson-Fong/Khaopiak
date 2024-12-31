@@ -3,6 +3,7 @@ import {z} from "zod";
 import {Context} from "hono";
 import {validateMnemonic, mnemonicToEntropy} from "bip39";
 import {digestToKey} from "../util/format";
+import {hexToArrayBuffer} from "../util/buffer";
 
 
 export class FileDelete extends OpenAPIRoute {
@@ -111,8 +112,7 @@ export class FileDelete extends OpenAPIRoute {
 
         const entropy = mnemonicToEntropy(data.body.mnemonic);
 
-        // TODO: Stop using Buffer
-        const entropyBytes = Buffer.from(entropy, 'hex').buffer;
+        const entropyBytes = hexToArrayBuffer(entropy);
 
         // Generate the file hash for generation of the R2 file path
         const objectKey = digestToKey(await crypto.subtle.digest({name: 'SHA-256'},
