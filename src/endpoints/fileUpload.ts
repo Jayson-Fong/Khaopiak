@@ -2,7 +2,7 @@ import {Bool, OpenAPIRoute, Str} from "chanfana";
 import {z} from "zod";
 import {Context} from "hono";
 import {generateMnemonic, mnemonicToEntropy} from "bip39";
-import {bip39ReduceEntropyChecksumToAESGCMKeyBits} from "../util/bip39";
+import {trimToCryptoKey} from "../util/buffer";
 
 
 export class FileUpload extends OpenAPIRoute {
@@ -109,16 +109,18 @@ export class FileUpload extends OpenAPIRoute {
         const mnemonic = generateMnemonic(data.body.entropy);
         const entropy = mnemonicToEntropy(mnemonic);
 
+        // TODO: Stop using Buffer
         const entropyBytes = Buffer.from(entropy, 'hex').buffer;
 
         // Generate the file hash for generation of the R2 file path
+        // TODO: Stop using Buffer
         const entropyShaDigest = Buffer.from(await crypto.subtle.digest({name: 'SHA-256'},
             entropyBytes)).toString('hex');
 
         // Encrypt file using AES-GCM. All entropy bits are used and the checksum bits are sliced off.
         // The checksum bits are only used to identify the file.
         const cryptoKey = await crypto.subtle.importKey('raw',
-            bip39ReduceEntropyChecksumToAESGCMKeyBits(entropyBytes),
+            trimToCryptoKey(entropyBytes),
             {name: 'AES-GCM', length: 128}, true, ['encrypt']);
         // The IV will be stored later as a prefix to the ciphertext
         const iv = crypto.getRandomValues(new Uint8Array(0xC));
@@ -127,6 +129,7 @@ export class FileUpload extends OpenAPIRoute {
         const file = data.body.file as File;
 
         // TODO: Inject a sanitized file name as part of the plaintext
+        // TODO: Stop using Buffer
         const cipherText = await crypto.subtle.encrypt(
             {name: 'AES-GCM', iv: iv}, cryptoKey, await file.arrayBuffer());
 

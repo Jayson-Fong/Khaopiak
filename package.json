@@ -18,6 +18,16 @@
 		"@cloudflare/workers-types": "^4.20241224.0",
 		"@types/node": "20.8.3",
 		"@types/service-worker-mock": "^2.0.1",
+		"ava": "^6.2.0",
+		"tsimp": "^2.0.12",
 		"wrangler": "^3.60.3"
+	},
+	"ava": {
+		"extensions": {
+			"ts": "module"
+		},
+		"nodeArguments": [
+			"--import=tsimp"
+		]
 	}
 }

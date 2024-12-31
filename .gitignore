@@ -174,3 +174,6 @@ dist
 
 # IDE
 .idea
+
+# tsimp
+.tsimp
