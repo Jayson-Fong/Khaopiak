@@ -1,12 +1,3 @@
-<style>
-   details.khaopiak {
-      border: 1px solid;
-      border-radius: 8px;
-      padding: 8px;
-      margin-top: 4px;
-   }
-</style>
-
 <div>
     <h1 style="text-align: center">Khaopiak</h1>
 </div>
@@ -26,7 +17,7 @@ Khaopiak is a temporary, intermediary file storage system for transferring betwe
 primarily with printing at hotel business centers in mind, but can cover a range of use cases from file transfers,
 viewership verification, and sharing secrets.
 
-<details class="khaopiak">
+<details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
 <summary>🖨️ Use Case: Printing at Hotel Business Centers</summary>
 
 Hotel business centers often restrict printing to dedicated, shared desktops, resulting in two main options for printing
@@ -77,7 +68,7 @@ unique, expiring mnemonic, and mnemonics cannot be reused to download the same u
 
 ### For end-users
 
-<details class="khaopiak">
+<details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
 <summary>🔒 End-to-end encryption</summary>
 
 A portion of the mnemonic is never transmitted over the internet and is used to encrypt the file before uploading,
@@ -91,7 +82,7 @@ GCM)</a> when possible.
 
 </details>
 
-<details class="khaopiak">
+<details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
 <summary>⌛ Expiring files</summary>
 
 By default, all files uploaded to Khaopiak eventually expire. If an attempt is made to an expired file which has not
@@ -105,7 +96,7 @@ whether the file expired.
 
 ### For administrators
 
-<details class="khaopiak">
+<details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
 <summary>🔑 Restrict access with Cloudflare Access</summary>
 
 Cloudflare Zero Trust customers can optionally require authentication through Cloudflare Access as a self-hosted
@@ -114,7 +105,7 @@ prevents impersonating through stripping the header from client requests.
 
 </details>
 
-<details class="khaopiak">
+<details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
 <summary>☁️ Serverless deployment</summary>
 
 Khaopiak is designed for deployment on <a href="https://workers.cloudflare.com/" target="_blank">Cloudflare Workers</a>,
