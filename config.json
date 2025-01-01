@@ -14,7 +14,8 @@
 			"min": 1,
 			"max": 4320000,
 			"default": 43200,
-			"excessiveExpiryAsInfinite": false
+			"excessiveExpiryAsInfinite": false,
+			"allowInfinite": false
 		}
 	}
 }

@@ -41,12 +41,15 @@ export class FileUpload extends OpenAPIRoute {
 										'The number of seconds the file should be downloadable before the file is made unavailable or deleted.'
 									// TODO: Make the maximum and default (and later, minimum) configurable
 								})
-								.min(config.upload.expiry.min)
+								.min(
+									config.upload.expiry.allowInfinite
+										? -1
+										: config.upload.expiry.min
+								)
 								// The max queue retry delay is 12 hours, with a max 100 retries
 								// as a result, the absolute maximum expiry is 1200 hours.
 								.max(config.upload.expiry.max)
 								.int()
-								.nonnegative()
 								// The max queue retry delay is 12 hours, so let's avoid
 								// using an operation if the user doesn't need to.
 								.default(config.upload.expiry.default)
@@ -172,9 +175,10 @@ export class FileUpload extends OpenAPIRoute {
 
 		// Enqueue the file for deletion if it's configured to be delete-able
 		if (
-			!config.upload.expiry.excessiveExpiryAsInfinite ||
-			data.body.expiry <=
-				config.queue.maxRetries * config.queue.maxRetryDelay
+			data.body.expiry >= 0 &&
+			(!config.upload.expiry.excessiveExpiryAsInfinite ||
+				data.body.expiry <=
+					config.queue.maxRetries * config.queue.maxRetryDelay)
 		) {
 			await c.env.CLEANUP_QUEUE.send(
 				{
