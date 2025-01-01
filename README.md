@@ -187,6 +187,19 @@ While it is possible for another collision, enabling decryption of the file, thi
 
 </details>
 
+<details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
+<summary>🦹 Mnemonic theft</summary>
+
+To conveniently use Khaopiak, the same portal should both accept a server mnemonic and a local mnemonic. However, the
+local mnemonic could accidentally be sent to the server if entered incorrectly, compromising end-to-end encryption. A
+portal may also be maliciously designed to explicitly capture local mnemonics.
+
+To avoid mnemonic theft, an end-user should have a means of verifying the portal's legitimacy (such as through TLS
+certificates). Further, the portal should have a clear means of distinguishing the local and server mnemonics, such as
+using half of a combined mnemonic for each, or using a distinct wordlist for the client and server.
+
+</details>
+
 ## To do
 
 - [ ] Configurable content padding to mask content
