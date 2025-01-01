@@ -59,7 +59,7 @@ export const Content = () =>
         -H 'accept: application/json' \\
         -H 'Content-Type: multipart/form-data' \\
         -F 'file=@/home/username/Desktop/file.pdf' \\
-        -F 'entropy=256' \\
+        -F 'entropy=128' \\
         -F 'expiry=43200'
             </code></pre>
 			</main>
