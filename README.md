@@ -64,6 +64,27 @@ unique, expiring mnemonic, and mnemonics cannot be reused to download the same u
 
 </details>
 
+<details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
+<summary>🤝 Use Case: Secrets distribution</summary>
+
+Khaopiak can be used to share secrets in an environment where communications integrity is guaranteed; however,
+confidentiality is susceptible to compromise, such as communicating vocally in an open office.
+
+This leverages Khaopiak's expiring mnemonics, thus if the intended receiver successfully downloads from the Khaopiak
+server, it can be assumed that only they have it. The receiver can then communicate back to the sender to confirm
+receipt and use the key.
+
+</details>
+
+<details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
+<summary>✅ Use Case: Confirmed file access</summary>
+
+Expiring mnemonics enables confirmed file access through using the Khaopiak server's file existance checking. If
+Khaopiak reports that a file exists, it has not yet been downloaded. If it reports that a file does not exist, it
+implies that the file has already been downloaded or the file expired.
+
+</details>
+
 ## Features
 
 ### For end-users
@@ -98,7 +119,8 @@ not exist.
 <details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
 <summary>🗄️ Protected file metadata</summary>
 
-File names and content types are included as part of the payload for encryption at both the client and server sides. As a result, at rest, file content cannot be easily inferred.
+File names and content types are included as part of the payload for encryption at both the client and server sides. As
+a result, at rest, file content cannot be easily inferred.
 
 </details>
 
@@ -166,6 +188,7 @@ While it is possible for another collision, enabling decryption of the file, thi
 </details>
 
 ## To do
+
 - [ ] Configurable content padding to mask content
 
 ## Examples
