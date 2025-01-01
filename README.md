@@ -68,7 +68,8 @@ unique, expiring mnemonic, and mnemonics cannot be reused to download the same u
 <summary>🤝 Use Case: Secrets distribution</summary>
 
 Khaopiak can be used to share secrets in an environment where communications integrity is guaranteed; however,
-confidentiality is susceptible to compromise, such as communicating vocally in an open office.
+confidentiality is susceptible to compromise, such as communicating vocally in an open office, on the condition that the
+secret is not of value immediate value.
 
 This leverages Khaopiak's expiring mnemonics, thus if the intended receiver successfully downloads from the Khaopiak
 server, it can be assumed that only they have it. The receiver can then communicate back to the sender to confirm
