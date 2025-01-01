@@ -8,9 +8,8 @@ nth_item() {
   counter=0
 
   for item in $1; do
-    echo "received $counter == $2" >> /Users/jaysonfong/debug.log
     if test "$counter" -eq "$2"; then
-      echo "$item"
+      printf "%s" "$item"
       break
     fi
 
@@ -24,7 +23,7 @@ nth_item() {
 # $2 - Number: Number to convert
 #
 base_convert() {
-  echo "ibase=$1; $2" | bc
+  printf "ibase=%d; %s" "$1" "$(printf "%s" "$2" | tr "[:lower:]" "[:upper:]")" | bc
 }
 
 # Retrieve 1-indexed characters $1 through $2 of $3, inclusive
@@ -33,7 +32,7 @@ base_convert() {
 # $2 - Integer: End character index, 1-indexed, inclusive
 # $3 - String: The String to substring
 substring() {
-  echo "$3" | cut -c "$1"-"$2"
+  printf "%s" "$3" | cut -c "$1-$2"
 }
 
 concat() {
@@ -45,7 +44,7 @@ generate_entropy() {
 }
 
 generate_checksum() {
-  echo "$1" | shasum -a 256 -0 | cut -c 1-2
+  printf "%s" "$1" | shasum -a 256 -0 | cut -c 1-2
 }
 
 to_nibble() {
@@ -79,4 +78,4 @@ generate_seed() {
   printf "%s" "$(substring 2 "" "$seed")"
 }
 
-generate_seed 128
+generate_seed 256
