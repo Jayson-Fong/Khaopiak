@@ -1,5 +1,5 @@
 <div>
-    <h1 style="text-align: center">Khaopiak</h1>
+    <h1 style="text-align: center">🍜 Khaopiak</h1>
 </div>
 
 An account-less and end-to-end encrypted storage system leveraging Cloudflare Workers with OpenAPI 3.1
@@ -114,6 +114,98 @@ and <a href="https://developers.cloudflare.com/queues/" target="_blank">Cloudfla
 deployment and automated scaling without having to maintain servers.
 
 </details>
+
+## Examples
+
+### Khaopiak server cURL examples
+
+> [!WARNING]  
+> Endpoints that require sending a mnemonic to the server should **only** send server-generated mnemonics, and not ones
+> generated locally, which can compromise end-to-end encryption.
+
+#### Uploading files
+
+> [!IMPORTANT]  
+> This example does not leverage client-side encryption. Encrypt sensitive files before transmitting them using this
+> command.
+
+Request:
+
+```shell
+curl -X 'POST' \
+  'https://khaopiak/api/file/upload' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'file=@/home/username/Desktop/file.pdf' \
+  -F 'entropy=128' \
+  -F 'expiry=43200'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
+}
+```
+
+#### Downloading files
+
+> [!NOTE]  
+> If the file was encrypted client-side before uploading, this command will not fully decrypt it.
+
+Request:
+
+```shell
+curl -X 'POST' \
+  'https://khaopiak/api/file/download?noRender=false' \
+  -H 'accept: application/octet-stream' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'mnemonic=badge knife trim glimpse solution chaos nasty that quarter angle marine sniff' \
+  --output "/home/username/Desktop/file.pdf"
+```
+
+#### Checking if files exist
+
+Request:
+
+```shell
+curl -X 'POST' \
+  'https://khaopiak/api/file/exists' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'mnemonic=badge knife trim glimpse solution chaos nasty that quarter angle marine sniff'
+```
+
+Response:
+
+```shell
+{
+  "success": true,
+  "exists": true
+}
+```
+
+#### Deleting a file
+
+Request:
+
+```shell
+curl -X 'POST' \
+  'https://khaopiak/api/file/delete' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'mnemonic=badge knife trim glimpse solution chaos nasty that quarter angle marine sniff'
+```
+
+Response:
+
+```json
+{
+  "success": true
+}
+```
 
 ## Get started
 
