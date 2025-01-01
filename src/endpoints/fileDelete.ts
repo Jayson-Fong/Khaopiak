@@ -4,6 +4,7 @@ import { Context } from 'hono';
 import { validateMnemonic, mnemonicToEntropy } from 'bip39';
 import { digestToKey } from '../util/format';
 import { hexToArrayBuffer } from '../util/buffer';
+import config from '../../config.json';
 
 export class FileDelete extends OpenAPIRoute {
 	schema = {
@@ -28,13 +29,19 @@ export class FileDelete extends OpenAPIRoute {
 						})
 					}
 				}
-			}
-			// TODO: Make requiring this configurable
-			// headers: z.object({
-			//     'cf-access-authenticated-user-email': z.string({
-			//         description: 'Cloudflare Access authenticated user email'
-			//     }).email()
-			// })
+			},
+			...(config.requireAuth.delete
+				? {
+						headers: z.object({
+							'cf-access-authenticated-user-email': z
+								.string({
+									description:
+										'Cloudflare Access authenticated user email'
+								})
+								.email()
+						})
+					}
+				: {})
 		},
 		responses: {
 			'200': {

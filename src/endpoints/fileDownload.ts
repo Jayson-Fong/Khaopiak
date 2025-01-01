@@ -8,6 +8,7 @@ import {
 	trimToCryptoKey
 } from '../util/buffer';
 import { digestToKey, extractContentPrefix, isPDF } from '../util/format';
+import config from '../../config.json';
 
 export class FileDownload extends OpenAPIRoute {
 	schema = {
@@ -40,13 +41,19 @@ export class FileDownload extends OpenAPIRoute {
 						})
 					}
 				}
-			}
-			// TODO: Make requiring this configurable
-			// headers: z.object({
-			//     'cf-access-authenticated-user-email': z.string({
-			//         description: 'Cloudflare Access authenticated user email'
-			//     }).email()
-			// })
+			},
+			...(config.requireAuth.download
+				? {
+						headers: z.object({
+							'cf-access-authenticated-user-email': z
+								.string({
+									description:
+										'Cloudflare Access authenticated user email'
+								})
+								.email()
+						})
+					}
+				: {})
 		},
 		responses: {
 			'200': {

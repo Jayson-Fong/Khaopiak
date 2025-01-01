@@ -1,6 +1,5 @@
-import {Bindings, CleanupMessage} from "../types";
-import config from "../../config.json";
-
+import { Bindings, CleanupMessage } from '../types';
+import config from '../../config.json';
 
 export const queue = async (
 	batch: MessageBatch<CleanupMessage>,

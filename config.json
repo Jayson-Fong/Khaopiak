@@ -1,10 +1,20 @@
 {
 	"requireAuth": {
 		"upload": false,
-		"download": false
+		"download": false,
+		"delete": false,
+		"exists": false
 	},
 	"queue": {
 		"maxRetryDelay": 43200,
 		"maxRetries": 100
+	},
+	"upload": {
+		"expiry": {
+			"min": 1,
+			"max": 4320000,
+			"default": 43200,
+			"excessiveExpiryAsInfinite": false
+		}
 	}
 }
