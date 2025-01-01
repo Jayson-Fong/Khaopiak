@@ -2,5 +2,9 @@
 	"requireAuth": {
 		"upload": false,
 		"download": false
+	},
+	"queue": {
+		"maxRetryDelay": 43200,
+		"maxRetries": 100
 	}
 }
