@@ -110,6 +110,8 @@ aes_cbc_maximum_bit_length() {
 
 #
 #
+# TODO: Inject file name and content type as part of the plaintext
+#
 # $1 - String: Bits of entropy
 # $2 - String: File paths to input for encryption
 encrypt_file() {
@@ -117,7 +119,7 @@ encrypt_file() {
   key=$(base_convert 16 2 "$(substring 1 "$key_length" "$1")")
   iv=$(base_convert 16 2 "$(generate_entropy 128)")
 
-  ciphertext=$(openssl enc "-aes-$key_length-cbc" -e -K "$key" -iv "$iv" -in "$2")
+  ciphertext=$(openssl enc "-aes-$key_length-cbc" -e -K "$key" -iv "$iv" -in "$2" --base64)
   printf "%s%s" "$iv" "$ciphertext"
 }
 
@@ -130,4 +132,27 @@ send() {
   payload=$(encrypt_file "$entropy" "$2")
 
   printf "%s" "$payload"
+}
+
+#
+#
+# $1 - String: Bits of entropy
+# $2 - String: Encrypted file bytes
+decrypt_file() {
+  key_length=$(aes_cbc_maximum_bit_length "${#1}")
+  key=$(base_convert 16 2 "$(substring 1 "$key_length" "$1")")
+  iv="$(echo "$2" | head -c 32)"
+
+  echo "$2" | tail -c +33 | openssl enc "-aes-$key_length-cbc" -d -K "$key" -iv "$iv" --base64
+}
+
+#
+#
+# $1 - Integer: Number of bits of entropy
+# $2 - String: Path to file for encryption
+# $3 - String: Path to file for saving (overwrites)
+test_encrypt_decrypt() {
+    entropy=$(generate_entropy "$1")
+    payload=$(encrypt_file "$entropy" "$2")
+    decrypt_file "$entropy" "$payload" > "$3"
 }
