@@ -42,7 +42,6 @@ export const Content = () =>
 				<form method="POST" action="/api/file/download" target="_blank">
 					<label for="mnemonic">Mnemonic</label>
 					<textarea id="mnemonic" name="mnemonic" rows="4"></textarea>
-					<label for="expiry">Expiry (Seconds)</label>
 					<p>
 						Please note that using this form will automatically
 						render any PDF-ey looking files in your browser! All
