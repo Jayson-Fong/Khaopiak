@@ -18,7 +18,7 @@ primarily with printing at hotel business centers in mind, but can cover a range
 viewership verification, and sharing secrets.
 
 <details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
-<summary>🖨️ Use Case: Printing at Hotel Business Centers</summary>
+<summary>🖨️ Use Case: Printing at hotel business centers</summary>
 
 Hotel business centers often restrict printing to dedicated, shared desktops, resulting in two main options for printing
 from a personal device:
@@ -206,6 +206,37 @@ Response:
   "success": true
 }
 ```
+
+## Security considerations
+
+<details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
+<summary>🔐 Cryptographic strength of encryption algorithms</summary>
+
+Khaopiak supports AES-CBC and AES-GCM as they are available through
+the <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto" target="_blank">SubtleCrypto interface of
+the Web Crypto API</a>:
+
+<ul>
+   <li><strong>RSA-OAEP</strong> is not supported as it is a public-key encryption system, which current guidelines recommend a minimum of 2048 key bits. To meet this, 192+ BIP39 words would be required, which is unreasonable for an end-user.</li>
+   <li><strong>AES-CTR</strong> is not supported as it is malleable, potentially allowing the meaning of the ciphertext to be changed.</li>
+   <li><strong>AES-CBC</strong> is supported as a client-side encryption algorithm. While Khaopiak is generally not itself vulnerable to a padding oracle attack, client developers should be aware of the algorithm's vulnerability.</li>
+   <li><strong>AES-GCM</strong> is supported as both a client and server-side encryption algorithm. As keys and initialization vectors (IVs) are randomly generated and not reused. AES-GCM provides authenticated encryption which helps authenticate the ciphertext. Additional design considerations are necessary when it is possible for a key and IV may potentially be reused.</li>
+</ul>
+
+The OpenSSL enc program does not support authenticated encryption modes. As a result, some clients may use AES-CBC
+instead, such as uploading from the command line.
+
+</details>
+
+<details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
+<summary>💥 Server-side collisions</summary>
+
+Khaopiak does not generate guaranteed unique mnemonics. As a result, it is theoretically possible for a collision to
+occur, which may enable accidental file overwriting or downloading of an alternate file. However, this case is extremely
+improbable. Client-side encryption helps protect data confidentiality even in the presence of a server-side failure.
+While it is possible for another collision, enabling decryption of the file, this is improbable.
+
+</details>
 
 ## Get started
 
