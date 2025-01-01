@@ -126,7 +126,7 @@ aes_cbc_maximum_bit_length() {
 # $2 - String: File paths to input for encryption
 encrypt_file() {
   key_length=$(aes_cbc_maximum_bit_length "${#1}")
-  key=$(pad "$key_length" "$(base_convert 16 2 "$(substring 1 "$key_length" "$1")")" "0")
+  key=$(pad $((key_length/4)) "$(base_convert 16 2 "$(substring 1 "$key_length" "$1")")" "0")
   iv=$(pad 32 "$(base_convert 16 2 "$(generate_entropy 128)")" "0")
 
   { printf "%s" "$iv" | xxd -r -p; openssl enc "-aes-$key_length-cbc" -e -K "$key" -iv "$iv" -in "$2"; } | base64
@@ -149,7 +149,7 @@ send() {
 # $2 - String: Encrypted file bytes as base64
 decrypt_file() {
   key_length=$(aes_cbc_maximum_bit_length "${#1}")
-  key=$(pad "$key_length" "$(base_convert 16 2 "$(substring 1 "$key_length" "$1")")" "0")
+  key=$(pad $((key_length/4)) "$(base_convert 16 2 "$(substring 1 "$key_length" "$1")")" "0")
   iv=$(pad 32 "$(substring 1 44 "$2" | base64 --decode | head -c 16 | xxd -p)" "0")
 
   echo "$2" | base64 --decode | tail -c +17 | openssl enc "-aes-$key_length-cbc" -d -K "$key" -iv "$iv"
