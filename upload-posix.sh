@@ -101,6 +101,8 @@ generate_seed() {
   printf "%s" "$(substring 2 "" "$seed")"
 }
 
+# TODO: Create a function for BIP39 Mnemonic -> Entropy
+
 # Determines the maximum AES-CBC key bit length possible using $1 bits
 #
 # $1 - Integer: Number of entropy bits available, minimum of 128
@@ -118,9 +120,10 @@ aes_cbc_maximum_bit_length() {
   printf "128"
 }
 
-#
-#
-# TODO: Inject file name and content type as part of the plaintext
+# Encrypt a file using AES-CBC with $1 as a key and store
+# the generated IV as a prefix, outputting as base64
+# TODO: Inject file name and content type as part of the
+# TODO: plaintext, separating them with null bytes
 #
 # $1 - String: Bits of entropy
 # $2 - String: File paths to input for encryption
@@ -132,7 +135,9 @@ encrypt_file() {
   { printf "%s" "$iv" | xxd -r -p; openssl enc "-aes-$key_length-cbc" -e -K "$key" -iv "$iv" -in "$2"; } | base64
 }
 
-#
+# Encrypt a file at $2 using AES-CBC with a $1-bit key, then
+# upload to Khaopiak and generates a mnemonic for decryption/retrieval
+# TODO: Upload to Khaopiak, Generate Mnemonic, Mash Mnemonics Together
 #
 # $1 - Integer: Number of bits of entropy (128, 160, 192, 224, 256)
 # $2 - String: File path to input for encryption
@@ -140,10 +145,14 @@ send() {
   entropy=$(generate_entropy "$1")
   payload=$(encrypt_file "$entropy" "$2")
 
-  printf "%s" "$payload"
+  mnemonic=$(generate_seed "$entropy")
+
+  printf "%s" "$mnemonic"
 }
 
-#
+# Decrypts a file passed as base64 in $2
+# using $1 as a proposed key, printing
+# the resulting bytes as base64.
 #
 # $1 - String: Bits of entropy
 # $2 - String: Encrypted file bytes as base64
@@ -152,10 +161,13 @@ decrypt_file() {
   key=$(pad $((key_length/4)) "$(base_convert 16 2 "$(substring 1 "$key_length" "$1")")" "0")
   iv=$(pad 32 "$(substring 1 44 "$2" | base64 --decode | head -c 16 | xxd -p)" "0")
 
-  echo "$2" | base64 --decode | tail -c +17 | openssl enc "-aes-$key_length-cbc" -d -K "$key" -iv "$iv"
+  echo "$2" | base64 --decode | tail -c +17 | openssl enc "-aes-$key_length-cbc" -d -K "$key" -iv "$iv" | base64
 }
 
-#
+# Test to ensure encryption and decryption
+# functions properly. Uses $1 bits of entropy
+# as a proposed key to encrypt a file at $2
+# and saves the decrypted file at path $3.
 #
 # $1 - Integer: Number of bits of entropy
 # $2 - String: Path to file for encryption
@@ -163,7 +175,11 @@ decrypt_file() {
 test_encrypt_decrypt() {
     entropy=$(generate_entropy "$1")
     payload=$(encrypt_file "$entropy" "$2")
-    decrypt_file "$entropy" "$payload" > "$3"
-}
+    decrypted=$(decrypt_file "$entropy" "$payload")
 
-# TODO: Upload to Khaopiak
+    # TODO: This will later require an additional
+    # TODO: step to splice off the file name/type
+    # TODO: so this will not be valid later on
+
+    printf "%s" "$decrypted" | base64 --decode > "$3"
+}
