@@ -44,7 +44,8 @@ While these web-based services often provide shareable links, they are often too
 this Google Drive share link:
 <pre>https://docs.google.com/document/d/t9trB8lKoaB_kIRk6FeFltqm1TGdsCpKolHGwcpVKXPE</pre>
 
-To mitigate this issue, a link shortener can be used; however, it increases the probability of randomly stumbling upon
+When end-users incorrectly type a character of these URLs, it is often difficult to identify the source of error. To
+mitigate this issue, a link shortener can be used; however, it increases the probability of randomly stumbling upon
 the document, involves an additional party, and may be predictable.
 
 Shareable links often do not expire, allowing a threat actor to regain access after the initial download, such as
@@ -57,7 +58,8 @@ easily-typed, one-time-use BIP39 mnemonics, such as:
 <pre>orchard home picture movie only what believe onion physical defy hole among climb brand million edge anchor upgrade sand awake loop layer panther soda</pre>
 
 This means that end-users need not reference a random character-by-character string, but known words they can quickly
-type. As all words can be identified using their first three letters, Khaopiak can automatically correct typos.
+type and remember the spelling of. As all words can be identified using their first three letters, Khaopiak can
+automatically correct typos.
 
 During this process, hardware manipulation is not required, users do not need to enter logon credentials besides a
 unique, expiring mnemonic, and mnemonics cannot be reused to download the same upload.
