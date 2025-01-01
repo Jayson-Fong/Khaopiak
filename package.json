@@ -7,7 +7,7 @@
 		"dev": "wrangler dev",
 		"start": "wrangler dev",
 		"cf-typegen": "wrangler types",
-		"clean": "npx prettier . -write && npx eslint ."
+		"clean": "npx prettier . -w && npx eslint ."
 	},
 	"dependencies": {
 		"bip39": "^3.1.0",

@@ -167,7 +167,7 @@ export class FileUpload extends OpenAPIRoute {
 		]);
 
 		// Enqueue the file for deletion
-		await (c.env.DELETION_QUEUE as Queue).send(
+		await c.env.CLEANUP_QUEUE.send(
 			{
 				key: objectKey,
 				expiry: fileExpiryTime

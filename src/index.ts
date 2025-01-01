@@ -6,11 +6,13 @@ import { FileDownload } from './endpoints/fileDownload';
 import { Content } from './pages';
 import { FileExists } from './endpoints/fileExists';
 import { FileDelete } from './endpoints/fileDelete';
+import { queue } from './handler/cleanupQueue';
+import { Bindings } from './types';
 
 globalThis.Buffer = Buffer;
 
 // Start a Hono app
-const app = new Hono();
+const app = new Hono<{ Bindings: Bindings }>();
 
 app.get('/', (c) => {
 	return c.html(Content());
@@ -28,4 +30,4 @@ openapi.post('/api/file/exists', FileExists);
 openapi.post('/api/file/delete', FileDelete);
 
 // Export the Hono app
-export default app;
+export default { ...app, queue };
