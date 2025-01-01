@@ -1,5 +1,5 @@
-<div>
-    <h1 style="text-align: center">🍜 Khaopiak</h1>
+<div align="center">
+    <h1>🍜 Khaopiak</h1>
 </div>
 
 An account-less and end-to-end encrypted storage system leveraging Cloudflare Workers with OpenAPI 3.1
