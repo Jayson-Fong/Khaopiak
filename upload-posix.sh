@@ -119,8 +119,7 @@ encrypt_file() {
   key=$(base_convert 16 2 "$(substring 1 "$key_length" "$1")")
   iv=$(base_convert 16 2 "$(generate_entropy 128)")
 
-  ciphertext=$(openssl enc "-aes-$key_length-cbc" -e -K "$key" -iv "$iv" -in "$2" --base64)
-  printf "%s%s" "$iv" "$ciphertext"
+  { printf "%s" "$iv" | xxd -r -p; openssl enc "-aes-$key_length-cbc" -e -K "$key" -iv "$iv" -in "$2"; } | base64
 }
 
 #
@@ -137,13 +136,13 @@ send() {
 #
 #
 # $1 - String: Bits of entropy
-# $2 - String: Encrypted file bytes
+# $2 - String: Encrypted file bytes as base64
 decrypt_file() {
   key_length=$(aes_cbc_maximum_bit_length "${#1}")
   key=$(base_convert 16 2 "$(substring 1 "$key_length" "$1")")
-  iv="$(echo "$2" | head -c 32)"
+  iv=$(substring 1 44 "$2" | base64 --decode | head -c 16 | xxd -p)
 
-  echo "$2" | tail -c +33 | openssl enc "-aes-$key_length-cbc" -d -K "$key" -iv "$iv" --base64
+  echo "$2" | base64 --decode | tail -c +17 | openssl enc "-aes-$key_length-cbc" -d -K "$key" -iv "$iv"
 }
 
 #
