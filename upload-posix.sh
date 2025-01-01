@@ -75,6 +75,7 @@ generate_seed() {
   checksum=$(generate_checksum "$entropy")
   bits=${#entropy}
 
+  # TODO: Pad base converted with leading zeroes
   entropy=$(concat "$entropy" "$(base_convert 2 16 "$(substring 1 1 "$checksum")")")
   entropy=$(concat "$entropy" "$(base_convert 2 16 "$(substring 2 2 "$checksum")")")
 
@@ -139,6 +140,7 @@ send() {
 # $2 - String: Encrypted file bytes as base64
 decrypt_file() {
   key_length=$(aes_cbc_maximum_bit_length "${#1}")
+  # TODO: Pad these with leading zeroes (i.e. if the value starts with 0000, there may be an error)
   key=$(base_convert 16 2 "$(substring 1 "$key_length" "$1")")
   iv=$(substring 1 44 "$2" | base64 --decode | head -c 16 | xxd -p)
 
@@ -155,3 +157,5 @@ test_encrypt_decrypt() {
     payload=$(encrypt_file "$entropy" "$2")
     decrypt_file "$entropy" "$payload" > "$3"
 }
+
+# TODO: Upload to Khaopiak
