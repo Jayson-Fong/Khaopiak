@@ -70,6 +70,7 @@ figure.dialog-box figcaption {
 	border-bottom: 1px solid;
 	padding: 4px 0;
 	border-radius: 4px;
+	transition: 1s;
 }
 
 figure.dialog-box[data-dialog-level='warning'] figcaption {
