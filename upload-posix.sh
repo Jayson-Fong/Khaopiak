@@ -131,6 +131,7 @@ generate_seed() {
 # TODO: Create a function for BIP39 Mnemonic -> Entropy
 
 # Determines the maximum AES-CBC key bit length possible using $1 bits
+# TODO: Update this similar to buffer.toAESKeyData
 #
 # $1 - Integer: Number of entropy bits available, minimum of 128
 aes_cbc_maximum_bit_length() {

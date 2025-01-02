@@ -2,11 +2,7 @@ import { Bool, OpenAPIRoute, Str } from 'chanfana';
 import { z } from 'zod';
 import { Context } from 'hono';
 import { validateMnemonic, mnemonicToEntropy } from 'bip39';
-import {
-	bufferToNumber,
-	hexToArrayBuffer,
-	trimToCryptoKey
-} from '../util/buffer';
+import { bufferToNumber, hexToArrayBuffer, toAESKeyData } from '../util/buffer';
 import { digestToKey, extractContentPrefix, isPDF } from '../util/format';
 import config from '../../config.json';
 
@@ -178,8 +174,8 @@ export class FileDownload extends OpenAPIRoute {
 
 		const cryptoKey = await crypto.subtle.importKey(
 			'raw',
-			trimToCryptoKey(entropyBytes),
-			{ name: 'AES-GCM', length: 128 },
+			toAESKeyData(entropyBytes),
+			{ name: 'AES-GCM' },
 			true,
 			['decrypt']
 		);

@@ -42,6 +42,7 @@ passwords are shared, stolen credentials may lead to further compromise, such as
 
 While these web-based services often provide shareable links, they are often too long or complicated to type, such as
 this Google Drive share link:
+
 <pre>https://docs.google.com/document/d/t9trB8lKoaB_kIRk6FeFltqm1TGdsCpKolHGwcpVKXPE</pre>
 
 When end-users incorrectly type a character of these URLs, it is often difficult to identify the source of error. To
@@ -55,6 +56,7 @@ through browser history.
 
 Khaopiak alleviates these issues through enabling the seamless end-to-end encryption of documents accessed through
 easily-typed, one-time-use BIP39 mnemonics, such as:
+
 <pre>orchard home picture movie only what believe onion physical defy hole among climb brand million edge anchor upgrade sand awake loop layer panther soda</pre>
 
 This means that end-users need not reference a random character-by-character string, but known words they can quickly
@@ -219,17 +221,17 @@ using half of a combined mnemonic for each, or using a distinct wordlist for the
 <details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
 <summary>🧮 User-specified entropy length</summary>
 
-While entropy lengths of 128, 160, 192, 224, and 256 bits are supported, coinciding with the BIP39 standard, increasing
-it does not inherently increase the system's level of security assurance because AES only supports 128, 192, and 256-bit
-key lengths, and Khaopiak currently chooses the longest key length possible without padding. This will be changed in the
-future to pad keys.
+When a user specifies an entropy length of 160 or 224, Khaopiak pads the entropy to become 192 and 256 bits,
+respectively, as AES only supports 128, 192, and 256-bit keys. As a result, while a longer-bit algorithm is used for
+encryption, it does not inherently increase the level of security assurance as the padding is predictable.
 
 </details>
 
 ## To do
 
 - [ ] Configurable content padding to mask content
-- [ ] Pad short keys to 192/256 to preserve entropy
+- [ ] POSIX-based upload/download script
+- [ ] Web portal
 
 ## Examples
 
@@ -261,8 +263,8 @@ Response:
 
 ```json
 {
-  "success": true,
-  "mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
+	"success": true,
+	"mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
 }
 ```
 
@@ -319,7 +321,7 @@ Response:
 
 ```json
 {
-  "success": true
+	"success": true
 }
 ```
 

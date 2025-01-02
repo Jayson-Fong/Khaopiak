@@ -63,11 +63,11 @@ export const Content = () =>
         -F 'expiry=43200'
             </code></pre>
 				<p>
-					Because AES-GCM is used, while you may specify 128, 160,
-					192, 224, or 256 bits for your BIP39, the server-side
-					encryption will only use 128, 192, or 256 bits, where the
-					highest possible key length is chosen. This will be changed
-					later to pad keys and preserve entropy.
+					Because AES is used, while you may specify 128, 160, 192,
+					224, or 256 for your BIP39, the server must use a key length
+					of 128, 192, or 256 bits for AES encryption. As a result,
+					the entropy will be padded appropriately to maintain the
+					entropy.
 				</p>
 				<p>
 					File expiry may be between 1 - 4,320,000 seconds, based on

@@ -1,16 +1,4 @@
 /**
- * Accepts `entropy` and slices to the longest possible entropy-bit only AES-GCM key
- * @param entropy Entropy bits as an ArrayBufferLike with a minimum byteLength of 16
- */
-export const trimToCryptoKey = (entropy: ArrayBufferLike): ArrayBufferLike => {
-	// AES-GCM only supports 128, 192, and 256-bit keys. These are represented as byte counts here.
-	return entropy.slice(
-		0,
-		Math.max(...[32, 24, 16].filter((x) => x <= entropy.byteLength))
-	);
-};
-
-/**
  * Takes an array of ArrayBufferLike and concatenates them sequentially to produce a single ArrayBuffer
  * @param buffers An array of ArrayBufferLike to concatenate
  */
@@ -29,6 +17,30 @@ export const bufferConcat = (buffers: ArrayBufferLike[]): ArrayBuffer => {
 
 	// Slice to change this ArrayBufferLike into an ArrayBuffer!
 	return newBuffer.buffer.slice(0);
+};
+
+/**
+ * Pad the entropy with leading zeroes if necessary to meet the next
+ * minimum key length for AES if needed (128, 192, 256), or truncate
+ * to 256 bits if the entropy is excessive.
+ * @param entropy Entropy bits as an ArrayBufferLike
+ */
+export const toAESKeyData = (entropy: ArrayBufferLike): ArrayBufferLike => {
+	const keyByteLength =
+		Math.min(Math.ceil((entropy.byteLength - 16) / 8), 2) * 8 + 16;
+
+	if (keyByteLength === entropy.byteLength) {
+		return entropy;
+	}
+
+	if (keyByteLength < entropy.byteLength) {
+		return bufferConcat([
+			new Uint8Array(keyByteLength - entropy.byteLength).buffer,
+			entropy
+		]);
+	}
+
+	return entropy.slice(0, keyByteLength);
 };
 
 /**

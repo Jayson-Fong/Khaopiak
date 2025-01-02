@@ -6,7 +6,7 @@ import {
 	bufferConcat,
 	hexToArrayBuffer,
 	msTimeToBuffer,
-	trimToCryptoKey
+	toAESKeyData
 } from '../util/buffer';
 import { digestToKey, fileToContentPrefix } from '../util/format';
 import config from '../../config.json';
@@ -146,8 +146,8 @@ export class FileUpload extends OpenAPIRoute {
 		// For AES-GCM encryption, use the entropy bits as a key.
 		const cryptoKey = await crypto.subtle.importKey(
 			'raw',
-			trimToCryptoKey(entropyBytes),
-			{ name: 'AES-GCM', length: 128 },
+			toAESKeyData(entropyBytes),
+			{ name: 'AES-GCM' },
 			true,
 			['encrypt']
 		);
