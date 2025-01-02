@@ -2,6 +2,21 @@ header {
 	text-align: center;
 }
 
+textarea {
+	padding: 16px;
+	border-radius: 8px;
+}
+
+input[type='submit'] {
+	padding: 8px;
+	border-radius: 8px;
+}
+
+form#download {
+	display: grid;
+	padding: 16px;
+}
+
 footer ul.links {
 	list-style: none;
 }

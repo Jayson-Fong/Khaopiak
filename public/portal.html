@@ -66,16 +66,34 @@
 			</p>
 		</header>
 		<main>
-			<form method="POST" action="/api/file/download" target="_blank">
-				<label for="mnemonic">Mnemonic</label>
-				<textarea id="mnemonic" name="mnemonic" rows="4"></textarea>
-				<p>
-					Please note that using this form will automatically render
-					any PDF-ey looking files in your browser! All others will be
-					happily downloaded, though.
-				</p>
-				<input type="submit" />
-			</form>
+			<div>
+				<form
+					method="POST"
+					action="api/file/download"
+					target="_blank"
+					id="download"
+				>
+					<p>
+						This form does not currently support client-side
+						decryption.
+					</p>
+					<label for="mnemonic">Server-side mnemonic</label>
+					<textarea
+						id="mnemonic"
+						name="mnemonic"
+						rows="4"
+						minlength="47"
+						maxlength="215"
+						required="required"
+					></textarea>
+					<p>
+						Please note that using this form will automatically
+						render any PDF-ey looking files in your browser! All
+						others will be happily downloaded, though.
+					</p>
+					<input type="submit" value="Download file" />
+				</form>
+			</div>
 		</main>
 		<footer>
 			<ul class="links">
