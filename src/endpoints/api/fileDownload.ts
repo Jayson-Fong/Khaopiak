@@ -2,10 +2,25 @@ import { Bool, OpenAPIRoute, Str } from 'chanfana';
 import { z } from 'zod';
 import { Context } from 'hono';
 import { validateMnemonic, mnemonicToEntropy } from 'bip39';
-import { bufferToNumber, hexToArrayBuffer, toAESKeyData } from '../util/buffer';
-import { digestToKey, extractContentPrefix, isPDF } from '../util/format';
-import config from '../../config.json';
+import {
+	bufferToNumber,
+	hexToArrayBuffer,
+	toAESKeyData
+} from '../../util/buffer';
+import { digestToKey, extractContentPrefix, isPDF } from '../../util/format';
+import config from '../../../config.json';
 
+/**
+ * OpenAPI endpoint to download a file based on
+ * a BIP39 mnemonic. If its file signature matches
+ * that of a PDF and its original Content-Type was
+ * consistent, and the client does not object,
+ * headers will be presented such that the browser
+ * should render it. If a file should be expired,
+ * it will be immediately deleted and a response
+ * will be returned to the client as if it did
+ * not exist.
+ */
 export class FileDownload extends OpenAPIRoute {
 	schema = {
 		tags: ['File'],

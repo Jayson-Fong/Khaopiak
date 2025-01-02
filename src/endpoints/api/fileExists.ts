@@ -2,14 +2,21 @@ import { Bool, OpenAPIRoute, Str } from 'chanfana';
 import { z } from 'zod';
 import { Context } from 'hono';
 import { validateMnemonic, mnemonicToEntropy } from 'bip39';
-import { digestToKey } from '../util/format';
-import { hexToArrayBuffer } from '../util/buffer';
-import config from '../../config.json';
+import { digestToKey } from '../../util/format';
+import { bufferToNumber, hexToArrayBuffer } from '../../util/buffer';
+import config from '../../../config.json';
 
-export class FileDelete extends OpenAPIRoute {
+/**
+ * Checks if a file exists based on a BIP39
+ * mnemonic. If the file should be expired,
+ * it will be immediately deleted and a
+ * response will be returned to the client
+ * as if it did not exist.
+ */
+export class FileExists extends OpenAPIRoute {
 	schema = {
 		tags: ['File'],
-		summary: 'Delete a file',
+		summary: 'Check if a file exists',
 		request: {
 			body: {
 				content: {
@@ -30,7 +37,7 @@ export class FileDelete extends OpenAPIRoute {
 					}
 				}
 			},
-			...(config.requireAuth.delete
+			...(config.requireAuth.exists
 				? {
 						headers: z.object({
 							'cf-access-authenticated-user-email': z
@@ -45,16 +52,23 @@ export class FileDelete extends OpenAPIRoute {
 		},
 		responses: {
 			'200': {
-				description: 'File delete request successfully executed',
+				description: 'File status successfully queried',
 				content: {
 					'application/json': {
 						schema: z.object({
 							success: Bool({
 								description:
-									'Whether the delete operation succeeded; however, does not indicate that the file existed',
+									'Whether the existence check operation succeeded',
 								required: true,
 								default: true,
 								example: true
+							}),
+							exists: Bool({
+								description:
+									'Whether the file exists at the time of querying',
+								required: true,
+								default: false,
+								example: false
 							})
 						})
 					}
@@ -67,7 +81,7 @@ export class FileDelete extends OpenAPIRoute {
 						schema: z.object({
 							success: Bool({
 								description:
-									'Whether the delete operation succeeded',
+									'Whether the existence check operation succeeded',
 								required: true,
 								default: false,
 								example: false
@@ -89,7 +103,7 @@ export class FileDelete extends OpenAPIRoute {
 						schema: z.object({
 							success: Bool({
 								description:
-									'Whether the delete operation succeeded',
+									'Whether the existence check operation succeeded',
 								required: true,
 								default: false,
 								example: false
@@ -137,10 +151,25 @@ export class FileDelete extends OpenAPIRoute {
 			await crypto.subtle.digest({ name: 'SHA-256' }, entropyBytes)
 		);
 
-		await c.env.STORAGE.delete(objectKey);
+		const object = await c.env.STORAGE.get(objectKey);
+
+		const expiry = bufferToNumber(
+			new Uint8Array((await object.arrayBuffer()).slice(0, 6))
+		);
+		if (expiry <= Date.now()) {
+			// Since the file is expired, it should be gone by now, so we pretend it's gone.
+			// And that's not wrong since it is indeed about to be gone...
+			await c.env.STORAGE.delete(objectKey);
+
+			return c.json({
+				success: true,
+				exists: false
+			});
+		}
 
 		return c.json({
-			success: true
+			success: true,
+			exists: !!object
 		});
 	}
 }

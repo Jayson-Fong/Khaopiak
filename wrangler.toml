@@ -107,3 +107,9 @@ preview_bucket_name = "khaopiak-preview"
 # [[vectorize]]
 # binding = "MY_INDEX"
 # index_name = "my-index"
+
+[assets]
+directory = "./public/"
+binding = "ASSETS"
+html_handling = "auto-trailing-slash"
+not_found_handling = "none"

@@ -7,10 +7,16 @@ import {
 	hexToArrayBuffer,
 	msTimeToBuffer,
 	toAESKeyData
-} from '../util/buffer';
-import { digestToKey, fileToContentPrefix } from '../util/format';
-import config from '../../config.json';
+} from '../../util/buffer';
+import { digestToKey, fileToContentPrefix } from '../../util/format';
+import config from '../../../config.json';
 
+/**
+ * Uploads a file to Cloudflare R2 after
+ * encrypting it with AES-GCM using a key
+ * derived from a BIP39 mnemonic of a length
+ * specified by the client.
+ */
 export class FileUpload extends OpenAPIRoute {
 	schema = {
 		tags: ['File'],

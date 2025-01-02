@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="x-ua-compatible" content="ie=edge; chrome=1" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+		<title>Portal | Khaopiak</title>
+
+		<meta
+			http-equiv="Content-Security-Policy"
+			content="default-src 'self'"
+		/>
+		<base target="_parent" />
+
+		<meta
+			name="description"
+			content="End-to-end encrypted file transfers without the complicated URLs."
+		/>
+		<meta
+			name="abstract"
+			content="End-to-end encrypted file transfers without the complicated URLs."
+		/>
+
+		<meta name="robots" content="all" />
+		<meta property="og:site_name" content="Khaopiak" />
+		<meta property="og:title" content="Portal | Khaopiak" />
+		<meta
+			property="og:description"
+			content="End-to-end encrypted file transfers without the complicated URLs."
+		/>
+		<meta property="og:type" content="website" />
+
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:title" content="Portal | Khaopiak" />
+		<meta
+			name="twitter:description"
+			content="End-to-end encrypted file transfers without the complicated URLs."
+		/>
+
+		<meta name="application-name" content="Khaopiak" />
+		<meta name="mobile-web-app-capable" content="yes" />
+
+		<!-- -->
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<meta name="apple-mobile-web-app-title" content="Khaopiak" />
+		<meta name="format-detection" content="telephone=no" />
+
+		<meta name="theme-color" content="#5547d1" />
+		<meta property="al:android:app_name" content="Khaopiak" />
+
+		<meta name="application-name" content="Khaopiak" />
+		<link rel="author" href="humans.txt" />
+		<link rel="copyright" href="LICENSE" />
+
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<header>
+			<h1>Khaopiak</h1>
+			<p>
+				An account-less and end-to-end encrypted file transfer system.
+			</p>
+		</header>
+		<main>
+			<form method="POST" action="/api/file/download" target="_blank">
+				<label for="mnemonic">Mnemonic</label>
+				<textarea id="mnemonic" name="mnemonic" rows="4"></textarea>
+				<p>
+					Please note that using this form will automatically render
+					any PDF-ey looking files in your browser! All others will be
+					happily downloaded, though.
+				</p>
+				<input type="submit" />
+			</form>
+		</main>
+		<footer>
+			<ul class="links">
+				<li>
+					<a
+						href="https://github.com/Jayson-Fong/Khaopiak"
+						target="_blank"
+						>GitHub</a
+					>
+				</li>
+				<li>
+					<a href="sh" target="_blank">POSIX Client</a>
+				</li>
+			</ul>
+		</footer>
+	</body>
+</html>

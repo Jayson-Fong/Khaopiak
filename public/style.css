@@ -1,0 +1,20 @@
+header {
+	text-align: center;
+}
+
+footer ul.links {
+	list-style: none;
+}
+
+footer ul.links li {
+	display: inline;
+	padding: 8px;
+}
+
+footer ul.links li a {
+	color: black;
+}
+
+footer ul.links li a:visited {
+	color: black;
+}
