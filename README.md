@@ -75,7 +75,12 @@ secret is not of value immediate value.
 
 This leverages Khaopiak's expiring mnemonics, thus if the intended receiver successfully downloads from the Khaopiak
 server, it can be assumed that only they have it. The receiver can then communicate back to the sender to confirm
-receipt and use the key.
+receipt and use the secret.
+
+If the secret for transmission is of immediate value, Khaopiak can be used through using two Khaopiak uploads. First,
+transmitting a secret of no immediate value, the client-side mnemonic for an intended upcoming transmission. If receipt
+is confirmed by the intended recipient, that client-side mnemonic can then be used to encrypt the actual secret
+client-side for upload to Khaopiak.
 
 </details>
 
