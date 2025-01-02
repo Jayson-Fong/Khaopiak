@@ -221,7 +221,7 @@ using half of a combined mnemonic for each, or using a distinct wordlist for the
 <details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
 <summary>🧮 User-specified entropy length</summary>
 
-When a user specifies an entropy length of 160 or 224, Khaopiak pads the entropy to become 192 and 256 bits,
+When a user specifies an entropy length of 160 or 224, Khaopiak pads the entropy to become 192 or 256 bits,
 respectively, as AES only supports 128, 192, and 256-bit keys. As a result, while a longer-bit algorithm is used for
 encryption, it does not inherently increase the level of security assurance as the padding is predictable.
 
@@ -230,6 +230,7 @@ encryption, it does not inherently increase the level of security assurance as t
 ## To do
 
 - [ ] Configurable content padding to mask content
+- [ ] Salt or HMAC object keys
 - [ ] POSIX-based upload/download script
 - [ ] Web portal
 
