@@ -111,3 +111,25 @@ footer ul.links li a {
 footer ul.links li a:visited {
 	color: black;
 }
+
+/** ** Mobile responsiveness ** **/
+
+/** Tabs **/
+@media only screen and (max-width: 512px) {
+	div.tab-opener-group button.right {
+		float: inherit;
+	}
+}
+
+@media only screen and (max-width: 480px) {
+	div.tab-opener-group button {
+		display: block;
+		width: 100%;
+		padding: 6px 16px;
+		border-bottom: 1px solid #ccc;
+	}
+
+	div.tab-opener-group button:last-of-type {
+		border-bottom: none;
+	}
+}
