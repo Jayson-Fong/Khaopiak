@@ -552,8 +552,9 @@ orchard home picture movie only what believe onion physical defy hole among clim
 									words would be required, which is
 									unreasonable for an end-user. While client
 									developers may use it for client-side
-									encryption, mnemonic-based
-									encryption/decryption will not be offered.
+									encryption, server-side mnemonic-based
+									encryption/decryption with RSA-OAEP will not
+									be offered.
 								</li>
 								<li>
 									<strong>AES-CTR</strong> is not supported as
@@ -621,16 +622,16 @@ orchard home picture movie only what believe onion physical defy hole among clim
 							<summary>🦹 Mnemonic theft</summary>
 
 							To conveniently use Khaopiak, the same portal should
-							both accept a server mnemonic and a local mnemonic.
-							However, the local mnemonic could accidentally be
+							both accept a server mnemonic and a client mnemonic.
+							However, the client mnemonic could accidentally be
 							sent to the server if entered incorrectly,
 							compromising end-to-end encryption. A portal may
 							also be maliciously designed to explicitly capture
-							local mnemonics. To avoid mnemonic theft, an
+							client mnemonics. To avoid mnemonic theft, an
 							end-user should have a means of verifying the
 							portal's legitimacy (such as through TLS
 							certificates). Further, the portal should have a
-							clear means of distinguishing the local and server
+							clear means of distinguishing the client and server
 							mnemonics, such as using half of a combined mnemonic
 							for each, or using a distinct wordlist for the
 							client and server.
