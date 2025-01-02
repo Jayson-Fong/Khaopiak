@@ -153,6 +153,13 @@ export class FileExists extends OpenAPIRoute {
 
 		const object = await c.env.STORAGE.get(objectKey);
 
+		if (!object) {
+			return c.json({
+				success: true,
+				exists: false
+			});
+		}
+
 		const expiry = bufferToNumber(
 			new Uint8Array((await object.arrayBuffer()).slice(0, 6))
 		);
