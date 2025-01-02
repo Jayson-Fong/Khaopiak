@@ -30,9 +30,9 @@ from a personal device:
 
 <h3>Personal hardware</h3>
 
-Connecting personal hardware may not always be an option, whether due to port restrictions (such as the lack of a
-physical port or software restriction) or the lack of a physical medium (i.e. cabling or drives). Shared devices may
-also harbor malware, stealing both files and potentially infecting the connected device.
+Connecting personal hardware may not always be an option, whether due to port restrictions (such as software
+restrictions and the lack of a physical port) or the lack of a physical medium (i.e. cabling or drives). Shared devices
+may also harbor malware, stealing files and potentially infecting connected devices.
 
 <h3>Web-based portals</h3>
 
@@ -77,8 +77,8 @@ This leverages Khaopiak's expiring mnemonics, thus if the intended receiver succ
 server, it can be assumed that only they have it. The receiver can then communicate back to the sender to confirm
 receipt and use the secret.
 
-If the secret for transmission is of immediate value, Khaopiak can be used through using two Khaopiak uploads. First,
-transmitting a secret of no immediate value, the client-side mnemonic for an intended upcoming transmission. If receipt
+If the secret for transmission is of immediate value, two Khaopiak uploads can be used for secure transmission. First,
+transmitting a secret of no immediate value: the client-side mnemonic for an intended upcoming transmission. If receipt
 is confirmed by the intended recipient, that client-side mnemonic can then be used to encrypt the actual secret
 client-side for upload to Khaopiak.
 
@@ -118,9 +118,8 @@ By default, all files uploaded to Khaopiak eventually expire. If an attempt is m
 been deleted from the Khaopiak server, it will be immediately deleted and a response will be returned as if the file did
 not exist.
 
-> [!NOTE]  
-> It is possible for a client to assume that a file existed based on the additional processing time required to check
-> whether the file expired.
+Note: It is possible for a client to assume that a file existed based on the additional processing time required to
+check whether the file expired.
 
 </details>
 
@@ -177,7 +176,7 @@ the Web Crypto API</a>:
    <li><strong>RSA-OAEP</strong> is not supported as it is a public-key encryption system, which current guidelines recommend a minimum of 2048 key bits. To meet this, 192+ BIP39 words would be required, which is unreasonable for an end-user. While client developers may use it for client-side encryption, mnemonic-based encryption/decryption will not be offered.</li>
    <li><strong>AES-CTR</strong> is not supported as it is malleable, potentially allowing the meaning of the ciphertext to be changed.</li>
    <li><strong>AES-CBC</strong> is supported as a client-side encryption algorithm. While Khaopiak is generally not itself vulnerable to a padding oracle attack, client developers should be aware of the algorithm's vulnerability.</li>
-   <li><strong>AES-GCM</strong> is supported as both a client and server-side encryption algorithm. As keys and initialization vectors (IVs) are randomly generated and not reused. AES-GCM provides authenticated encryption which helps authenticate the ciphertext. Additional design considerations are necessary when it is possible for a key and IV may potentially be reused.</li>
+   <li><strong>AES-GCM</strong> is supported as both a client and server-side encryption algorithm. AES-GCM provides authenticated encryption which helps authenticate the ciphertext. Additional design considerations are necessary when it is possible for a key and initialization vector (IV) may potentially be reused; however, Khaopiak generates a random key and IV for each upload.</li>
 </ul>
 
 The OpenSSL enc program does not support authenticated encryption modes. As a result, some clients may use AES-CBC
