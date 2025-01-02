@@ -140,27 +140,29 @@
 						</form>
 					</div>
 					<div data-tab-group="operation" data-tab-label="delete">
+						<figure class="dialog-box" data-dialog="delete">
+							<figcaption></figcaption>
+							<p></p>
+						</figure>
+
 						<form
 							method="POST"
 							action="api/file/delete"
 							target="_blank"
+							id="form-delete"
+							data-change="delete"
 						>
 							<p>
-								This form currently does not extract client-side
-								mnemonics! Only send the server portion of your
-								mnemonic.
-							</p>
-							<p>
-								If your mnemonic is valid, the server will
-								*always* report success. This endpoint does not
-								confirm whether the file existed.
+								This form currently only supports automatic
+								mnemonic format detection in the form of a 50/50
+								server/client split.
 							</p>
 							<label for="delete-mnemonic"
 								>Server-side mnemonic</label
 							>
 							<textarea
 								id="delete-mnemonic"
-								name="mnemonic"
+								name="aggregate-mnemonic"
 								rows="4"
 								minlength="47"
 								maxlength="215"

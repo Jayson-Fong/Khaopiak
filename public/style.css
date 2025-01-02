@@ -55,6 +55,39 @@ div[data-tab-label] {
 	border-top: none;
 }
 
+/** Dialogs **/
+figure.dialog-box {
+	border: 1px solid;
+	padding: 8px;
+	border-radius: 8px;
+}
+
+figure.dialog-box:not([data-dialog-level]) {
+	display: none;
+}
+
+figure.dialog-box figcaption {
+	border-bottom: 1px solid;
+	padding: 4px 0;
+	border-radius: 4px;
+}
+
+figure.dialog-box[data-dialog-level='warning'] figcaption {
+	background-color: #ed751a;
+}
+
+figure.dialog-box[data-dialog-level='warning'][data-dialog-dimmed] figcaption {
+	background-color: #b06831;
+}
+
+figure.dialog-box[data-dialog-level='success'] figcaption {
+	background-color: #50fc17;
+}
+
+figure.dialog-box[data-dialog-level='success'][data-dialog-dimmed] figcaption {
+	background-color: #20590c;
+}
+
 /** Footer **/
 
 footer ul.links {
