@@ -113,15 +113,16 @@
 							method="POST"
 							action="api/file/download"
 							target="_blank"
-							id="download"
 						>
 							<p>
 								This form does not currently support client-side
 								decryption, but it will!
 							</p>
-							<label for="mnemonic">Server-side mnemonic</label>
+							<label for="download-mnemonic"
+								>Server-side mnemonic</label
+							>
 							<textarea
-								id="mnemonic"
+								id="download-mnemonic"
 								name="mnemonic"
 								rows="4"
 								minlength="47"
@@ -139,16 +140,61 @@
 						</form>
 					</div>
 					<div data-tab-group="operation" data-tab-label="delete">
-						<p>
-							Deleting files through this form is currently not
-							supported, but it will be in the future!
-						</p>
+						<form
+							method="POST"
+							action="api/file/delete"
+							target="_blank"
+						>
+							<p>
+								This form currently does not extract client-side
+								mnemonics! Only send the server portion of your
+								mnemonic.
+							</p>
+							<p>
+								If your mnemonic is valid, the server will
+								*always* report success. This endpoint does not
+								confirm whether the file existed.
+							</p>
+							<label for="delete-mnemonic"
+								>Server-side mnemonic</label
+							>
+							<textarea
+								id="delete-mnemonic"
+								name="mnemonic"
+								rows="4"
+								minlength="47"
+								maxlength="215"
+								required="required"
+								placeholder="badge knife trim glimpse solution chaos nasty that quarter angle marine sniff orchard home picture movie only what believe onion physical defy hole among climb brand million edge anchor upgrade sand awake loop layer panther soda"
+							></textarea>
+							<input type="submit" value="Check file" />
+						</form>
 					</div>
 					<div data-tab-group="operation" data-tab-label="exists">
-						<p>
-							Checking file status through this form is currently
-							not supported, but it will be in the future!
-						</p>
+						<form
+							method="POST"
+							action="api/file/exists"
+							target="_blank"
+						>
+							<p>
+								This form currently does not extract client-side
+								mnemonics! Only send the server portion of your
+								mnemonic.
+							</p>
+							<label for="exists-mnemonic"
+								>Server-side mnemonic</label
+							>
+							<textarea
+								id="exists-mnemonic"
+								name="mnemonic"
+								rows="4"
+								minlength="47"
+								maxlength="215"
+								required="required"
+								placeholder="badge knife trim glimpse solution chaos nasty that quarter angle marine sniff orchard home picture movie only what believe onion physical defy hole among climb brand million edge anchor upgrade sand awake loop layer panther soda"
+							></textarea>
+							<input type="submit" value="Check file" />
+						</form>
 					</div>
 				</div>
 			</div>
