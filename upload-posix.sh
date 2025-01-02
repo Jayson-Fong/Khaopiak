@@ -53,6 +53,33 @@ concat() {
   printf "%s%s" "$1" "$2"
 }
 
+# Given a properly formatted mnemonic $1,
+# returns the index of the space separating
+# the words in two given 1-indexing.
+#
+# $1 - String: BIP39 mnemonic
+get_split_mnemonic_index() {
+  counter=0
+  total_words=$(echo "$1" | wc -w)
+  split_word_count=$((total_words/2))
+  # 0 1 2 3 4 5
+  left=""
+
+  for word in $1; do
+    if [ "$counter" -ge "$split_word_count" ]; then
+      break
+    fi
+
+    left="$left $word"
+
+    counter=$((counter+1))
+  done
+
+  # Because of the initial space, this will return
+  # the 1-indexed index of the space separating the words
+  printf "%d" "${#left}"
+}
+
 # Generates a binary string of $1 bits
 #
 # $1 - Integer: Positive integer representing number of entropy bits
@@ -121,7 +148,7 @@ aes_cbc_maximum_bit_length() {
 }
 
 # Encrypt a file using AES-CBC with $1 as a key and store
-# the generated IV as a prefix, outputting as base64
+# the generated IV as a prefix, outputting as bytes
 # TODO: Inject file name and content type as part of the
 # TODO: plaintext, separating them with null bytes
 #
@@ -132,22 +159,33 @@ encrypt_file() {
   key=$(pad $((key_length/4)) "$(base_convert 16 2 "$(substring 1 "$key_length" "$1")")" "0")
   iv=$(pad 32 "$(base_convert 16 2 "$(generate_entropy 128)")" "0")
 
-  { printf "%s" "$iv" | xxd -r -p; openssl enc "-aes-$key_length-cbc" -e -K "$key" -iv "$iv" -in "$2"; } | base64
+  { printf "%s" "$iv" | xxd -r -p; openssl enc "-aes-$key_length-cbc" -e -K "$key" -iv "$iv" -in "$2"; }
 }
 
 # Encrypt a file at $2 using AES-CBC with a $1-bit key, then
 # upload to Khaopiak and generates a mnemonic for decryption/retrieval
-# TODO: Upload to Khaopiak, Generate Mnemonic, Mash Mnemonics Together
 #
 # $1 - Integer: Number of bits of entropy (128, 160, 192, 224, 256)
 # $2 - String: File path to input for encryption
 send() {
   entropy=$(generate_entropy "$1")
-  payload=$(encrypt_file "$entropy" "$2")
+  payload_temp_file=$(mktemp)
+  encrypt_file "$entropy" "$2" > "$payload_temp_file"
+
+  # TODO: Make the endpoint configurable and entropy/expiry user-specified
+  response=$(curl -X 'POST' \
+    'https://khaopiak/api/file/upload' \
+    -H 'accept: application/json' \
+    -H 'Content-Type: multipart/form-data' \
+    -F "file=@$payload_temp_file" \
+    -F "entropy=$1" \
+    -F 'expiry=43200')
+
+    rm -f "$payload_temp_file"
 
   mnemonic=$(generate_seed "$entropy")
 
-  printf "%s" "$mnemonic"
+  printf "%s %s" "$(echo "$response" | jq -r '.mnemonic')" "$mnemonic"
 }
 
 # Decrypts a file passed as base64 in $2
@@ -164,22 +202,61 @@ decrypt_file() {
   echo "$2" | base64 --decode | tail -c +17 | openssl enc "-aes-$key_length-cbc" -d -K "$key" -iv "$iv" | base64
 }
 
-# Test to ensure encryption and decryption
-# functions properly. Uses $1 bits of entropy
-# as a proposed key to encrypt a file at $2
-# and saves the decrypted file at path $3.
+# Retrieves a file and decrypts it
 #
-# $1 - Integer: Number of bits of entropy
-# $2 - String: Path to file for encryption
-# $3 - String: Path to file for saving (overwrites)
-test_encrypt_decrypt() {
-    entropy=$(generate_entropy "$1")
-    payload=$(encrypt_file "$entropy" "$2")
-    decrypted=$(decrypt_file "$entropy" "$payload")
+# $1 - String: The full mnemonic
+# $2 - String: The path to the file to save to
+retrieve() {
+  split_index=$(get_split_mnemonic_index "$1")
+  server_mnemonic=$(substring 1 $((split_index-1)) "$1")
+  # shellcheck disable=SC2034
+  client_mnemonic=$(substring $((split_index+1)) "" "$1")
 
-    # TODO: This will later require an additional
-    # TODO: step to splice off the file name/type
-    # TODO: so this will not be valid later on
+  encrypted_content=$(curl -X 'POST' \
+    'https://khaopiak/api/file/download?noRender=false' \
+    -H 'accept: application/octet-stream' \
+    -H 'Content-Type: multipart/form-data' \
+    -F "mnemonic=$server_mnemonic" | base64)
 
-    printf "%s" "$decrypted" | base64 --decode > "$3"
+    # TODO: Need to calculate entropy from mnemonic (param #2)
+    decrypt_file "" "$encrypted_content" | base64 --decode > "$2"
 }
+
+
+main() {
+  case $1 in
+    upload)
+      send "$2" "$3"
+      ;;
+    download)
+      retrieve "$2"
+      ;;
+    *)
+      HELP=$(cat << EOF
+Khaopiak - POSIX Utility
+========================
+  Usage: khaopiak <command> [ parameters... ]
+
+  Standard Commands
+    upload <bits_of_entropy> <input_file_path>
+      Uploads a file after encrypting it using AES-CBC.
+      Accepts 128, 160, 192, 224, or 256 bits of entropy;
+      however, 160 does not provide a notable benefit over
+      128, and 224 does not provide a notable benefit over
+      192. The Khaopiak server will use an identical number
+      of entropy bits for AES-GCM encryption.
+    download <mnemonic> <output_file_path>
+      Retrieves a file from the Khaopiak server using
+      the provided mnemonic. The first half of words is
+      interpreted as a server-side mnemonic and the second
+      half is interpreted as a client-side nmemonic.
+EOF
+      )
+
+      printf "%s\n" "$HELP"
+      ;;
+  esac
+}
+
+
+main "$@"
