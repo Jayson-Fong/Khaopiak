@@ -2,6 +2,8 @@ header {
 	text-align: center;
 }
 
+/** Generic forms **/
+
 textarea {
 	padding: 16px;
 	border-radius: 8px;
@@ -12,10 +14,49 @@ input[type='submit'] {
 	border-radius: 8px;
 }
 
+/** Tabs
+ * CSS largely based on: https://www.w3schools.com/howto/howto_js_tabs.asp
+ **/
+
+div.tab-opener-group {
+	overflow: hidden;
+	border: 1px solid #ccc;
+	background-color: #f1f1f1;
+}
+
+div.tab-opener-group button {
+	background-color: inherit;
+	float: left;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	padding: 14px 16px;
+	transition: 0.3s;
+	font-size: 17px;
+}
+
+div.tab-opener-group button:hover {
+	background-color: #ddd;
+}
+
+div.tab-opener-group button[data-active] {
+	background-color: #ccc;
+}
+
+div[data-tab-label] {
+	padding: 6px 12px;
+	border: 1px solid #ccc;
+	border-top: none;
+}
+
+/** Specific forms **/
+
 form#download {
 	display: grid;
 	padding: 16px;
 }
+
+/** Footer **/
 
 footer ul.links {
 	list-style: none;

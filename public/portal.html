@@ -8,10 +8,11 @@
 
 		<title>Portal | Khaopiak</title>
 
-		<meta
-			http-equiv="Content-Security-Policy"
-			content="default-src 'self'"
-		/>
+		<!-- TODO: Uncomment this when stable -->
+		<!--    <meta-->
+		<!--            http-equiv="Content-Security-Policy"-->
+		<!--            content="default-src 'self'"-->
+		<!--    />-->
 		<base target="_parent" />
 
 		<meta
@@ -42,8 +43,6 @@
 		<meta name="application-name" content="Khaopiak" />
 		<meta name="mobile-web-app-capable" content="yes" />
 
-		<!-- -->
-
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
 		<meta name="apple-mobile-web-app-title" content="Khaopiak" />
@@ -67,32 +66,91 @@
 		</header>
 		<main>
 			<div>
-				<form
-					method="POST"
-					action="api/file/download"
-					target="_blank"
-					id="download"
-				>
-					<p>
-						This form does not currently support client-side
-						decryption.
-					</p>
-					<label for="mnemonic">Server-side mnemonic</label>
-					<textarea
-						id="mnemonic"
-						name="mnemonic"
-						rows="4"
-						minlength="47"
-						maxlength="215"
-						required="required"
-					></textarea>
-					<p>
-						Please note that using this form will automatically
-						render any PDF-ey looking files in your browser! All
-						others will be happily downloaded, though.
-					</p>
-					<input type="submit" value="Download file" />
-				</form>
+				<div>
+					<div class="tab-opener-group">
+						<button
+							class="tab-button"
+							data-tab-opener-group="operation"
+							data-tab="upload"
+						>
+							Upload
+						</button>
+						<button
+							class="tab-button"
+							data-tab-opener-group="operation"
+							data-tab="download"
+						>
+							Download
+						</button>
+						<button
+							class="tab-button"
+							data-tab-opener-group="operation"
+							data-tab="delete"
+						>
+							Delete
+						</button>
+						<button
+							class="tab-button"
+							data-tab-opener-group="operation"
+							data-tab="exists"
+						>
+							Check
+						</button>
+					</div>
+
+					<div data-tab-group="operation" data-tab-label="upload">
+						<p>
+							Uploading through this web client is currently not
+							supported; however, will be in the future!
+						</p>
+					</div>
+					<div
+						data-tab-group="operation"
+						data-tab-label="download"
+						data-tab-default
+					>
+						<form
+							method="POST"
+							action="api/file/download"
+							target="_blank"
+							id="download"
+						>
+							<p>
+								This form does not currently support client-side
+								decryption, but it will!
+							</p>
+							<label for="mnemonic">Server-side mnemonic</label>
+							<textarea
+								id="mnemonic"
+								name="mnemonic"
+								rows="4"
+								minlength="47"
+								maxlength="215"
+								required="required"
+								placeholder="badge knife trim glimpse solution chaos nasty that quarter angle marine sniff orchard home picture movie only what believe onion physical defy hole among climb brand million edge anchor upgrade sand awake loop layer panther soda"
+							></textarea>
+							<p>
+								Please note that using this form will
+								automatically render any PDF-ey looking files in
+								your browser! All others will be happily
+								downloaded, though.
+							</p>
+							<input type="submit" value="Download file" />
+						</form>
+					</div>
+					<div data-tab-group="operation" data-tab-label="delete">
+						<p>
+							Deleting files through this form is currently not
+							supported, but it will be in the future!
+						</p>
+					</div>
+					<div data-tab-group="operation" data-tab-label="exists">
+						<p>
+							Checking file status through this form is currently
+							not supported, but it will be in the future!
+						</p>
+					</div>
+				</div>
 			</div>
 		</main>
 		<footer>
@@ -110,4 +168,5 @@
 			</ul>
 		</footer>
 	</body>
+	<script src="portal.js"></script>
 </html>
