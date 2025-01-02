@@ -184,7 +184,7 @@ the <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto" targ
 the Web Crypto API</a>:
 
 <ul>
-   <li><strong>RSA-OAEP</strong> is not supported as it is a public-key encryption system, which current guidelines recommend a minimum of 2048 key bits. To meet this, 192+ BIP39 words would be required, which is unreasonable for an end-user. While client developers may use it for client-side encryption, server-side mnemonic-based encryption/decryption with RSA-OAEP will not be offered.</li>
+   <li><strong>RSA-OAEP</strong> is not supported as it is a public-key encryption system, where current guidelines recommend a minimum of 2048 key bits. To meet this, 192+ BIP39 words would be required, which is unreasonable for an end-user. While client developers may use it for client-side encryption, server-side mnemonic-based encryption/decryption with RSA-OAEP will not be offered.</li>
    <li><strong>AES-CTR</strong> is not supported as it is malleable, potentially allowing the meaning of the ciphertext to be changed.</li>
    <li><strong>AES-CBC</strong> is supported as a client-side encryption algorithm. While Khaopiak is generally not itself vulnerable to a padding oracle attack, client developers should be aware of the algorithm's vulnerability.</li>
    <li><strong>AES-GCM</strong> is supported as both a client and server-side encryption algorithm. AES-GCM provides authenticated encryption which helps authenticate the ciphertext. Additional design considerations are necessary when it is possible for a key and initialization vector (IV) may potentially be reused; however, Khaopiak generates a random key and IV for each upload.</li>
