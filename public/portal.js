@@ -64,6 +64,7 @@ window.addEventListener('load', () => {
 				e.getAttribute('data-tab'),
 				e.getAttribute('data-tab-opener-group')
 			);
+
 			e.setAttribute('data-active', 'active');
 			document
 				.querySelectorAll(
@@ -72,6 +73,10 @@ window.addEventListener('load', () => {
 				.forEach((opener) => {
 					opener.removeAttribute('data-active');
 				});
+
+			if (e.hasAttribute('data-session-restore')) {
+				window.location.hash = `#${e.getAttribute('data-session-restore')}`;
+			}
 		});
 	});
 
@@ -97,6 +102,15 @@ window.addEventListener('load', () => {
 			dimDialog(e.getAttribute('data-change'));
 		});
 	});
+
+	if (window.location.hash.length) {
+		const restoreItems = document.querySelectorAll(
+			`[data-session-restore=${window.location.hash.slice(1)}]`
+		);
+		if (restoreItems.length) {
+			restoreItems.item(0).click();
+		}
+	}
 });
 
 /** Dialogs **/

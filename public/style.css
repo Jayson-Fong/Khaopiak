@@ -41,6 +41,10 @@ div.tab-opener-group button {
 	font-size: 17px;
 }
 
+div.tab-opener-group button.right {
+	float: right;
+}
+
 div.tab-opener-group button:hover {
 	background-color: #ddd;
 }
