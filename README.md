@@ -131,6 +131,15 @@ a result, at rest, file content cannot be easily inferred.
 
 </details>
 
+<details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
+<summary>📏 Configure mnemonic lengths</summary>
+
+Mnemonics can range from 24 to 48 words where end-users can specify the amount of words for the client and server
+independently. As a result, users can choose to increase encryption key lengths for more sensitive files for increased
+assurance that data confidentiality is protected.
+
+</details>
+
 ### For administrators
 
 <details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
@@ -207,9 +216,20 @@ using half of a combined mnemonic for each, or using a distinct wordlist for the
 
 </details>
 
+<details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
+<summary>🧮 User-specified entropy length</summary>
+
+While entropy lengths of 128, 160, 192, 224, and 256 bits are supported, coinciding with the BIP39 standard, increasing
+it does not inherently increase the system's level of security assurance because AES only supports 128, 192, and 256-bit
+key lengths, and Khaopiak currently chooses the longest key length possible without padding. This will be changed in the
+future to pad keys.
+
+</details>
+
 ## To do
 
 - [ ] Configurable content padding to mask content
+- [ ] Pad short keys to 192/256 to preserve entropy
 
 ## Examples
 
