@@ -1,0 +1,62 @@
+[
+  {
+    "methods": ["POST"],
+    "path": "/api/file/upload"
+  },
+  {
+    "methods": ["POST"],
+    "path": "/api/file/exists"
+  },
+  {
+    "methods": ["POST"],
+    "path": "/api/file/download"
+  },
+  {
+    "methods": ["POST"],
+    "path": "/api/file/delete"
+  },
+  {
+    "methods": ["GET", "HEAD"],
+    "path": "/"
+  },
+  {
+    "methods": ["GET", "HEAD"],
+    "path": "/humans.txt"
+  },
+  {
+    "methods": ["GET", "HEAD"],
+    "path": "/security.txt"
+  },
+  {
+    "methods": ["GET", "HEAD"],
+    "path": "/LICENSE"
+  },
+  {
+    "methods": ["GET", "HEAD"],
+    "path": "/portal"
+  },
+  {
+    "methods": ["GET", "HEAD"],
+    "path": "/portal.js"
+  },
+  {
+    "methods": ["GET", "HEAD"],
+    "path": "/robots.txt"
+  },
+  {
+    "methods": ["GET", "HEAD"],
+    "path": "/sh"
+  },
+  {
+    "methods": ["GET", "HEAD"],
+    "path": "/style.css"
+  },
+  {
+    "methods": ["GET", "HEAD"],
+    "path": "/api"
+  },
+  {
+    "methods": ["GET", "HEAD"],
+    "path": "/openapi.json"
+  }
+]
