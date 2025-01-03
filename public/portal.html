@@ -111,10 +111,48 @@
 					</div>
 
 					<div data-tab-group="operation" data-tab-label="upload">
-						<p>
-							Uploading through this web client is currently not
-							supported; however, will be in the future!
-						</p>
+						<figure class="dialog-box" data-dialog="upload">
+							<figcaption></figcaption>
+							<p></p>
+						</figure>
+
+						<form data-change="upload" id="form-upload">
+							<div>
+								<label class="file-upload" for="upload-file"
+									>Upload file</label
+								>
+								<span id="file-upload-view"></span>
+								<input
+									name="file"
+									id="upload-file"
+									type="file"
+									data-input-target="file-upload-view"
+									data-input-target-default="No file selected"
+								/>
+							</div>
+
+							<div>
+								<label for="upload-entropy"
+									>Bits of entropy (<span
+										id="upload-entropy-view"
+									></span
+									>)</label
+								>
+								<input
+									type="range"
+									name="entropy"
+									min="128"
+									max="256"
+									step="32"
+									value="128"
+									required="required"
+									data-input-target="upload-entropy-view"
+									id="upload-entropy"
+								/>
+							</div>
+
+							<input type="submit" value="Upload" />
+						</form>
 					</div>
 					<div
 						data-tab-group="operation"
@@ -181,22 +219,25 @@
 						</form>
 					</div>
 					<div data-tab-group="operation" data-tab-label="exists">
-						<form
-							method="POST"
-							action="api/file/exists"
-							target="_blank"
-						>
+						<figure class="dialog-box" data-dialog="exists">
+							<figcaption></figcaption>
+							<p></p>
+						</figure>
+
+						<form data-change="delete" id="form-exists">
 							<p>
-								This form currently does not extract client-side
-								mnemonics! Only send the server portion of your
-								mnemonic.
+								This form currently only supports automatic
+								mnemonic format detection in the form of a 50/50
+								server/client split.
 							</p>
-							<label for="exists-mnemonic"
-								>Server-side mnemonic</label
+							<label
+								for="exists-mnemonic"
+								title="The full mnemonic composed of both the server and client mnemonics."
+								>Aggregate mnemonic</label
 							>
 							<textarea
 								id="exists-mnemonic"
-								name="mnemonic"
+								name="aggregate-mnemonic"
 								rows="4"
 								minlength="47"
 								maxlength="215"

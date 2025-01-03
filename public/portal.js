@@ -103,6 +103,19 @@ window.addEventListener('load', () => {
 		});
 	});
 
+	document.querySelectorAll('[data-input-target]').forEach((e) => {
+		e.addEventListener('input', () => {
+			document.getElementById(
+				e.getAttribute('data-input-target')
+			).innerText = e.value;
+		});
+
+		document.getElementById(e.getAttribute('data-input-target')).innerText =
+			e.hasAttribute('data-input-target-default')
+				? e.getAttribute('data-input-target-default')
+				: (e.value ?? '');
+	});
+
 	if (window.location.hash.length) {
 		const restoreItems = document.querySelectorAll(
 			`[data-session-restore=${window.location.hash.slice(1)}]`
@@ -111,6 +124,13 @@ window.addEventListener('load', () => {
 			restoreItems.item(0).click();
 		}
 	}
+
+	showDialog(
+		'upload',
+		'warning',
+		'Not implemented',
+		'This feature is not implemented yet and files will not be uploaded. Please check back later.'
+	);
 });
 
 /** Dialogs **/
@@ -143,16 +163,40 @@ function dimDialog(name) {
 
 /** Specific form endpoints **/
 document
+	.getElementById('form-upload')
+	.addEventListener('submit', async (event) => {
+		event.preventDefault();
+
+		const formData = new FormData(event.target);
+		if (!formData.get('file').size) {
+			showDialog(
+				'upload',
+				'warning',
+				'Invalid request',
+				'You must upload a file containing content before proceeding.'
+			);
+			return;
+		}
+
+		showDialog(
+			'upload',
+			'warning',
+			'Not implemented',
+			'Apologies, this feature is not ready yet! Please try again later.'
+		);
+	});
+
+document
 	.getElementById('form-delete')
 	.addEventListener('submit', async (event) => {
 		event.preventDefault();
 
 		const formData = new FormData(event.target);
 
-		let clientMnemonic;
+		let serverMnemonic;
 
 		try {
-			({ clientMnemonic } = autoDetectMnemonicSplit(
+			({ serverMnemonic } = autoDetectMnemonicSplit(
 				formData.get('aggregate-mnemonic')
 			));
 		} catch (e) {
@@ -166,7 +210,7 @@ document
 		}
 
 		const serverFormData = new FormData();
-		serverFormData.set('mnemonic', clientMnemonic);
+		serverFormData.set('mnemonic', serverMnemonic);
 		fetch('api/file/delete', {
 			method: 'POST',
 			body: serverFormData
@@ -217,5 +261,85 @@ document
 			})
 			.catch((err) => {
 				showDialog('delete', 'warning', 'Error', extractError(err));
+			});
+	});
+
+document
+	.getElementById('form-exists')
+	.addEventListener('submit', async (event) => {
+		event.preventDefault();
+
+		const formData = new FormData(event.target);
+
+		let serverMnemonic;
+
+		try {
+			({ serverMnemonic } = autoDetectMnemonicSplit(
+				formData.get('aggregate-mnemonic')
+			));
+		} catch (e) {
+			showDialog(
+				'exists',
+				'warning',
+				'Error',
+				e.message ?? 'An unknown error occurred'
+			);
+			return;
+		}
+
+		const serverFormData = new FormData();
+		serverFormData.set('mnemonic', serverMnemonic);
+		fetch('api/file/exists', {
+			method: 'POST',
+			body: serverFormData
+		})
+			.then((response) => {
+				if (response.ok) {
+					event.target.querySelector(
+						'[name=aggregate-mnemonic]'
+					).value = '';
+
+					response.json().then((data) => {
+						if (data.success) {
+							showDialog(
+								'exists',
+								'success',
+								'File check succeeded',
+								data.exists
+									? 'The requested file exists'
+									: 'The requested file does not exist'
+							);
+						} else {
+							showDialog(
+								'exists',
+								'warning',
+								'Error',
+								extractError(data)
+							);
+						}
+					});
+				} else {
+					response
+						.json()
+						.then((data) => {
+							showDialog(
+								'exists',
+								'warning',
+								'Error',
+								extractError(data)
+							);
+						})
+						.catch((err) => {
+							showDialog(
+								'exists',
+								'warning',
+								'Error',
+								extractError(err)
+							);
+						});
+				}
+			})
+			.catch((err) => {
+				showDialog('exists', 'warning', 'Error', extractError(err));
 			});
 	});
