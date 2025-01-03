@@ -235,6 +235,35 @@ encryption, it does not inherently increase the level of security assurance as t
 - [ ] Web portal
 - [ ] Add optional PKI encryption for mnemonic transfers to avoid TLS inspection
 
+## Recommended headers
+
+> [!IMPORTANT]  
+> To prevent access issues, including for other applications using the same domain, review headers before setting them.
+> You may consider setting them using This may be done
+> through [Transform Rules](https://developers.cloudflare.com/rules/transform/response-header-modification/). For
+> instance, public installations may consider altering `Clear-Site-Data` to reduce inbound requests. This example will
+> be altered at a later date when service workers are supported.
+
+> [!TIP]
+> When using [Transform Rules](https://developers.cloudflare.com/rules/transform/response-header-modification/) to set
+> the `Access-Control-Allow-Origin` header for multiple sites, consider making it
+> dynamically-valued: `http.request.headers["origin"][0]`
+
+```
+Access-Control-Allow-Origin: <origin>
+Cache-Control: no-store
+Clear-Site-Data: "*" 
+Content-Security-Policy: default-src 'none'; base-uri 'none'; script-src 'self'; form-action 'self'; script-src-attr 'none'; connect-src 'self'; style-src-elem 'self'; style-src 'self'; style-src-attr 'none'; frame-ancestors 'none'; upgrade-insecure-requests
+Cross-Origin-Embedder-Policy: require-corp
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-site
+Permissions-Policy: microphone=(), camera=(), geolocation=()
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+Vary: Origin
+X-Content-Type-Options: nosniff
+```
+
 ## Examples
 
 ### Khaopiak server cURL examples
@@ -265,8 +294,8 @@ Response:
 
 ```json
 {
-	"success": true,
-	"mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
+  "success": true,
+  "mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
 }
 ```
 
@@ -323,7 +352,7 @@ Response:
 
 ```json
 {
-	"success": true
+  "success": true
 }
 ```
 
