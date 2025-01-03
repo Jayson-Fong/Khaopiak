@@ -23,11 +23,9 @@ for template_file in $template_files; do
   for integrity_check in $integrity_checks; do
     integrity_check_file_name=$(printf "%s" "$integrity_check" | cut -c "13-$((${#integrity_check}-2))")
 
-    integrity_sha512=$(openssl dgst -binary -sha512 "$ASSETS_FOLDER/$integrity_check_file_name" | base64)
+    integrity_sha512=$(openssl dgst -binary -sha512 "$ASSETS_FOLDER/$integrity_check_file_name" | base64 | tr -d '\n')
     integrity_check_string="sha512-$integrity_sha512"
-    echo "INTEGRITY CHECK: $integrity_check_string"
     template_file_contents=${template_file_contents/"$integrity_check"/"$integrity_check_string"}
-    echo "$template_file_contents"
 #    template_file_contents=$(echo "$template_file_contents" | sed "s#$integrity_check#$integrity_check_string#")
   done
 
