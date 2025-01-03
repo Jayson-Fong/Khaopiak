@@ -117,3 +117,6 @@ not_found_handling = "none"
 [build]
 command = "./build.sh"
 watch_dir = ['src', 'build.sh', 'public-templates']
+
+[limits]
+cpu_ms = 10
