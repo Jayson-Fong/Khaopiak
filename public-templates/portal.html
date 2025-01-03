@@ -8,6 +8,7 @@
 
 		<title>Portal | Khaopiak</title>
 
+		<!-- Safari seems to have an issue with style-src-elem, so added style-src for now -->
 		<meta
 			http-equiv="Content-Security-Policy"
 			content="
@@ -16,8 +17,13 @@
                 script-src 'self';
                 form-action 'self';
                 script-src-attr 'none';
-                style-src-elem 'self';
                 connect-src 'self';
+
+                style-src-elem 'self';
+                style-src 'self';
+                style-src-attr 'none';
+
+
                 upgrade-insecure-requests;
             "
 		/>
