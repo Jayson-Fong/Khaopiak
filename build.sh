@@ -1,8 +1,9 @@
 #!/bin/sh
 
-TEMPLATE_FOLDER="public-templates"
-ASSETS_FOLDER="public-templates/assets"
-TARGET_FOLDER="public"
+BASE_FOLDER="$(dirname "$(realpath "$0")")"
+TEMPLATE_FOLDER="$BASE_FOLDER/public-templates"
+ASSETS_FOLDER="$BASE_FOLDER/public-templates/assets"
+TARGET_FOLDER="$BASE_FOLDER/public"
 
 rm -rf "${TARGET_FOLDER:?}"/*
 
