@@ -2,6 +2,10 @@ header {
 	text-align: center;
 }
 
+pre {
+	white-space: pre-wrap;
+}
+
 /** Generic forms **/
 
 form {
@@ -35,10 +39,24 @@ label.file-upload {
  * CSS largely based on: https://www.w3schools.com/howto/howto_js_tabs.asp
  **/
 
+div.tab-container[data-tab-vertical] {
+	display: inline-flex;
+	width: 100%;
+	border: 1px solid #cccccc;
+}
+
+div.tab-container[data-tab-vertical] > div:nth-of-type(2) {
+	width: 100%;
+	height: 100%;
+}
+
 div.tab-opener-group {
 	overflow: hidden;
 	border: 1px solid #ccc;
 	background-color: #f1f1f1;
+}
+
+div.tab-opener-group[data-tab-vertical] {
 }
 
 div.tab-opener-group button {
@@ -50,6 +68,10 @@ div.tab-opener-group button {
 	padding: 14px 16px;
 	transition: 0.3s;
 	font-size: 17px;
+}
+
+div.tab-opener-group[data-tab-vertical] button {
+	width: 100%;
 }
 
 div.tab-opener-group button.right {
@@ -64,10 +86,17 @@ div.tab-opener-group button[data-active] {
 	background-color: #ccc;
 }
 
-div[data-tab-label] {
+div[data-tab-label]:not([data-tab-vertical]) {
 	padding: 6px 12px;
 	border: 1px solid #ccc;
 	border-top: none;
+}
+
+div.tab-container[data-tab-vertical] div[data-tab-label] {
+	border: none;
+}
+
+div[data-tab-label][data-tab-vertical] {
 }
 
 /** Dialogs **/

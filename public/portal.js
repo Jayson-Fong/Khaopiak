@@ -117,12 +117,27 @@ window.addEventListener('load', () => {
 	});
 
 	if (window.location.hash.length) {
-		const restoreItems = document.querySelectorAll(
-			`[data-session-restore=${window.location.hash.slice(1)}]`
-		);
-		if (restoreItems.length) {
-			restoreItems.item(0).click();
-		}
+		window.location.hash
+			.slice(1)
+			.split('+')
+			.map((r) => r.trim())
+			.filter((r) => r.length)
+			.forEach((r) => {
+				const restoreItems = Array.from(
+					document.querySelectorAll(`[data-session-restore*=${r}]`)
+				).filter(
+					(restoreItem) =>
+						restoreItem
+							.getAttribute('data-session-restore')
+							.split('+')
+							.filter(
+								(restoreItemInner) => restoreItemInner === r
+							).length
+				);
+				if (restoreItems.length) {
+					restoreItems[0].click();
+				}
+			});
 	}
 
 	showDialog(
@@ -130,6 +145,13 @@ window.addEventListener('load', () => {
 		'warning',
 		'Not implemented',
 		'This feature is not implemented yet and files will not be uploaded. Please check back later.'
+	);
+
+	showDialog(
+		'download',
+		'warning',
+		'Partially implemented',
+		'This form will only download the file from Khaopiak and not decrypt it if client-side encryption was involved in its upload.'
 	);
 });
 

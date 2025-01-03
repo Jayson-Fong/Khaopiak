@@ -111,6 +111,7 @@
 					</div>
 
 					<div data-tab-group="operation" data-tab-label="upload">
+						<h2>Upload files</h2>
 						<figure class="dialog-box" data-dialog="upload">
 							<figcaption></figcaption>
 							<p></p>
@@ -159,6 +160,12 @@
 						data-tab-label="download"
 						data-tab-default
 					>
+						<h2>Download files</h2>
+						<figure class="dialog-box" data-dialog="download">
+							<figcaption></figcaption>
+							<p></p>
+						</figure>
+
 						<form
 							method="POST"
 							action="api/file/download"
@@ -190,17 +197,13 @@
 						</form>
 					</div>
 					<div data-tab-group="operation" data-tab-label="delete">
+						<h2>Delete files</h2>
 						<figure class="dialog-box" data-dialog="delete">
 							<figcaption></figcaption>
 							<p></p>
 						</figure>
 
 						<form data-change="delete" id="form-delete">
-							<p>
-								This form currently only supports automatic
-								mnemonic format detection in the form of a 50/50
-								server/client split.
-							</p>
 							<label
 								for="delete-mnemonic"
 								title="The full mnemonic composed of both the server and client mnemonics."
@@ -210,8 +213,8 @@
 								id="delete-mnemonic"
 								name="aggregate-mnemonic"
 								rows="4"
-								minlength="47"
-								maxlength="215"
+								minlength="95"
+								maxlength="431"
 								required="required"
 								placeholder="badge knife trim glimpse solution chaos nasty that quarter angle marine sniff orchard home picture movie only what believe onion physical defy hole among climb brand million edge anchor upgrade sand awake loop layer panther soda"
 							></textarea>
@@ -219,17 +222,13 @@
 						</form>
 					</div>
 					<div data-tab-group="operation" data-tab-label="exists">
+						<h2>Check for file existance</h2>
 						<figure class="dialog-box" data-dialog="exists">
 							<figcaption></figcaption>
 							<p></p>
 						</figure>
 
 						<form data-change="delete" id="form-exists">
-							<p>
-								This form currently only supports automatic
-								mnemonic format detection in the form of a 50/50
-								server/client split.
-							</p>
 							<label
 								for="exists-mnemonic"
 								title="The full mnemonic composed of both the server and client mnemonics."
@@ -239,8 +238,8 @@
 								id="exists-mnemonic"
 								name="aggregate-mnemonic"
 								rows="4"
-								minlength="47"
-								maxlength="215"
+								minlength="95"
+								maxlength="431"
 								required="required"
 								placeholder="badge knife trim glimpse solution chaos nasty that quarter angle marine sniff orchard home picture movie only what believe onion physical defy hole among climb brand million edge anchor upgrade sand awake loop layer panther soda"
 							></textarea>
@@ -248,463 +247,595 @@
 						</form>
 					</div>
 					<div data-tab-group="operation" data-tab-label="about">
-						<h2>Purpose</h2>
+						<div class="tab-container" data-tab-vertical>
+							<div
+								class="tab-opener-group"
+								style="width: 20%"
+								data-tab-vertical
+							>
+								<button
+									class="tab-button"
+									data-tab-opener-group="about"
+									data-tab="project"
+									data-session-restore="tab-operation-about+tab-about-project"
+								>
+									Project
+								</button>
+							</div>
+							<div>
+								<div
+									data-tab-group="about"
+									data-tab-label="project"
+									data-tab-default
+								>
+									<div>
+										<h2>Purpose</h2>
 
-						Khaopiak is a temporary, intermediary file storage
-						system for transferring between two devices. It was
-						designed primarily with printing at hotel business
-						centers in mind, but can cover a range of use cases from
-						file transfers, viewership verification, and sharing
-						secrets.
+										Khaopiak is a temporary, intermediary
+										file storage system for transferring
+										between two devices. It was designed
+										primarily with printing at hotel
+										business centers in mind, but can cover
+										a range of use cases from file
+										transfers, viewership verification, and
+										sharing secrets.
 
-						<details
-							style="
-								border: 1px solid;
-								border-radius: 8px;
-								padding: 8px;
-								margin-top: 4px;
-							"
-						>
-							<summary>
-								🖨️ Use Case: Printing at hotel business centers
-							</summary>
+										<details
+											style="
+												border: 1px solid;
+												border-radius: 8px;
+												padding: 8px;
+												margin-top: 4px;
+											"
+										>
+											<summary>
+												🖨️ Use Case: Printing at hotel
+												business centers
+											</summary>
 
-							Hotel business centers often restrict printing to
-							dedicated, shared desktops, resulting in two main
-							options for printing from a personal device:
+											Hotel business centers often
+											restrict printing to dedicated,
+											shared desktops, resulting in two
+											main options for printing from a
+											personal device:
 
-							<ul>
-								<li>
-									Connect personal hardware (ex. USB thumb
-									drives) to shared equipment
-								</li>
-								<li>
-									Upload files to a web-based intermediary for
-									download
-								</li>
-							</ul>
+											<ul>
+												<li>
+													Connect personal hardware
+													(ex. USB thumb drives) to
+													shared equipment
+												</li>
+												<li>
+													Upload files to a web-based
+													intermediary for download
+												</li>
+											</ul>
 
-							<h3>Personal hardware</h3>
+											<h3>Personal hardware</h3>
 
-							Connecting personal hardware may not always be an
-							option, whether due to port restrictions (such as
-							software restrictions and the lack of a physical
-							port) or the lack of a physical medium (i.e. cabling
-							or drives). Shared devices may also harbor malware,
-							stealing files and potentially infecting connected
-							devices.
+											Connecting personal hardware may not
+											always be an option, whether due to
+											port restrictions (such as software
+											restrictions and the lack of a
+											physical port) or the lack of a
+											physical medium (i.e. cabling or
+											drives). Shared devices may also
+											harbor malware, stealing files and
+											potentially infecting connected
+											devices.
 
-							<h3>Web-based portals</h3>
+											<h3>Web-based portals</h3>
 
-							Logging into web-based portals such as Google Drive,
-							Box, SharePoint, Proton Drive, and Dropbox requires
-							inputting personal login credentials and grants
-							excessive access to files alongside additional
-							services, such as email. When passwords are shared,
-							stolen credentials may lead to further compromise,
-							such as enabling logon to financial accounts. While
-							these web-based services often provide shareable
-							links, they are often too long or complicated to
-							type, such as this Google Drive share link:
+											Logging into web-based portals such
+											as Google Drive, Box, SharePoint,
+											Proton Drive, and Dropbox requires
+											inputting personal login credentials
+											and grants excessive access to files
+											alongside additional services, such
+											as email. When passwords are shared,
+											stolen credentials may lead to
+											further compromise, such as enabling
+											logon to financial accounts. While
+											these web-based services often
+											provide shareable links, they are
+											often too long or complicated to
+											type, such as this Google Drive
+											share link:
 
-							<pre>
+											<pre>
 https://docs.google.com/document/d/t9trB8lKoaB_kIRk6FeFltqm1TGdsCpKolHGwcpVKXPE</pre
-							>
+											>
 
-							When end-users incorrectly type a character of these
-							URLs, it is often difficult to identify the source
-							of error. To mitigate this issue, a link shortener
-							can be used; however, it increases the probability
-							of randomly stumbling upon the document, involves an
-							additional party, and may be predictable. Shareable
-							links often do not expire, allowing a threat actor
-							to regain access after the initial download, such as
-							through browser history.
+											When end-users incorrectly type a
+											character of these URLs, it is often
+											difficult to identify the source of
+											error. To mitigate this issue, a
+											link shortener can be used; however,
+											it increases the probability of
+											randomly stumbling upon the
+											document, involves an additional
+											party, and may be predictable.
+											Shareable links often do not expire,
+											allowing a threat actor to regain
+											access after the initial download,
+											such as through browser history.
 
-							<h3>How Khaopiak helps</h3>
+											<h3>How Khaopiak helps</h3>
 
-							Khaopiak alleviates these issues through enabling
-							the seamless end-to-end encryption of documents
-							accessed through easily-typed, one-time-use BIP39
-							mnemonics, such as:
+											Khaopiak alleviates these issues
+											through enabling the seamless
+											end-to-end encryption of documents
+											accessed through easily-typed,
+											one-time-use BIP39 mnemonics, such
+											as:
 
-							<pre>
+											<pre>
 orchard home picture movie only what believe onion physical defy hole among climb brand million edge anchor upgrade sand awake loop layer panther soda</pre
-							>
+											>
 
-							This means that end-users need not reference a
-							random character-by-character string, but known
-							words they can quickly type and remember the
-							spelling of. As all words can be identified using
-							their first three letters, Khaopiak can
-							automatically correct typos. During this process,
-							hardware manipulation is not required, users do not
-							need to enter logon credentials besides a unique,
-							expiring mnemonic, and mnemonics cannot be reused to
-							download the same upload.
-						</details>
+											This means that end-users need not
+											reference a random
+											character-by-character string, but
+											known words they can quickly type
+											and remember the spelling of. As all
+											words can be identified using their
+											first three letters, Khaopiak can
+											automatically correct typos. During
+											this process, hardware manipulation
+											is not required, users do not need
+											to enter logon credentials besides a
+											unique, expiring mnemonic, and
+											mnemonics cannot be reused to
+											download the same upload.
+										</details>
 
-						<details
-							style="
-								border: 1px solid;
-								border-radius: 8px;
-								padding: 8px;
-								margin-top: 4px;
-							"
-						>
-							<summary>🤝 Use Case: Secrets distribution</summary>
+										<details
+											style="
+												border: 1px solid;
+												border-radius: 8px;
+												padding: 8px;
+												margin-top: 4px;
+											"
+										>
+											<summary>
+												🤝 Use Case: Secrets
+												distribution
+											</summary>
 
-							Khaopiak can be used to share secrets in an
-							environment where communications integrity is
-							guaranteed; however, confidentiality is susceptible
-							to compromise, such as communicating vocally in an
-							open office, on the condition that the secret is not
-							of value immediate value. This leverages Khaopiak's
-							expiring mnemonics, thus if the intended receiver
-							successfully downloads from the Khaopiak server, it
-							can be assumed that only they have it. The receiver
-							can then communicate back to the sender to confirm
-							receipt and use the secret. If the secret for
-							transmission is of immediate value, two Khaopiak
-							uploads can be used for secure transmission. First,
-							transmitting a secret of no immediate value: the
-							client-side mnemonic for an intended upcoming
-							transmission. If receipt is confirmed by the
-							intended recipient, that client-side mnemonic can
-							then be used to encrypt the actual secret
-							client-side for upload to Khaopiak.
-						</details>
+											Khaopiak can be used to share
+											secrets in an environment where
+											communications integrity is
+											guaranteed; however, confidentiality
+											is susceptible to compromise, such
+											as communicating vocally in an open
+											office, on the condition that the
+											secret is not of value immediate
+											value. This leverages Khaopiak's
+											expiring mnemonics, thus if the
+											intended receiver successfully
+											downloads from the Khaopiak server,
+											it can be assumed that only they
+											have it. The receiver can then
+											communicate back to the sender to
+											confirm receipt and use the secret.
+											If the secret for transmission is of
+											immediate value, two Khaopiak
+											uploads can be used for secure
+											transmission. First, transmitting a
+											secret of no immediate value: the
+											client-side mnemonic for an intended
+											upcoming transmission. If receipt is
+											confirmed by the intended recipient,
+											that client-side mnemonic can then
+											be used to encrypt the actual secret
+											client-side for upload to Khaopiak.
+										</details>
 
-						<details
-							style="
-								border: 1px solid;
-								border-radius: 8px;
-								padding: 8px;
-								margin-top: 4px;
-							"
-						>
-							<summary>
-								✅ Use Case: Confirmed file access
-							</summary>
+										<details
+											style="
+												border: 1px solid;
+												border-radius: 8px;
+												padding: 8px;
+												margin-top: 4px;
+											"
+										>
+											<summary>
+												✅ Use Case: Confirmed file
+												access
+											</summary>
 
-							Expiring mnemonics enables confirmed file access
-							through using the Khaopiak server's file existance
-							checking. If Khaopiak reports that a file exists, it
-							has not yet been downloaded. If it reports that a
-							file does not exist, it implies that the file has
-							already been downloaded or the file expired.
-						</details>
+											Expiring mnemonics enables confirmed
+											file access through using the
+											Khaopiak server's file existance
+											checking. If Khaopiak reports that a
+											file exists, it has not yet been
+											downloaded. If it reports that a
+											file does not exist, it implies that
+											the file has already been downloaded
+											or the file expired.
+										</details>
 
-						<h2>Features</h2>
+										<h2>Features</h2>
 
-						<h3>For end users</h3>
+										<h3>For end users</h3>
 
-						<details
-							style="
-								border: 1px solid;
-								border-radius: 8px;
-								padding: 8px;
-								margin-top: 4px;
-							"
-						>
-							<summary>🔒 End-to-end encryption</summary>
+										<details
+											style="
+												border: 1px solid;
+												border-radius: 8px;
+												padding: 8px;
+												margin-top: 4px;
+											"
+										>
+											<summary>
+												🔒 End-to-end encryption
+											</summary>
 
-							A portion of the mnemonic is never transmitted over
-							the internet and is used to encrypt the file before
-							uploading, allowing end-to-end encryption. As a
-							result, confidentiality of the original file is
-							protected as it is never made available to
-							intermediaries. For all purposes of encryption,
-							Khaopiak uses the Advanced Encryption Standard
-							(AES), with all clients supporting
-							<a
-								href="https://csrc.nist.gov/pubs/sp/800/38/a/final"
-								target="_blank"
-								>Cipher Block Chaining (CBC)</a
-							>
-							and recommending
-							<a
-								href="https://csrc.nist.gov/pubs/sp/800/38/d/final"
-								target="_blank"
-								>Galois/Counter Mode (GCM)</a
-							>
-							when possible.
-						</details>
+											A portion of the mnemonic is never
+											transmitted over the internet and is
+											used to encrypt the file before
+											uploading, allowing end-to-end
+											encryption. As a result,
+											confidentiality of the original file
+											is protected as it is never made
+											available to intermediaries. For all
+											purposes of encryption, Khaopiak
+											uses the Advanced Encryption
+											Standard (AES), with all clients
+											supporting
+											<a
+												href="https://csrc.nist.gov/pubs/sp/800/38/a/final"
+												target="_blank"
+												>Cipher Block Chaining (CBC)</a
+											>
+											and recommending
+											<a
+												href="https://csrc.nist.gov/pubs/sp/800/38/d/final"
+												target="_blank"
+												>Galois/Counter Mode (GCM)</a
+											>
+											when possible.
+										</details>
 
-						<details
-							style="
-								border: 1px solid;
-								border-radius: 8px;
-								padding: 8px;
-								margin-top: 4px;
-							"
-						>
-							<summary>⌛ Expiring files</summary>
+										<details
+											style="
+												border: 1px solid;
+												border-radius: 8px;
+												padding: 8px;
+												margin-top: 4px;
+											"
+										>
+											<summary>⌛ Expiring files</summary>
 
-							By default, all files uploaded to Khaopiak
-							eventually expire. If an attempt is made to an
-							expired file which has not been deleted from the
-							Khaopiak server, it will be immediately deleted and
-							a response will be returned as if the file did not
-							exist. Note: It is possible for a client to assume
-							that a file existed based on the additional
-							processing time required to check whether the file
-							expired.
-						</details>
+											By default, all files uploaded to
+											Khaopiak eventually expire. If an
+											attempt is made to an expired file
+											which has not been deleted from the
+											Khaopiak server, it will be
+											immediately deleted and a response
+											will be returned as if the file did
+											not exist. Note: It is possible for
+											a client to assume that a file
+											existed based on the additional
+											processing time required to check
+											whether the file expired.
+										</details>
 
-						<details
-							style="
-								border: 1px solid;
-								border-radius: 8px;
-								padding: 8px;
-								margin-top: 4px;
-							"
-						>
-							<summary>🗄️ Protected file metadata</summary>
+										<details
+											style="
+												border: 1px solid;
+												border-radius: 8px;
+												padding: 8px;
+												margin-top: 4px;
+											"
+										>
+											<summary>
+												🗄️ Protected file metadata
+											</summary>
 
-							File names and content types are included as part of
-							the payload for encryption at both the client and
-							server sides. As a result, at rest, file content
-							cannot be easily inferred.
-						</details>
+											File names and content types are
+											included as part of the payload for
+											encryption at both the client and
+											server sides. As a result, at rest,
+											file content cannot be easily
+											inferred.
+										</details>
 
-						<details
-							style="
-								border: 1px solid;
-								border-radius: 8px;
-								padding: 8px;
-								margin-top: 4px;
-							"
-						>
-							<summary>📏 Configure mnemonic lengths</summary>
+										<details
+											style="
+												border: 1px solid;
+												border-radius: 8px;
+												padding: 8px;
+												margin-top: 4px;
+											"
+										>
+											<summary>
+												📏 Configure mnemonic lengths
+											</summary>
 
-							Mnemonics can range from 24 to 48 words where
-							end-users can specify the amount of words for the
-							client and server independently. As a result, users
-							can choose to increase encryption key lengths for
-							more sensitive files for increased assurance that
-							data confidentiality is protected.
-						</details>
+											Mnemonics can range from 24 to 48
+											words where end-users can specify
+											the amount of words for the client
+											and server independently. As a
+											result, users can choose to increase
+											encryption key lengths for more
+											sensitive files for increased
+											assurance that data confidentiality
+											is protected.
+										</details>
 
-						<h3>For administrators</h3>
+										<h3>For administrators</h3>
 
-						<details
-							style="
-								border: 1px solid;
-								border-radius: 8px;
-								padding: 8px;
-								margin-top: 4px;
-							"
-						>
-							<summary>
-								🔑 Restrict access with Cloudflare Access
-							</summary>
+										<details
+											style="
+												border: 1px solid;
+												border-radius: 8px;
+												padding: 8px;
+												margin-top: 4px;
+											"
+										>
+											<summary>
+												🔑 Restrict access with
+												Cloudflare Access
+											</summary>
 
-							Cloudflare Zero Trust customers can optionally
-							require authentication through Cloudflare Access as
-							a self-hosted application. Khaopiak will check for a
-							`cf-access-authenticated-user-email` header
-							containing a valid email. Cloudflare prevents
-							impersonating through stripping the header from
-							client requests.
-						</details>
+											Cloudflare Zero Trust customers can
+											optionally require authentication
+											through Cloudflare Access as a
+											self-hosted application. Khaopiak
+											will check for a
+											<code
+												>cf-access-authenticated-user-email</code
+											>
+											header containing a valid email.
+											Cloudflare prevents impersonating
+											through stripping the header from
+											client requests.
+										</details>
 
-						<details
-							style="
-								border: 1px solid;
-								border-radius: 8px;
-								padding: 8px;
-								margin-top: 4px;
-							"
-						>
-							<summary>☁️ Serverless deployment</summary>
+										<details
+											style="
+												border: 1px solid;
+												border-radius: 8px;
+												padding: 8px;
+												margin-top: 4px;
+											"
+										>
+											<summary>
+												☁️ Serverless deployment
+											</summary>
 
-							Khaopiak is designed for deployment on
-							<a
-								href="https://workers.cloudflare.com/"
-								target="_blank"
-								>Cloudflare Workers</a
-							>, leveraging
-							<a
-								href="https://developers.cloudflare.com/r2/"
-								target="_blank"
-								>Cloudflare R2</a
-							>
-							for file storage and
-							<a
-								href="https://developers.cloudflare.com/queues/"
-								target="_blank"
-								>Cloudflare Queues</a
-							>
-							for file expiry, allowing deployment and automated
-							scaling without having to maintain servers.
-						</details>
+											Khaopiak is designed for deployment
+											on
+											<a
+												href="https://workers.cloudflare.com/"
+												target="_blank"
+												>Cloudflare Workers</a
+											>, leveraging
+											<a
+												href="https://developers.cloudflare.com/r2/"
+												target="_blank"
+												>Cloudflare R2</a
+											>
+											for file storage and
+											<a
+												href="https://developers.cloudflare.com/queues/"
+												target="_blank"
+												>Cloudflare Queues</a
+											>
+											for file expiry, allowing deployment
+											and automated scaling without having
+											to maintain servers.
+										</details>
 
-						<h3>For all</h3>
+										<h3>For all</h3>
 
-						<details
-							style="
-								border: 1px solid;
-								border-radius: 8px;
-								padding: 8px;
-								margin-top: 4px;
-							"
-						>
-							<summary>📖 Open source</summary>
+										<details
+											style="
+												border: 1px solid;
+												border-radius: 8px;
+												padding: 8px;
+												margin-top: 4px;
+											"
+										>
+											<summary>📖 Open source</summary>
 
-							Unlike commercially available products, Khaopiak is
-							open source. Organizations and end-users need not go
-							solely based on product claims, but verify them
-							through analyzing both code and infrastructure
-							design. If a provider hosting a Khaopiak server
-							cannot be trusted, a private instance can quickly be
-							deployed.
-						</details>
+											Unlike commercially available
+											products, Khaopiak is open source.
+											Organizations and end-users need not
+											go solely based on product claims,
+											but verify them through analyzing
+											both code and infrastructure design.
+											If a provider hosting a Khaopiak
+											server cannot be trusted, a private
+											instance can quickly be deployed.
+										</details>
 
-						<h2>Security considerations</h2>
+										<h2>Security considerations</h2>
 
-						<details
-							style="
-								border: 1px solid;
-								border-radius: 8px;
-								padding: 8px;
-								margin-top: 4px;
-							"
-						>
-							<summary>
-								🔐 Cryptographic strength of encryption
-								algorithms
-							</summary>
+										<details
+											style="
+												border: 1px solid;
+												border-radius: 8px;
+												padding: 8px;
+												margin-top: 4px;
+											"
+										>
+											<summary>
+												🔐 Cryptographic strength of
+												encryption algorithms
+											</summary>
 
-							Khaopiak supports AES-CBC and AES-GCM as they are
-							available through the
-							<a
-								href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto"
-								target="_blank"
-								>SubtleCrypto interface of the Web Crypto API</a
-							>:
+											Khaopiak supports AES-CBC and
+											AES-GCM as they are available
+											through the
+											<a
+												href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto"
+												target="_blank"
+												>SubtleCrypto interface of the
+												Web Crypto API</a
+											>:
 
-							<ul>
-								<li>
-									<strong>RSA-OAEP</strong> is not supported
-									as it is a public-key encryption system,
-									where current guidelines recommend a minimum
-									of 2048 key bits. To meet this, 192+ BIP39
-									words would be required, which is
-									unreasonable for an end-user. While client
-									developers may use it for client-side
-									encryption, server-side mnemonic-based
-									encryption/decryption with RSA-OAEP will not
-									be offered.
-								</li>
-								<li>
-									<strong>AES-CTR</strong> is not supported as
-									it is malleable, potentially allowing the
-									meaning of the ciphertext to be changed.
-								</li>
-								<li>
-									<strong>AES-CBC</strong> is supported as a
-									client-side encryption algorithm. While
-									Khaopiak is generally not itself vulnerable
-									to a padding oracle attack, client
-									developers should be aware of the
-									algorithm's vulnerability.
-								</li>
-								<li>
-									<strong>AES-GCM</strong> is supported as
-									both a client and server-side encryption
-									algorithm. AES-GCM provides authenticated
-									encryption which helps authenticate the
-									ciphertext. Additional design considerations
-									are necessary when it is possible for a key
-									and initialization vector (IV) may
-									potentially be reused; however, Khaopiak
-									generates a random key and IV for each
-									upload.
-								</li>
-							</ul>
+											<ul>
+												<li>
+													<strong>RSA-OAEP</strong> is
+													not supported as it is a
+													public-key encryption
+													system, where current
+													guidelines recommend a
+													minimum of 2048 key bits. To
+													meet this, 192+ BIP39 words
+													would be required, which is
+													unreasonable for an
+													end-user. While client
+													developers may use it for
+													client-side encryption,
+													server-side mnemonic-based
+													encryption/decryption with
+													RSA-OAEP will not be
+													offered.
+												</li>
+												<li>
+													<strong>AES-CTR</strong> is
+													not supported as it is
+													malleable, potentially
+													allowing the meaning of the
+													ciphertext to be changed.
+												</li>
+												<li>
+													<strong>AES-CBC</strong> is
+													supported as a client-side
+													encryption algorithm. While
+													Khaopiak is generally not
+													itself vulnerable to a
+													padding oracle attack,
+													client developers should be
+													aware of the algorithm's
+													vulnerability.
+												</li>
+												<li>
+													<strong>AES-GCM</strong> is
+													supported as both a client
+													and server-side encryption
+													algorithm. AES-GCM provides
+													authenticated encryption
+													which helps authenticate the
+													ciphertext. Additional
+													design considerations are
+													necessary when it is
+													possible for a key and
+													initialization vector (IV)
+													may potentially be reused;
+													however, Khaopiak generates
+													a random key and IV for each
+													upload.
+												</li>
+											</ul>
 
-							The OpenSSL enc program does not support
-							authenticated encryption modes. As a result, some
-							clients may use AES-CBC instead, such as uploading
-							from the command line.
-						</details>
+											The OpenSSL enc program does not
+											support authenticated encryption
+											modes. As a result, some clients may
+											use AES-CBC instead, such as
+											uploading from the command line.
+										</details>
 
-						<details
-							style="
-								border: 1px solid;
-								border-radius: 8px;
-								padding: 8px;
-								margin-top: 4px;
-							"
-						>
-							<summary>💥 Server-side collisions</summary>
+										<details
+											style="
+												border: 1px solid;
+												border-radius: 8px;
+												padding: 8px;
+												margin-top: 4px;
+											"
+										>
+											<summary>
+												💥 Server-side collisions
+											</summary>
 
-							Khaopiak does not generate guaranteed unique
-							mnemonics. As a result, it is theoretically possible
-							for a collision to occur, which may enable
-							accidental file overwriting or downloading of an
-							alternate file. However, this case is extremely
-							improbable. Client-side encryption helps protect
-							data confidentiality even in the presence of a
-							server-side failure. While it is possible for
-							another collision, enabling decryption of the file,
-							this is improbable.
-						</details>
+											Khaopiak does not generate
+											guaranteed unique mnemonics. As a
+											result, it is theoretically possible
+											for a collision to occur, which may
+											enable accidental file overwriting
+											or downloading of an alternate file.
+											However, this case is extremely
+											improbable. Client-side encryption
+											helps protect data confidentiality
+											even in the presence of a
+											server-side failure. While it is
+											possible for another collision,
+											enabling decryption of the file,
+											this is improbable.
+										</details>
 
-						<details
-							style="
-								border: 1px solid;
-								border-radius: 8px;
-								padding: 8px;
-								margin-top: 4px;
-							"
-						>
-							<summary>🦹 Mnemonic theft</summary>
+										<details
+											style="
+												border: 1px solid;
+												border-radius: 8px;
+												padding: 8px;
+												margin-top: 4px;
+											"
+										>
+											<summary>🦹 Mnemonic theft</summary>
 
-							To conveniently use Khaopiak, the same portal should
-							both accept a server mnemonic and a client mnemonic.
-							However, the client mnemonic could accidentally be
-							sent to the server if entered incorrectly,
-							compromising end-to-end encryption. A portal may
-							also be maliciously designed to explicitly capture
-							client mnemonics. To avoid mnemonic theft, an
-							end-user should have a means of verifying the
-							portal's legitimacy (such as through TLS
-							certificates). Further, the portal should have a
-							clear means of distinguishing the client and server
-							mnemonics, such as using half of a combined mnemonic
-							for each, or using a distinct wordlist for the
-							client and server.
-						</details>
+											To conveniently use Khaopiak, the
+											same portal should both accept a
+											server mnemonic and a client
+											mnemonic. However, the client
+											mnemonic could accidentally be sent
+											to the server if entered
+											incorrectly, compromising end-to-end
+											encryption. A portal may also be
+											maliciously designed to explicitly
+											capture client mnemonics. To avoid
+											mnemonic theft, an end-user should
+											have a means of verifying the
+											portal's legitimacy (such as through
+											TLS certificates). Further, the
+											portal should have a clear means of
+											distinguishing the client and server
+											mnemonics, such as using half of a
+											combined mnemonic for each, or using
+											a distinct wordlist for the client
+											and server.
+										</details>
 
-						<details
-							style="
-								border: 1px solid;
-								border-radius: 8px;
-								padding: 8px;
-								margin-top: 4px;
-							"
-						>
-							<summary>🧮 User-specified entropy length</summary>
+										<details
+											style="
+												border: 1px solid;
+												border-radius: 8px;
+												padding: 8px;
+												margin-top: 4px;
+											"
+										>
+											<summary>
+												🧮 User-specified entropy length
+											</summary>
 
-							When a user specifies an entropy length of 160 or
-							224, Khaopiak pads the entropy to become 192 or 256
-							bits, respectively, as AES only supports 128, 192,
-							and 256-bit keys. As a result, while a longer-bit
-							algorithm is used for encryption, it does not
-							inherently increase the level of security assurance
-							as the padding is predictable.
-						</details>
+											When a user specifies an entropy
+											length of 160 or 224, Khaopiak pads
+											the entropy to become 192 or 256
+											bits, respectively, as AES only
+											supports 128, 192, and 256-bit keys.
+											As a result, while a longer-bit
+											algorithm is used for encryption, it
+											does not inherently increase the
+											level of security assurance as the
+											padding is predictable.
+										</details>
 
-						<p>
-							For more about Khaopiak, please
-							<a
-								href="https://github.com/Jayson-Fong/Khaopiak"
-								target="_blank"
-								>visit the project's GitHub repository</a
-							>.
-						</p>
+										<p>
+											For more about Khaopiak, please
+											<a
+												href="https://github.com/Jayson-Fong/Khaopiak"
+												target="_blank"
+												>visit the project's GitHub
+												repository</a
+											>.
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
