@@ -20,6 +20,10 @@ details {
 	margin-top: 4px;
 }
 
+.emoji-text {
+	line-height: 1.1em;
+}
+
 /** Generic forms **/
 
 form {
