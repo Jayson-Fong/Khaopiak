@@ -178,6 +178,4 @@ dist
 .tsimp
 
 # Project
-public/portal.html
-public/*.css
-public/*.js
+public/*
