@@ -147,7 +147,8 @@ window.addEventListener('load', () => {
 	});
 
 	document.querySelectorAll('[data-navigate]').forEach((e) => {
-		e.addEventListener('click', () => {
+		e.addEventListener('click', (evt) => {
+			evt.preventDefault();
 			navigate(e.getAttribute('data-navigate'));
 		});
 	});
@@ -193,6 +194,11 @@ window.addEventListener('load', () => {
 				e.removeAttribute('open');
 				e.removeAttribute('data-print-open');
 			});
+	});
+
+	// Mostly for SEO
+	document.body.querySelectorAll('a[data-navigate]').forEach((e) => {
+		e.setAttribute('href', `#${e.getAttribute('data-navigate')}`);
 	});
 });
 
