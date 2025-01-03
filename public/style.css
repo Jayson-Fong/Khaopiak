@@ -196,3 +196,28 @@ footer ul.links li a:visited {
 		border-bottom: none;
 	}
 }
+
+@media screen {
+	[data-print-only] {
+		display: none;
+	}
+}
+
+@media print {
+	div.tab-opener-group {
+		display: none;
+	}
+
+	div[data-tab-label] {
+		border: none !important;
+	}
+
+	div.tab-container {
+		border: none !important;
+		display: block !important;
+	}
+
+	footer .links {
+		display: none;
+	}
+}

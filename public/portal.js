@@ -164,6 +164,31 @@ window.addEventListener('load', () => {
 		'Partially implemented',
 		'This form will only download the file from Khaopiak and not decrypt it if client-side encryption was involved in its upload.'
 	);
+
+	// Printing
+	document.body.querySelectorAll('a[href][target=_blank]').forEach((e) => {
+		const linkSpan = document.createElement('span');
+		linkSpan.innerText = ` (${e.getAttribute('href')})`;
+		linkSpan.setAttribute('data-print-only', 'print');
+
+		e.appendChild(linkSpan);
+	});
+
+	window.addEventListener('beforeprint', () => {
+		document.body.querySelectorAll('details:not([open])').forEach((e) => {
+			e.setAttribute('open', 'open');
+			e.setAttribute('data-print-open', 'open');
+		});
+	});
+
+	window.addEventListener('afterprint', () => {
+		document.body
+			.querySelectorAll('details[data-print-open]')
+			.forEach((e) => {
+				e.removeAttribute('open');
+				e.removeAttribute('data-print-open');
+			});
+	});
 });
 
 /** Dialogs **/
