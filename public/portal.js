@@ -1,3 +1,28 @@
+/** Navigation **/
+function navigate(sessionRecoveryKey) {
+	sessionRecoveryKey
+		.split('+')
+		.map((r) => r.trim())
+		.filter((r) => r.length)
+		.forEach((r) => {
+			const restoreItems = Array.from(
+				document.querySelectorAll(`[data-session-restore*=${r}]`)
+			).filter(
+				(restoreItem) =>
+					restoreItem
+						.getAttribute('data-session-restore')
+						.split('+')
+						.filter((restoreItemInner) => restoreItemInner === r)
+						.length
+			);
+			if (restoreItems.length) {
+				restoreItems[0].click();
+			}
+		});
+
+	window.location.hash = `#${sessionRecoveryKey}`;
+}
+
 /** Khaopiak server **/
 function extractError(data) {
 	if (data.success) {
@@ -116,28 +141,14 @@ window.addEventListener('load', () => {
 				: (e.value ?? '');
 	});
 
+	document.querySelectorAll('[data-navigate]').forEach((e) => {
+		e.addEventListener('click', () => {
+			navigate(e.getAttribute('data-navigate'));
+		});
+	});
+
 	if (window.location.hash.length) {
-		window.location.hash
-			.slice(1)
-			.split('+')
-			.map((r) => r.trim())
-			.filter((r) => r.length)
-			.forEach((r) => {
-				const restoreItems = Array.from(
-					document.querySelectorAll(`[data-session-restore*=${r}]`)
-				).filter(
-					(restoreItem) =>
-						restoreItem
-							.getAttribute('data-session-restore')
-							.split('+')
-							.filter(
-								(restoreItemInner) => restoreItemInner === r
-							).length
-				);
-				if (restoreItems.length) {
-					restoreItems[0].click();
-				}
-			});
+		navigate(window.location.hash.slice(1));
 	}
 
 	showDialog(
