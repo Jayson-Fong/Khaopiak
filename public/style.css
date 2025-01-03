@@ -47,6 +47,7 @@ label.file-upload {
 	cursor: pointer;
 	background-color: var(--outline-color);
 	display: inline-block;
+	border-radius: 8px;
 }
 
 /** Tabs
@@ -98,7 +99,7 @@ div.tab-opener-group button:hover {
 }
 
 div.tab-opener-group button[data-active] {
-	background-color: var(--primary-foreground-color);
+	background-color: var(--secondary-foreground-color);
 }
 
 div[data-tab-label]:not([data-tab-vertical]) {
@@ -119,6 +120,11 @@ figure.dialog-box {
 	border: 1px solid var(--outline-color);
 	padding: 8px;
 	border-radius: 8px;
+	background-color: var(--secondary-foreground-color);
+}
+
+figure.dialog-box p {
+	background-color: transparent;
 }
 
 figure.dialog-box:not([data-dialog-level]) {

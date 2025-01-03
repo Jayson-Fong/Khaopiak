@@ -50,7 +50,8 @@ function extractError(data) {
 function autoDetectMnemonicSplit(mnemonic) {
 	const mnemonicWords = mnemonic
 		.trim()
-		.split(' ')
+		.split(/[ \n]/)
+		.map((w) => w.trim())
 		.filter((w) => w.length > 2);
 
 	if (mnemonicWords.length >= 24 && mnemonicWords.length % 2 === 0) {

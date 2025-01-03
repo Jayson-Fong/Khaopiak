@@ -3,7 +3,7 @@
 	--outline-color: #cccccc;
 	--primary-background-color: #f1f1f1;
 	--primary-foreground-color: #cccccc;
-	--secondary-foreground-color: #dddddd;
+	--secondary-foreground-color: #f0f0f0;
 
 	--primary-text-color: #000000;
 	--primary-link-color: var(--primary-text-color);
@@ -29,5 +29,15 @@ figure.dialog-box[data-dialog-level][data-dialog-dimmed] {
 
 		--primary-text-color: #ffffff;
 		--primary-link-color: var(--primary-text-color);
+	}
+
+	figure.dialog-box[data-dialog-level] {
+		--warning-color: #ed751a;
+		--success-color: #0c9e02;
+	}
+
+	figure.dialog-box[data-dialog-level][data-dialog-dimmed] {
+		--warning-color: #b06831;
+		--success-color: #064002;
 	}
 }
