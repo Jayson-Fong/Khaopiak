@@ -94,6 +94,14 @@ div.tab-opener-group button.right {
 	float: right;
 }
 
+div[data-tab-label][data-tab-active] {
+	display: block;
+}
+
+div[data-tab-label]:not([data-tab-active]) {
+	display: none;
+}
+
 div.tab-opener-group button:hover {
 	background-color: var(--secondary-foreground-color);
 }

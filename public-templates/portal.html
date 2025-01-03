@@ -128,9 +128,16 @@
 
 					<div data-tab-group="operation" data-tab-label="upload">
 						<h2>Upload files</h2>
-						<figure class="dialog-box" data-dialog="upload">
-							<figcaption></figcaption>
-							<p></p>
+						<figure
+							class="dialog-box"
+							data-dialog="upload"
+							data-dialog-level="warning"
+						>
+							<figcaption>Not implemented</figcaption>
+							<p>
+								This feature is not implemented yet and files
+								will not be uploaded. Please check back later.
+							</p>
 						</figure>
 
 						<form data-change="upload" id="form-upload">
@@ -175,11 +182,20 @@
 						data-tab-group="operation"
 						data-tab-label="download"
 						data-tab-default
+						data-tab-active
 					>
 						<h2>Download files</h2>
-						<figure class="dialog-box" data-dialog="download">
-							<figcaption></figcaption>
-							<p></p>
+						<figure
+							class="dialog-box"
+							data-dialog="download"
+							data-dialog-level="warning"
+						>
+							<figcaption>Partially implemented</figcaption>
+							<p>
+								This form will only download the file from
+								Khaopiak and not decrypt it if client-side
+								encryption was involved in its upload.
+							</p>
 						</figure>
 
 						<form
@@ -287,6 +303,7 @@
 									data-tab-group="about"
 									data-tab-label="project"
 									data-tab-default
+									data-tab-active
 								>
 									<div>
 										<h2>Purpose</h2>
@@ -833,5 +850,5 @@ orchard home picture movie only what believe onion physical defy hole among clim
 			</ul>
 		</footer>
 	</body>
-	<script src="portal.js" integrity="%%INTEGRITY:portal.js%%"></script>
+	<script src="portal.js" integrity="%%INTEGRITY:portal.js%%" async></script>
 </html>
