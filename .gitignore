@@ -176,3 +176,6 @@ dist
 
 # tsimp
 .tsimp
+
+# Project
+public/portal.html
