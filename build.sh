@@ -4,6 +4,8 @@ TEMPLATE_FOLDER="public-templates"
 ASSETS_FOLDER="public-templates/assets"
 TARGET_FOLDER="public"
 
+rm -rf "${TARGET_FOLDER:?}"/*
+
 asset_files=$(ls "$ASSETS_FOLDER")
 
 for asset_file in $asset_files; do

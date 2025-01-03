@@ -1,1 +1,1 @@
-public/sh
+public-templates/assets/sh
