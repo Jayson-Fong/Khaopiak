@@ -1,0 +1,33 @@
+:root {
+	--background-color: #ffffff;
+	--outline-color: #cccccc;
+	--primary-background-color: #f1f1f1;
+	--primary-foreground-color: #cccccc;
+	--secondary-foreground-color: #dddddd;
+
+	--primary-text-color: #000000;
+	--primary-link-color: var(--primary-text-color);
+}
+
+figure.dialog-box[data-dialog-level] {
+	--warning-color: #ed751a;
+	--success-color: #50fc17;
+}
+
+figure.dialog-box[data-dialog-level][data-dialog-dimmed] {
+	--warning-color: #b06831;
+	--success-color: #20590c;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--background-color: #15171a;
+		--outline-color: #525252;
+		--primary-background-color: #161617;
+		--primary-foreground-color: #272729;
+		--secondary-foreground-color: #2e2e30;
+
+		--primary-text-color: #ffffff;
+		--primary-link-color: var(--primary-text-color);
+	}
+}

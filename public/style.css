@@ -1,3 +1,8 @@
+* {
+	background-color: var(--background-color);
+	color: var(--primary-text-color);
+}
+
 header {
 	text-align: center;
 }
@@ -6,6 +11,13 @@ pre {
 	white-space: pre-wrap;
 	overflow: scroll;
 	overflow-wrap: anywhere;
+}
+
+details {
+	border: 1px solid;
+	border-radius: 8px;
+	padding: 8px;
+	margin-top: 4px;
 }
 
 /** Generic forms **/
@@ -33,7 +45,7 @@ input[type='file'] {
 label.file-upload {
 	padding: 6px 12px;
 	cursor: pointer;
-	background-color: #ccc;
+	background-color: var(--outline-color);
 	display: inline-block;
 }
 
@@ -44,7 +56,7 @@ label.file-upload {
 div.tab-container[data-tab-vertical] {
 	display: inline-flex;
 	width: 100%;
-	border: 1px solid #cccccc;
+	border: 1px solid var(--outline-color);
 }
 
 div.tab-container[data-tab-vertical] > div:nth-of-type(2) {
@@ -54,8 +66,8 @@ div.tab-container[data-tab-vertical] > div:nth-of-type(2) {
 
 div.tab-opener-group {
 	overflow: hidden;
-	border: 1px solid #ccc;
-	background-color: #f1f1f1;
+	border: 1px solid var(--outline-color);
+	background-color: var(--primary-background-color);
 }
 
 div.tab-opener-group[data-tab-vertical] {
@@ -82,16 +94,16 @@ div.tab-opener-group button.right {
 }
 
 div.tab-opener-group button:hover {
-	background-color: #ddd;
+	background-color: var(--secondary-foreground-color);
 }
 
 div.tab-opener-group button[data-active] {
-	background-color: #ccc;
+	background-color: var(--primary-foreground-color);
 }
 
 div[data-tab-label]:not([data-tab-vertical]) {
 	padding: 6px 12px;
-	border: 1px solid #ccc;
+	border: 1px solid var(--outline-color);
 	border-top: none;
 }
 
@@ -104,7 +116,7 @@ div[data-tab-label][data-tab-vertical] {
 
 /** Dialogs **/
 figure.dialog-box {
-	border: 1px solid;
+	border: 1px solid var(--outline-color);
 	padding: 8px;
 	border-radius: 8px;
 }
@@ -114,26 +126,18 @@ figure.dialog-box:not([data-dialog-level]) {
 }
 
 figure.dialog-box figcaption {
-	border-bottom: 1px solid;
-	padding: 4px 0;
+	border-bottom: 1px solid var(--outline-color);
+	padding: 4px 6px;
 	border-radius: 4px;
 	transition: 1s;
 }
 
 figure.dialog-box[data-dialog-level='warning'] figcaption {
-	background-color: #ed751a;
-}
-
-figure.dialog-box[data-dialog-level='warning'][data-dialog-dimmed] figcaption {
-	background-color: #b06831;
+	background-color: var(--warning-color);
 }
 
 figure.dialog-box[data-dialog-level='success'] figcaption {
-	background-color: #50fc17;
-}
-
-figure.dialog-box[data-dialog-level='success'][data-dialog-dimmed] figcaption {
-	background-color: #20590c;
+	background-color: var(--success-color);
 }
 
 /** Footer **/
@@ -148,13 +152,13 @@ footer ul.links li {
 }
 
 footer ul.links li a {
-	color: black;
+	color: var(--primary-link-color);
 	text-decoration: none;
 	cursor: pointer;
 }
 
 footer ul.links li a:visited {
-	color: black;
+	color: var(--primary-link-color);
 }
 
 /** ** Mobile responsiveness ** **/
@@ -185,7 +189,7 @@ footer ul.links li a:visited {
 		display: block;
 		width: 100%;
 		padding: 6px 16px;
-		border-bottom: 1px solid #ccc;
+		border-bottom: 1px solid var(--outline-color);
 	}
 
 	div.tab-opener-group button:last-of-type {
