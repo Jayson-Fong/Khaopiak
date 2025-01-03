@@ -127,6 +127,10 @@ window.addEventListener('load', () => {
 		e.addEventListener('click', () => {
 			dimDialog(e.getAttribute('data-change'));
 		});
+
+		e.addEventListener('input', () => {
+			dimDialog(e.getAttribute('data-change'));
+		});
 	});
 
 	document.querySelectorAll('[data-input-target]').forEach((e) => {
