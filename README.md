@@ -233,6 +233,7 @@ encryption, it does not inherently increase the level of security assurance as t
 - [ ] Salt or HMAC object keys
 - [ ] POSIX-based upload/download script
 - [ ] Web portal
+- [ ] Add optional PKI encryption for mnemonic transfers to avoid TLS inspection
 
 ## Examples
 
@@ -264,8 +265,8 @@ Response:
 
 ```json
 {
-	"success": true,
-	"mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
+  "success": true,
+  "mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
 }
 ```
 
@@ -322,7 +323,7 @@ Response:
 
 ```json
 {
-	"success": true
+  "success": true
 }
 ```
 
