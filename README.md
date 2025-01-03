@@ -247,7 +247,7 @@ encryption, it does not inherently increase the level of security assurance as t
 > [!TIP]
 > When using [Transform Rules](https://developers.cloudflare.com/rules/transform/response-header-modification/) to set
 > the `Access-Control-Allow-Origin` header for multiple sites, consider making it
-> dynamically-valued: `http.request.headers["origin"][0]`
+> dynamically-valued: `concat("https://", http.host)`
 
 ```
 Access-Control-Allow-Origin: <origin>
