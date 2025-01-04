@@ -1,10 +1,14 @@
 import { Bool, OpenAPIRoute, Str } from 'chanfana';
 import { z } from 'zod';
 import { Context } from 'hono';
-import { validateMnemonic, mnemonicToEntropy } from 'bip39';
-import { digestToKey } from '../../util/format';
-import { bufferToNumber, hexToArrayBuffer } from '../../util/buffer';
+import { bufferToNumber } from '../../util/buffer';
 import config from '../../../config.json';
+import {
+	extractMnemonic,
+	generateResponse,
+	GENERIC_NULL_RESPONSE_SCHEMA,
+	importServerPrivateKey
+} from '../../util/pki';
 
 /**
  * Checks if a file exists based on a BIP39
@@ -24,15 +28,22 @@ export class FileExists extends OpenAPIRoute {
 						schema: z.object({
 							// The minimum mnemonic in *English* is 12 space-separated words of 3 characters
 							// The maximum mnemonic in *English* is 24 space-separated words of 8 characters
-							mnemonic: Str({
-								description:
-									'The BIP39 mnemonic used for file storage and server-side encryption',
-								example:
-									'vivid few stable brown wine update elevator angry document brain another success',
-								required: true
-							})
-								.min(47)
-								.max(215)
+							mnemonic: z.union([
+								Str({
+									description:
+										'The BIP39 mnemonic used for file storage and server-side encryption',
+									example:
+										'vivid few stable brown wine update elevator angry document brain another success',
+									required: true
+								})
+									.min(47)
+									.max(215),
+								z
+									.instanceof(File)
+									.describe(
+										"A binary file encrypted using the server's public key. The plaintext should start with two bytes indicating the length of the following public key, which is itself followed by the mnemonic."
+									)
+							])
 						})
 					}
 				}
@@ -71,6 +82,13 @@ export class FileExists extends OpenAPIRoute {
 								example: false
 							})
 						})
+					},
+					'application/octet-stream': {
+						schema: Str({
+							description:
+								'Returned when an encrypted mnemonic is sent to the server. The JSON response is encrypted using the provided public key and contains a single boolean-valued entry named "success" indicating whether the server successfully processed the request; however, does not acknowledge whether the file initially existed.',
+							required: true
+						})
 					}
 				}
 			},
@@ -93,7 +111,8 @@ export class FileExists extends OpenAPIRoute {
 								required: true
 							})
 						})
-					}
+					},
+					'application/octet-stream': GENERIC_NULL_RESPONSE_SCHEMA
 				}
 			},
 			'400': {
@@ -115,7 +134,8 @@ export class FileExists extends OpenAPIRoute {
 								required: true
 							})
 						})
-					}
+					},
+					'application/octet-stream': GENERIC_NULL_RESPONSE_SCHEMA
 				}
 			}
 		}
@@ -132,8 +152,28 @@ export class FileExists extends OpenAPIRoute {
 			].schema.parse(await c.req.parseBody())
 		};
 
-		if (!validateMnemonic(data.body.mnemonic)) {
-			return c.json(
+		let publicKey;
+		let mnemonic;
+
+		try {
+			const privateKey = await importServerPrivateKey(c.env);
+
+			({ publicKey, mnemonic } = await extractMnemonic(
+				data.body.mnemonic,
+				privateKey
+			));
+		} catch (e) {
+			// This indicates a potentially encrypted request,
+			// and the client might want an encrypted response.
+			// We can't honor it without their public key, so
+			// we error on the side of caution.
+			return new Response(null);
+		}
+
+		if (!mnemonic.isValid()) {
+			return generateResponse(
+				publicKey,
+				c.json,
 				{
 					success: false,
 					error: 'Invalid mnemonic'
@@ -142,19 +182,11 @@ export class FileExists extends OpenAPIRoute {
 			);
 		}
 
-		const entropy = mnemonicToEntropy(data.body.mnemonic);
-
-		const entropyBytes = hexToArrayBuffer(entropy);
-
-		// Generate the file hash for generation of the R2 file path
-		const objectKey = digestToKey(
-			await crypto.subtle.digest({ name: 'SHA-256' }, entropyBytes)
-		);
-
-		const object = await c.env.STORAGE.get(objectKey);
+		const theoreticalObject = await mnemonic.toTheoreticalObject();
+		const object = await theoreticalObject.get(c.env.STORAGE);
 
 		if (!object) {
-			return c.json({
+			return generateResponse(publicKey, c.json, {
 				success: true,
 				exists: false
 			});
@@ -166,15 +198,15 @@ export class FileExists extends OpenAPIRoute {
 		if (expiry <= Date.now()) {
 			// Since the file is expired, it should be gone by now, so we pretend it's gone.
 			// And that's not wrong since it is indeed about to be gone...
-			await c.env.STORAGE.delete(objectKey);
+			await theoreticalObject.delete(c.env.STORAGE);
 
-			return c.json({
+			return generateResponse(publicKey, c.json, {
 				success: true,
 				exists: false
 			});
 		}
 
-		return c.json({
+		return generateResponse(publicKey, c.json, {
 			success: true,
 			exists: !!object
 		});

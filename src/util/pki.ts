@@ -1,4 +1,15 @@
-import { bufferToNumber } from './buffer';
+import { bufferToNumber, hexToArrayBuffer } from './buffer';
+import { Bindings } from '../types';
+import { Str } from 'chanfana';
+import BIP39 from './bip39';
+
+// TODO: Move this somewhere more reasonable.
+export const GENERIC_NULL_RESPONSE_SCHEMA = {
+	schema: Str({
+		description:
+			'Returned when an encrypted mnemonic is sent to the server. The equivalent of the application/json response is stored as a payload when encrypted. If encrypting the response is not possible, a null response is returned'
+	})
+};
 
 export const decryptServerKeyed = async (
 	input: File,
@@ -14,7 +25,10 @@ export const decryptServerKeyed = async (
 export const extractMnemonic = async (
 	input: string | File,
 	privateKey: CryptoKey
-): Promise<{ publicKey: null | CryptoKey; mnemonic: null | string }> => {
+): Promise<{
+	publicKey: null | CryptoKey;
+	mnemonic: BIP39;
+}> => {
 	if (input instanceof File) {
 		const inputBytes = new Uint8Array(
 			await decryptServerKeyed(input, privateKey)
@@ -25,7 +39,7 @@ export const extractMnemonic = async (
 		if (inputBytes.byteLength < 3) {
 			return {
 				publicKey: null,
-				mnemonic: null
+				mnemonic: new BIP39()
 			};
 		}
 
@@ -33,7 +47,7 @@ export const extractMnemonic = async (
 		if (inputBytes.length - keyByteCount - 2 < 0) {
 			return {
 				publicKey: null,
-				mnemonic: null
+				mnemonic: new BIP39()
 			};
 		}
 
@@ -49,12 +63,58 @@ export const extractMnemonic = async (
 							['decrypt']
 						)
 					: null,
-			mnemonic: textDecoder.decode(inputBytes.slice(keyByteCount + 2))
+			mnemonic: new BIP39(
+				textDecoder.decode(inputBytes.slice(keyByteCount + 2))
+			)
 		};
 	}
 
 	return {
 		publicKey: null,
-		mnemonic: input
+		mnemonic: new BIP39(input)
 	};
+};
+
+export const generateResponse = async (
+	publicKey: CryptoKey | null,
+	jsonWrapper: (payload: object, status: number | undefined) => Response,
+	payload: object | Uint8Array | null,
+	status: number | undefined = undefined
+): Promise<Response> => {
+	if (!payload) {
+		return new Response(payload, { status: status });
+	}
+
+	if (!publicKey) {
+		return payload instanceof Uint8Array
+			? new Response(payload, { status: status })
+			: jsonWrapper(payload, status);
+	}
+
+	const textEncoder = new TextEncoder();
+	try {
+		return new Response(
+			await crypto.subtle.encrypt(
+				{ name: 'RSA-OAEP' },
+				publicKey,
+				payload instanceof Uint8Array
+					? payload
+					: textEncoder.encode(JSON.stringify(payload))
+			),
+			{ status: status }
+		);
+	} catch (e) {
+		// An encrypted response was requested, which we cannot provide.
+		return new Response(null, { status: 400 });
+	}
+};
+
+export const importServerPrivateKey = async (env: Bindings) => {
+	return await crypto.subtle.importKey(
+		'pkcs8',
+		hexToArrayBuffer(env.PRIVATE_KEY_HEX),
+		{ name: 'RSA-OAEP' },
+		true,
+		['decrypt']
+	);
 };

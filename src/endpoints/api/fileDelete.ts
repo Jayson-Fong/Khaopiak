@@ -1,11 +1,13 @@
 import { Bool, OpenAPIRoute, Str } from 'chanfana';
 import { z } from 'zod';
 import { Context } from 'hono';
-import { validateMnemonic, mnemonicToEntropy } from 'bip39';
-import { digestToKey } from '../../util/format';
-import { hexToArrayBuffer } from '../../util/buffer';
 import config from '../../../config.json';
-import { extractMnemonic } from '../../util/pki';
+import {
+	extractMnemonic,
+	generateResponse,
+	GENERIC_NULL_RESPONSE_SCHEMA,
+	importServerPrivateKey
+} from '../../util/pki';
 
 /**
  * OpenAPI endpoint to delete a file based on a BIP39 mnemonic
@@ -98,7 +100,8 @@ export class FileDelete extends OpenAPIRoute {
 								required: true
 							})
 						})
-					}
+					},
+					'application/octet-stream': GENERIC_NULL_RESPONSE_SCHEMA
 				}
 			},
 			'400': {
@@ -120,7 +123,8 @@ export class FileDelete extends OpenAPIRoute {
 								required: true
 							})
 						})
-					}
+					},
+					'application/octet-stream': GENERIC_NULL_RESPONSE_SCHEMA
 				}
 			}
 		}
@@ -141,13 +145,7 @@ export class FileDelete extends OpenAPIRoute {
 		let mnemonic;
 
 		try {
-			const privateKey = await crypto.subtle.importKey(
-				'pkcs8',
-				hexToArrayBuffer(c.env.PRIVATE_KEY_HEX),
-				{ name: 'RSA-OAEP' },
-				true,
-				['decrypt']
-			);
+			const privateKey = await importServerPrivateKey(c.env);
 
 			({ publicKey, mnemonic } = await extractMnemonic(
 				data.body.mnemonic,
@@ -161,10 +159,10 @@ export class FileDelete extends OpenAPIRoute {
 			return new Response(null);
 		}
 
-		if (!mnemonic) {
-			// TODO: If a public key was provided,
-			//  encrypt this. Or if it fails...null.
-			return c.json(
+		if (!mnemonic.isValid()) {
+			return generateResponse(
+				publicKey,
+				c.json,
 				{
 					success: false,
 					error: 'Invalid mnemonic'
@@ -173,50 +171,10 @@ export class FileDelete extends OpenAPIRoute {
 			);
 		}
 
-		if (!validateMnemonic(mnemonic)) {
-			// TODO: If a public key was provided,
-			//  encrypt this. Or if it fails...null.
-			return c.json(
-				{
-					success: false,
-					error: 'Invalid mnemonic'
-				},
-				400
-			);
-		}
+		await (await mnemonic.toTheoreticalObject()).delete(c.env.STORAGE);
 
-		const entropy = mnemonicToEntropy(mnemonic);
-
-		const entropyBytes = hexToArrayBuffer(entropy);
-
-		// Generate the file hash for generation of the R2 file path
-		const objectKey = digestToKey(
-			await crypto.subtle.digest({ name: 'SHA-256' }, entropyBytes)
-		);
-
-		await c.env.STORAGE.delete(objectKey);
-
-		const payload = {
+		return generateResponse(publicKey, c.json, {
 			success: true
-		};
-
-		if (publicKey) {
-			const textEncoder = new TextEncoder();
-
-			try {
-				return new Response(
-					await crypto.subtle.encrypt(
-						{ name: 'RSA-OAEP' },
-						publicKey,
-						textEncoder.encode(JSON.stringify(payload))
-					)
-				);
-			} catch (e) {
-				// An encrypted response was requested, which we cannot provide.
-				return new Response(null);
-			}
-		}
-
-		return c.json(payload);
+		});
 	}
 }
