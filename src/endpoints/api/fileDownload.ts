@@ -9,6 +9,12 @@ import {
 } from '../../util/buffer';
 import { digestToKey, extractContentPrefix, isPDF } from '../../util/format';
 import config from '../../../config.json';
+import {
+	GENERIC_400,
+	GENERIC_401,
+	GENERIC_HEADER_CLOUDFLARE_ACCESS,
+	MNEMONIC_STRING
+} from '../../util/schema';
 
 /**
  * OpenAPI endpoint to download a file based on
@@ -38,32 +44,13 @@ export class FileDownload extends OpenAPIRoute {
 				content: {
 					'multipart/form-data': {
 						schema: z.object({
-							// The minimum mnemonic in *English* is 12 space-separated words of 3 characters
-							// The maximum mnemonic in *English* is 24 space-separated words of 8 characters
-							mnemonic: Str({
-								description:
-									'The BIP39 mnemonic used for file storage and server-side encryption',
-								example:
-									'vivid few stable brown wine update elevator angry document brain another success',
-								required: true
-							})
-								.min(47)
-								.max(215)
+							mnemonic: MNEMONIC_STRING
 						})
 					}
 				}
 			},
-			...(config.requireAuth.download
-				? {
-						headers: z.object({
-							'cf-access-authenticated-user-email': z
-								.string({
-									description:
-										'Cloudflare Access authenticated user email'
-								})
-								.email()
-						})
-					}
+			...(config.requireAuth.delete
+				? { headers: GENERIC_HEADER_CLOUDFLARE_ACCESS }
 				: {})
 		},
 		responses: {
@@ -88,50 +75,8 @@ export class FileDownload extends OpenAPIRoute {
 					}
 				}
 			},
-			'401': {
-				description: 'Missing or bad authentication',
-				content: {
-					'application/json': {
-						schema: z.object({
-							success: Bool({
-								description:
-									'Whether the download operation succeeded',
-								required: true,
-								default: false,
-								example: false
-							}),
-							error: Str({
-								default: 'Missing or bad authentication',
-								description: 'Authentication error',
-								example: 'Missing or bad authentication',
-								required: true
-							})
-						})
-					}
-				}
-			},
-			'400': {
-				description: 'Bad request',
-				content: {
-					'application/json': {
-						schema: z.object({
-							success: Bool({
-								description:
-									'Whether the download operation succeeded',
-								required: true,
-								default: false,
-								example: false
-							}),
-							error: Str({
-								default: 'Invalid mnemonic',
-								description: 'Bad request error',
-								example: 'Invalid mnemonic',
-								required: true
-							})
-						})
-					}
-				}
-			},
+			'401': GENERIC_401,
+			'400': GENERIC_400,
 			'404': {
 				description: 'File not found',
 				content: {

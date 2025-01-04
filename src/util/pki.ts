@@ -1,15 +1,6 @@
 import { bufferToNumber, hexToArrayBuffer } from './buffer';
 import { Bindings } from '../types';
-import { Str } from 'chanfana';
 import BIP39 from './bip39';
-
-// TODO: Move this somewhere more reasonable.
-export const GENERIC_NULL_RESPONSE_SCHEMA = {
-	schema: Str({
-		description:
-			'Returned when an encrypted mnemonic is sent to the server. The equivalent of the application/json response is stored as a payload when encrypted. If encrypting the response is not possible, a null response is returned'
-	})
-};
 
 export const decryptServerKeyed = async (
 	input: File,

@@ -6,9 +6,14 @@ import config from '../../../config.json';
 import {
 	extractMnemonic,
 	generateResponse,
-	GENERIC_NULL_RESPONSE_SCHEMA,
 	importServerPrivateKey
 } from '../../util/pki';
+import {
+	GENERIC_400,
+	GENERIC_401,
+	GENERIC_HEADER_CLOUDFLARE_ACCESS,
+	MNEMONIC_STRING
+} from '../../util/schema';
 
 /**
  * Checks if a file exists based on a BIP39
@@ -29,15 +34,7 @@ export class FileExists extends OpenAPIRoute {
 							// The minimum mnemonic in *English* is 12 space-separated words of 3 characters
 							// The maximum mnemonic in *English* is 24 space-separated words of 8 characters
 							mnemonic: z.union([
-								Str({
-									description:
-										'The BIP39 mnemonic used for file storage and server-side encryption',
-									example:
-										'vivid few stable brown wine update elevator angry document brain another success',
-									required: true
-								})
-									.min(47)
-									.max(215),
+								MNEMONIC_STRING,
 								z
 									.instanceof(File)
 									.describe(
@@ -48,17 +45,8 @@ export class FileExists extends OpenAPIRoute {
 					}
 				}
 			},
-			...(config.requireAuth.exists
-				? {
-						headers: z.object({
-							'cf-access-authenticated-user-email': z
-								.string({
-									description:
-										'Cloudflare Access authenticated user email'
-								})
-								.email()
-						})
-					}
+			...(config.requireAuth.delete
+				? { headers: GENERIC_HEADER_CLOUDFLARE_ACCESS }
 				: {})
 		},
 		responses: {
@@ -92,52 +80,8 @@ export class FileExists extends OpenAPIRoute {
 					}
 				}
 			},
-			'401': {
-				description: 'Missing or bad authentication',
-				content: {
-					'application/json': {
-						schema: z.object({
-							success: Bool({
-								description:
-									'Whether the existence check operation succeeded',
-								required: true,
-								default: false,
-								example: false
-							}),
-							error: Str({
-								default: 'Missing or bad authentication',
-								description: 'Authentication error',
-								example: 'Missing or bad authentication',
-								required: true
-							})
-						})
-					},
-					'application/octet-stream': GENERIC_NULL_RESPONSE_SCHEMA
-				}
-			},
-			'400': {
-				description: 'Bad request',
-				content: {
-					'application/json': {
-						schema: z.object({
-							success: Bool({
-								description:
-									'Whether the existence check operation succeeded',
-								required: true,
-								default: false,
-								example: false
-							}),
-							error: Str({
-								default: 'Invalid mnemonic',
-								description: 'Bad request error',
-								example: 'Invalid mnemonic',
-								required: true
-							})
-						})
-					},
-					'application/octet-stream': GENERIC_NULL_RESPONSE_SCHEMA
-				}
-			}
+			'401': GENERIC_401,
+			'400': GENERIC_400
 		}
 	};
 

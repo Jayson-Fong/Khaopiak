@@ -10,6 +10,10 @@ import {
 } from '../../util/buffer';
 import { digestToKey, fileToContentPrefix } from '../../util/format';
 import config from '../../../config.json';
+import {
+	GENERIC_401,
+	GENERIC_HEADER_CLOUDFLARE_ACCESS
+} from '../../util/schema';
 
 /**
  * Uploads a file to Cloudflare R2 after
@@ -63,17 +67,8 @@ export class FileUpload extends OpenAPIRoute {
 					}
 				}
 			},
-			...(config.requireAuth.upload
-				? {
-						headers: z.object({
-							'cf-access-authenticated-user-email': z
-								.string({
-									description:
-										'Cloudflare Access authenticated user email'
-								})
-								.email()
-						})
-					}
+			...(config.requireAuth.delete
+				? { headers: GENERIC_HEADER_CLOUDFLARE_ACCESS }
 				: {})
 		},
 		responses: {
@@ -100,28 +95,7 @@ export class FileUpload extends OpenAPIRoute {
 					}
 				}
 			},
-			'401': {
-				description: 'Missing or bad authentication',
-				content: {
-					'application/json': {
-						schema: z.object({
-							success: Bool({
-								description:
-									'Whether the upload operation succeeded',
-								required: true,
-								default: false,
-								example: false
-							}),
-							error: Str({
-								default: 'Missing or bad authentication',
-								description: 'Authentication error',
-								example: 'Missing or bad authentication',
-								required: true
-							})
-						})
-					}
-				}
-			}
+			'401': GENERIC_401
 		}
 	};
 
