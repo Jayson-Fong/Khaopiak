@@ -89,11 +89,9 @@ export class FileDelete extends OpenAPIRoute {
 		let mnemonic;
 
 		try {
-			const privateKey = await importServerPrivateKey(c.env);
-
 			({ publicKey, mnemonic } = await extractMnemonic(
 				data.body.mnemonic,
-				privateKey
+				importServerPrivateKey(c.env)
 			));
 		} catch (e) {
 			// This indicates a potentially encrypted request,

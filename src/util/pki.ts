@@ -15,14 +15,14 @@ export const decryptServerKeyed = async (
 
 export const extractMnemonic = async (
 	input: string | File,
-	privateKey: CryptoKey
+	privateKey: Promise<CryptoKey>
 ): Promise<{
 	publicKey: null | CryptoKey;
 	mnemonic: BIP39;
 }> => {
 	if (input instanceof File) {
 		const inputBytes = new Uint8Array(
-			await decryptServerKeyed(input, privateKey)
+			await decryptServerKeyed(input, await privateKey)
 		);
 
 		// It should be 2 bytes to specify key length, then key
@@ -49,7 +49,7 @@ export const extractMnemonic = async (
 					? await crypto.subtle.importKey(
 							'spki',
 							inputBytes.slice(2, keyByteCount + 2),
-							{ name: 'RSA-OAEP' },
+							{ name: 'RSA-OAEP', hash: 'SHA-512' },
 							true,
 							['decrypt']
 						)
@@ -100,11 +100,11 @@ export const generateResponse = async (
 	}
 };
 
-export const importServerPrivateKey = async (env: Bindings) => {
-	return await crypto.subtle.importKey(
+export const importServerPrivateKey = (env: Bindings) => {
+	return crypto.subtle.importKey(
 		'pkcs8',
 		hexToArrayBuffer(env.PRIVATE_KEY_HEX),
-		{ name: 'RSA-OAEP' },
+		{ name: 'RSA-OAEP', hash: 'SHA-512' },
 		true,
 		['decrypt']
 	);
