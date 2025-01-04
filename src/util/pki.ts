@@ -71,15 +71,16 @@ export const generateResponse = async (
 	publicKey: CryptoKey | null,
 	jsonWrapper: (payload: object, status: number | undefined) => Response,
 	payload: object | Uint8Array | null,
-	status: number | undefined = undefined
+	status: number | undefined = undefined,
+	headers: HeadersInit | undefined = undefined
 ): Promise<Response> => {
 	if (!payload) {
-		return new Response(payload, { status: status });
+		return new Response(payload, { status, headers });
 	}
 
 	if (!publicKey) {
 		return payload instanceof Uint8Array
-			? new Response(payload, { status: status })
+			? new Response(payload, { status: status, headers })
 			: jsonWrapper(payload, status);
 	}
 
@@ -93,7 +94,7 @@ export const generateResponse = async (
 					? payload
 					: textEncoder.encode(JSON.stringify(payload))
 			),
-			{ status: status }
+			{ status }
 		);
 	} catch (e) {
 		// An encrypted response was requested, which we cannot provide.

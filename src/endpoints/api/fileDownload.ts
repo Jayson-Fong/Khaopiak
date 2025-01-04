@@ -1,13 +1,8 @@
 import { Bool, OpenAPIRoute, Str } from 'chanfana';
 import { z } from 'zod';
 import { Context } from 'hono';
-import { validateMnemonic, mnemonicToEntropy } from 'bip39';
-import {
-	bufferToNumber,
-	hexToArrayBuffer,
-	toAESKeyData
-} from '../../util/buffer';
-import { digestToKey, extractContentPrefix, isPDF } from '../../util/format';
+import { bufferToNumber, toAESKeyData } from '../../util/buffer';
+import { extractContentPrefix, isPDF } from '../../util/format';
 import config from '../../../config.json';
 import {
 	GENERIC_400,
@@ -230,6 +225,12 @@ export class FileDownload extends OpenAPIRoute {
 		await theoreticalObject.delete(c.env.STORAGE);
 
 		// TODO: Return this using generateResponse
-		return new Response(decryptedBuffer.slice(contentStart), { headers });
+		return generateResponse(
+			publicKey,
+			c.json,
+			decryptedBuffer.slice(contentStart),
+			200,
+			headers
+		);
 	}
 }
