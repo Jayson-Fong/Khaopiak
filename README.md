@@ -252,7 +252,7 @@ encryption, it does not inherently increase the level of security assurance as t
 ```
 Access-Control-Allow-Origin: <origin>
 Cache-Control: no-store
-Clear-Site-Data: "*" 
+Clear-Site-Data: "*"
 Content-Security-Policy: default-src 'none'; base-uri 'none'; script-src 'self'; form-action 'self'; script-src-attr 'none'; connect-src 'self'; style-src-elem 'self'; style-src 'self'; style-src-attr 'none'; frame-ancestors 'none'; upgrade-insecure-requests
 Cross-Origin-Embedder-Policy: require-corp
 Cross-Origin-Opener-Policy: same-origin
@@ -294,8 +294,8 @@ Response:
 
 ```json
 {
-  "success": true,
-  "mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
+	"success": true,
+	"mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
 }
 ```
 
@@ -352,7 +352,7 @@ Response:
 
 ```json
 {
-  "success": true
+	"success": true
 }
 ```
 
