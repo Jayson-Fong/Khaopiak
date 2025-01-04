@@ -66,6 +66,7 @@ export const extractMnemonic = async (
 	};
 };
 
+// TODO: Add support for headers
 export const generateResponse = async (
 	publicKey: CryptoKey | null,
 	jsonWrapper: (payload: object, status: number | undefined) => Response,

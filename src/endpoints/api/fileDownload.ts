@@ -15,6 +15,11 @@ import {
 	GENERIC_HEADER_CLOUDFLARE_ACCESS,
 	MNEMONIC_STRING
 } from '../../util/schema';
+import {
+	extractMnemonic,
+	generateResponse,
+	importServerPrivateKey
+} from '../../util/pki';
 
 /**
  * OpenAPI endpoint to download a file based on
@@ -113,8 +118,26 @@ export class FileDownload extends OpenAPIRoute {
 			].schema.parse(await c.req.parseBody())
 		};
 
-		if (!validateMnemonic(data.body.mnemonic)) {
-			return c.json(
+		let publicKey;
+		let mnemonic;
+
+		try {
+			({ publicKey, mnemonic } = await extractMnemonic(
+				data.body.mnemonic,
+				importServerPrivateKey(c.env)
+			));
+		} catch (e) {
+			// This indicates a potentially encrypted request,
+			// and the client might want an encrypted response.
+			// We can't honor it without their public key, so
+			// we error on the side of caution.
+			return new Response(null);
+		}
+
+		if (!mnemonic.isValid()) {
+			return generateResponse(
+				publicKey,
+				c.json,
 				{
 					success: false,
 					error: 'Invalid mnemonic'
@@ -123,28 +146,22 @@ export class FileDownload extends OpenAPIRoute {
 			);
 		}
 
-		const entropy = mnemonicToEntropy(data.body.mnemonic);
-
-		const entropyBytes = hexToArrayBuffer(entropy);
-
-		// Generate the file hash for generation of the R2 file path
-		const objectKey = digestToKey(
-			await crypto.subtle.digest({ name: 'SHA-256' }, entropyBytes)
-		);
-
 		const cryptoKey = await crypto.subtle.importKey(
 			'raw',
-			toAESKeyData(entropyBytes),
+			toAESKeyData(mnemonic.toEntropy()),
 			{ name: 'AES-GCM' },
 			true,
 			['decrypt']
 		);
 
-		const object = await c.env.STORAGE.get(objectKey);
+		const theoreticalObject = await mnemonic.toTheoreticalObject();
+		const object = await theoreticalObject.get(c.env.STORAGE);
 
 		// If the object does not exist...
 		if (!object) {
-			return c.json(
+			return generateResponse(
+				publicKey,
+				c.json,
 				{
 					success: false,
 					error: 'Failed to find file by mnemonic'
@@ -163,9 +180,11 @@ export class FileDownload extends OpenAPIRoute {
 		if (expiry <= Date.now()) {
 			// Since the file is expired, it should be gone by now, so we pretend it's gone.
 			// And that's not wrong since it is indeed about to be gone...
-			await c.env.STORAGE.delete(objectKey);
+			await theoreticalObject.delete(c.env.STORAGE);
 
-			return c.json(
+			return generateResponse(
+				publicKey,
+				c.json,
 				{
 					success: false,
 					error: 'Failed to find file by mnemonic'
@@ -208,8 +227,9 @@ export class FileDownload extends OpenAPIRoute {
 		headers.set('Content-Type', type ?? 'application/octet-stream');
 
 		// We've got the file and got this far...now to destroy it
-		await c.env.STORAGE.delete(objectKey);
+		await theoreticalObject.delete(c.env.STORAGE);
 
+		// TODO: Return this using generateResponse
 		return new Response(decryptedBuffer.slice(contentStart), { headers });
 	}
 }
