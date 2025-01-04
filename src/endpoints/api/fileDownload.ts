@@ -224,7 +224,7 @@ export class FileDownload extends OpenAPIRoute {
 		// We've got the file and got this far...now to destroy it
 		await theoreticalObject.delete(c.env.STORAGE);
 
-		// TODO: Return this using generateResponse
+		// TODO: Add secure headers
 		return generateResponse(
 			publicKey,
 			c.json,

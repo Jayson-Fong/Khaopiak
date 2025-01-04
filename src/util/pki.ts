@@ -90,6 +90,7 @@ export const generateResponse = async (
 			await crypto.subtle.encrypt(
 				{ name: 'RSA-OAEP' },
 				publicKey,
+				// TODO: Add secure headers to payload
 				payload instanceof Uint8Array
 					? payload
 					: textEncoder.encode(JSON.stringify(payload))
