@@ -28,7 +28,7 @@ type ExtractionData<T> = {
 
 export const extractData = async <T extends object>(
 	contentType: string | undefined,
-	primaryInputStream: ReadableStream<any> | null,
+	primaryInputStream: ReadableStream | null,
 	extractor: (input: Uint8Array) => Promise<T>,
 	fallback: () => Promise<T>,
 	privateKey: () => Promise<CryptoKey>
