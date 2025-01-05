@@ -78,16 +78,18 @@ export const extractData = async <T extends object>(
 	}
 
 	let publicKey;
-	try {
-		publicKey = await crypto.subtle.importKey(
-			'spki',
-			payload.slice(4, keyByteCount + 4),
-			{ name: 'RSA-OAEP', hash: 'SHA-512' },
-			true,
-			['decrypt']
-		);
-	} catch (e) {
-		return Promise.reject(e);
+	if (keyByteCount > 0) {
+		try {
+			publicKey = await crypto.subtle.importKey(
+				'spki',
+				payload.slice(4, keyByteCount + 4),
+				{ name: 'RSA-OAEP', hash: 'SHA-512' },
+				true,
+				['decrypt']
+			);
+		} catch (e) {
+			return Promise.reject(e);
+		}
 	}
 
 	return {

@@ -106,7 +106,7 @@ A portion of the mnemonic is never transmitted over the internet and is used to 
 allowing end-to-end encryption. As a result, confidentiality of the original file is protected as it is never made
 available to intermediaries.
 
-For all purposes of encryption, Khaopiak uses the Advanced Encryption Standard (AES), with all clients
+For all purposes of encryption at rest, Khaopiak uses the Advanced Encryption Standard (AES), with all clients
 supporting <a href="https://csrc.nist.gov/pubs/sp/800/38/a/final" target="_blank">Cipher Block Chaining (CBC)</a> and
 recommending <a href="https://csrc.nist.gov/pubs/sp/800/38/d/final" target="_blank">Galois/Counter Mode (GCM)</a> when
 possible.
@@ -184,7 +184,7 @@ the <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto" targ
 the Web Crypto API</a>:
 
 <ul>
-   <li><strong>RSA-OAEP</strong> is not supported as it is a public-key encryption system, where current guidelines recommend a minimum of 2048 key bits. To meet this, 192+ BIP39 words would be required, which is unreasonable for an end-user. While client developers may use it for client-side encryption, server-side mnemonic-based encryption/decryption with RSA-OAEP will not be offered.</li>
+   <li><strong>RSA-OAEP</strong> is supported and required when encrypting payloads to the server or requesting an encrypted response. It is not supported for at-rest storage as it is a public-key encryption system, where current guidelines recommend a minimum of 2048 key bits. To meet this, 192+ BIP39 words would be required, which is unreasonable for an end-user. While client developers may use it for client-side encryption, server-side mnemonic-based encryption/decryption with RSA-OAEP will not be offered.</li>
    <li><strong>AES-CTR</strong> is not supported as it is malleable, potentially allowing the meaning of the ciphertext to be changed.</li>
    <li><strong>AES-CBC</strong> is supported as a client-side encryption algorithm. While Khaopiak is generally not itself vulnerable to a padding oracle attack, client developers should be aware of the algorithm's vulnerability.</li>
    <li><strong>AES-GCM</strong> is supported as both a client and server-side encryption algorithm. AES-GCM provides authenticated encryption which helps authenticate the ciphertext. Additional design considerations are necessary when it is possible for a key and initialization vector (IV) may potentially be reused; however, Khaopiak generates a random key and IV for each upload.</li>
@@ -234,6 +234,7 @@ encryption, it does not inherently increase the level of security assurance as t
 - [ ] POSIX-based upload/download script
 - [ ] Web portal
 - [ ] Add optional PKI encryption for mnemonic transfers to avoid TLS inspection
+- [ ] Encrypt-then-MAC CBC client-side
 
 ## Recommended headers
 
