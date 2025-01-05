@@ -180,3 +180,6 @@ dist
 # Project
 public/*
 !public/.public
+
+# Docs
+docs/public

@@ -21,12 +21,15 @@ export const extractMnemonic = async (
 	mnemonic: BIP39;
 }> => {
 	if (input instanceof File) {
+		// Across all versions, the first 2 bytes
+		// specify the protocol version in plaintext
+
 		const inputBytes = new Uint8Array(
 			await decryptServerKeyed(input, await privateKey)
 		);
 
-		// It should be 2 bytes to specify key length, then key
-		// of at least a byte, then content bytes of at least 1 byte
+		// For version 1, it should be 2 bytes to specify
+		// public key length, followed by content.
 		if (inputBytes.byteLength < 3) {
 			return {
 				publicKey: null,
@@ -66,19 +69,21 @@ export const extractMnemonic = async (
 	};
 };
 
+// TODO: Add support for headers
 export const generateResponse = async (
 	publicKey: CryptoKey | null,
 	jsonWrapper: (payload: object, status: number | undefined) => Response,
 	payload: object | Uint8Array | null,
-	status: number | undefined = undefined
+	status: number | undefined = undefined,
+	headers: HeadersInit | undefined = undefined
 ): Promise<Response> => {
 	if (!payload) {
-		return new Response(payload, { status: status });
+		return new Response(payload, { status, headers });
 	}
 
 	if (!publicKey) {
 		return payload instanceof Uint8Array
-			? new Response(payload, { status: status })
+			? new Response(payload, { status: status, headers })
 			: jsonWrapper(payload, status);
 	}
 
@@ -88,11 +93,12 @@ export const generateResponse = async (
 			await crypto.subtle.encrypt(
 				{ name: 'RSA-OAEP' },
 				publicKey,
+				// TODO: Add secure headers to payload
 				payload instanceof Uint8Array
 					? payload
 					: textEncoder.encode(JSON.stringify(payload))
 			),
-			{ status: status }
+			{ status }
 		);
 	} catch (e) {
 		// An encrypted response was requested, which we cannot provide.
