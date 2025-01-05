@@ -27,7 +27,6 @@ openapi.post('/api/file/upload', FileUpload);
 openapi.post('/api/file/download', FileDownload);
 openapi.post('/api/file/exists', FileExists);
 openapi.post('/api/file/delete', FileDelete);
-openapi.post('/api/file/test', Test);
 
 // Export the Hono app
 export default { ...app, queue };
