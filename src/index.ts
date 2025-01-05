@@ -8,7 +8,6 @@ import { FileDelete } from './endpoints/api/fileDelete';
 import { queue } from './handler/cleanupQueue';
 import { Bindings } from './types';
 import { PortalIndex } from './endpoints';
-import { Test } from './endpoints/api/fileTest';
 
 globalThis.Buffer = Buffer;
 
