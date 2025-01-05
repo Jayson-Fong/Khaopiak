@@ -62,7 +62,8 @@ export class FileUpload extends OpenAPIRoute {
 								.int()
 								// The max queue retry delay is 12 hours, so let's avoid
 								// using an operation if the user doesn't need to.
-								.default(config.upload.expiry.default)
+								.default(config.upload.expiry.default),
+							padding: z.coerce.number().nonnegative()
 						})
 					}
 				}

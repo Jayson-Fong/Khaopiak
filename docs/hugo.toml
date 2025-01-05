@@ -1,4 +1,45 @@
-baseURL = 'https://example.org/'
-languageCode = 'en-us'
-title = 'My New Hugo Site'
-theme = 'hextra'
+title = "Khaopiak"
+theme = "hextra"
+
+[markup.goldmark.renderer]
+unsafe = true
+
+[markup.highlight]
+noClasses = false
+
+[[menu.main]]
+name = "Docs"
+pageRef = "/docs"
+weight = 1
+
+[[menu.main]]
+name = "About"
+pageRef = "/about"
+weight = 2
+
+[[menu.main]]
+name = "Search"
+weight = 3
+
+[menu.main.params]
+type = "search"
+
+[[menu.main]]
+name = "GitHub"
+weight = 4
+url = "https://github.com/Jayson-Fong/Khaopiak"
+
+[menu.main.params]
+icon = "github"
+
+[params.navbar]
+displayTitle = true
+displayLogo = false
+
+[params.footer]
+displayCopyright = false
+displayPoweredBy = true
+
+[params.editURL]
+enable = true
+base = "https://github.com/Jayson-Fong/Khaopiak/edit/main/docs/content"

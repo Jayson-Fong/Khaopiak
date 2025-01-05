@@ -8,6 +8,7 @@ import { FileDelete } from './endpoints/api/fileDelete';
 import { queue } from './handler/cleanupQueue';
 import { Bindings } from './types';
 import { PortalIndex } from './endpoints';
+import { Test } from './endpoints/api/fileTest';
 
 globalThis.Buffer = Buffer;
 
@@ -26,6 +27,7 @@ openapi.post('/api/file/upload', FileUpload);
 openapi.post('/api/file/download', FileDownload);
 openapi.post('/api/file/exists', FileExists);
 openapi.post('/api/file/delete', FileDelete);
+openapi.post('/api/file/test', Test);
 
 // Export the Hono app
 export default { ...app, queue };

@@ -13,6 +13,90 @@ export const decryptServerKeyed = async (
 	);
 };
 
+export const decryptServerKeyedV2 = async (
+	input: Uint8Array,
+	privateKey: CryptoKey
+) => {
+	return crypto.subtle.decrypt({ name: 'RSA-OAEP' }, privateKey, input);
+};
+
+type ExtractionData<T> = {
+	version?: number;
+	publicKey?: CryptoKey;
+	data: Promise<T>;
+};
+
+export const extractData = async <T extends object>(
+	contentType: string | undefined,
+	primaryInputStream: ReadableStream<any> | null,
+	extractor: (input: Uint8Array) => Promise<T>,
+	fallback: () => Promise<T>,
+	privateKey: () => Promise<CryptoKey>
+): Promise<ExtractionData<T>> => {
+	if (
+		!contentType ||
+		contentType !== 'application/octet-stream' ||
+		!primaryInputStream ||
+		primaryInputStream.locked
+	) {
+		return { data: fallback() };
+	}
+
+	let bytes;
+	try {
+		bytes = (await primaryInputStream.getReader().read()).value;
+	} catch (e) {
+		return Promise.reject(e);
+	}
+
+	if (!(bytes instanceof Uint8Array)) {
+		return Promise.reject('Failed to parse payload');
+	}
+
+	const payload = new Uint8Array(
+		await decryptServerKeyedV2(bytes, await privateKey())
+	);
+
+	// Minimally, the response must include at least 2 bytes
+	// for the version, then 2 bytes for the key length
+	if (payload.byteLength < 4) {
+		return Promise.reject('Malformed payload');
+	}
+
+	const version = bufferToNumber(payload.slice(0, 2));
+	if (!version) {
+		return Promise.reject('Malformed payload');
+	}
+
+	if (version !== 1) {
+		return Promise.reject('Unsupported version');
+	}
+
+	const keyByteCount = bufferToNumber(payload.slice(2, 4));
+	if (payload.byteLength - keyByteCount - 4 < 0) {
+		return Promise.reject('Malformed payload');
+	}
+
+	let publicKey;
+	try {
+		publicKey = await crypto.subtle.importKey(
+			'spki',
+			payload.slice(4, keyByteCount + 4),
+			{ name: 'RSA-OAEP', hash: 'SHA-512' },
+			true,
+			['decrypt']
+		);
+	} catch (e) {
+		return Promise.reject(e);
+	}
+
+	return {
+		version: version,
+		data: extractor(payload),
+		publicKey: publicKey
+	};
+};
+
 export const extractMnemonic = async (
 	input: string | File,
 	privateKey: Promise<CryptoKey>
@@ -71,7 +155,7 @@ export const extractMnemonic = async (
 
 // TODO: Add support for headers
 export const generateResponse = async (
-	publicKey: CryptoKey | null,
+	publicKey: CryptoKey | null | undefined,
 	jsonWrapper: (payload: object, status: number | undefined) => Response,
 	payload: object | Uint8Array | null,
 	status: number | undefined = undefined,
