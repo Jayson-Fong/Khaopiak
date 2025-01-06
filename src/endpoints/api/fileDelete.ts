@@ -1,22 +1,21 @@
-import { Bool, OpenAPIRoute, Str } from 'chanfana';
+import { Bool, Str } from 'chanfana';
 import { z } from 'zod';
 import { Context } from 'hono';
 import config from '../../../config.json';
-import { extractData, generateResponse } from '../../util/pki';
+import { generateResponse } from '../../util/pki';
 import {
 	GENERIC_400,
 	GENERIC_401,
 	GENERIC_HEADER_CLOUDFLARE_ACCESS,
 	MNEMONIC_STRING
 } from '../../util/schema';
-import { mnemonicExtractor } from '../../extractor/mnemonic';
-import BIP39 from '../../util/bip39';
+import { OpenAPIFormRoute } from '../../util/OpenAPIFormRoute';
 
 /**
  * OpenAPI endpoint to delete a file based on a BIP39 mnemonic
  * without acknowledging whether a file existed with the mnemonic
  */
-export class FileDelete extends OpenAPIRoute {
+export class FileDelete extends OpenAPIFormRoute {
 	schema = {
 		tags: ['File'],
 		summary: 'Delete a file',
@@ -67,37 +66,7 @@ export class FileDelete extends OpenAPIRoute {
 	};
 
 	async handle(c: Context) {
-		let extractedData;
-		try {
-			extractedData = await extractData<{ mnemonic: string }>(
-				c.req.header('Content-Type'),
-				c.req.raw.body,
-				mnemonicExtractor,
-				async () => {
-					return this.schema.request.body.content[
-						'multipart/form-data'
-					].schema.parse(await c.req.parseBody());
-				},
-				c.env.PRIVATE_KEY_HEX
-			);
-		} catch (e) {
-			return new Response(null, { status: 400 });
-		}
-
-		const { mnemonic } = await extractedData.data;
-		const bip39 = new BIP39(mnemonic);
-
-		if (!bip39.isValid()) {
-			return generateResponse(
-				extractedData.publicKey,
-				c.json,
-				{
-					success: false,
-					error: 'Invalid mnemonic'
-				},
-				400
-			);
-		}
+		const { bip39, extractedData } = await this.extractMnemonicOrError(c);
 
 		await (await bip39.toTheoreticalObject()).delete(c.env.STORAGE);
 		return generateResponse(extractedData.publicKey, c.json, {

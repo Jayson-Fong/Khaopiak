@@ -1,19 +1,16 @@
-import { Bool, OpenAPIRoute, Str } from 'chanfana';
+import { Bool, Str } from 'chanfana';
 import { z } from 'zod';
 import { Context } from 'hono';
 import { bufferToNumber } from '../../util/buffer';
 import config from '../../../config.json';
-import {
-	extractMnemonic,
-	generateResponse,
-	importServerPrivateKey
-} from '../../util/pki';
+import { generateResponse } from '../../util/pki';
 import {
 	GENERIC_400,
 	GENERIC_401,
 	GENERIC_HEADER_CLOUDFLARE_ACCESS,
 	MNEMONIC_STRING
 } from '../../util/schema';
+import { OpenAPIFormRoute } from '../../util/OpenAPIFormRoute';
 
 /**
  * Checks if a file exists based on a BIP39
@@ -22,7 +19,7 @@ import {
  * response will be returned to the client
  * as if it did not exist.
  */
-export class FileExists extends OpenAPIRoute {
+export class FileExists extends OpenAPIFormRoute {
 	schema = {
 		tags: ['File'],
 		summary: 'Check if a file exists',
@@ -33,14 +30,7 @@ export class FileExists extends OpenAPIRoute {
 						schema: z.object({
 							// The minimum mnemonic in *English* is 12 space-separated words of 3 characters
 							// The maximum mnemonic in *English* is 24 space-separated words of 8 characters
-							mnemonic: z.union([
-								MNEMONIC_STRING,
-								z
-									.instanceof(File)
-									.describe(
-										"A binary file encrypted using the server's public key. The plaintext should start with two bytes indicating the length of the following public key, which is itself followed by the mnemonic."
-									)
-							])
+							mnemonic: MNEMONIC_STRING
 						})
 					}
 				}
@@ -86,49 +76,13 @@ export class FileExists extends OpenAPIRoute {
 	};
 
 	async handle(c: Context) {
-		// Get the validated, typed data from the context.
-		// TODO: Chanfana has a bug causing it not to parse the body with `this.getValidatedData`. Eventually, simplify.
-		// Really this only depends on the body anyways, but nonetheless...
-		const data = {
-			...(await this.getValidatedData<typeof this.schema>()),
-			body: this.schema.request.body.content[
-				'multipart/form-data'
-			].schema.parse(await c.req.parseBody())
-		};
+		const { bip39, extractedData } = await this.extractMnemonicOrError(c);
 
-		let publicKey;
-		let mnemonic;
-
-		try {
-			({ publicKey, mnemonic } = await extractMnemonic(
-				data.body.mnemonic,
-				importServerPrivateKey(c.env)
-			));
-		} catch (e) {
-			// This indicates a potentially encrypted request,
-			// and the client might want an encrypted response.
-			// We can't honor it without their public key, so
-			// we error on the side of caution.
-			return new Response(null);
-		}
-
-		if (!mnemonic.isValid()) {
-			return generateResponse(
-				publicKey,
-				c.json,
-				{
-					success: false,
-					error: 'Invalid mnemonic'
-				},
-				400
-			);
-		}
-
-		const theoreticalObject = await mnemonic.toTheoreticalObject();
+		const theoreticalObject = await bip39.toTheoreticalObject();
 		const object = await theoreticalObject.get(c.env.STORAGE);
 
 		if (!object) {
-			return generateResponse(publicKey, c.json, {
+			return generateResponse(extractedData.publicKey, c.json, {
 				success: true,
 				exists: false
 			});
@@ -142,13 +96,13 @@ export class FileExists extends OpenAPIRoute {
 			// And that's not wrong since it is indeed about to be gone...
 			await theoreticalObject.delete(c.env.STORAGE);
 
-			return generateResponse(publicKey, c.json, {
+			return generateResponse(extractedData.publicKey, c.json, {
 				success: true,
 				exists: false
 			});
 		}
 
-		return generateResponse(publicKey, c.json, {
+		return generateResponse(extractedData.publicKey, c.json, {
 			success: true,
 			exists: !!object
 		});

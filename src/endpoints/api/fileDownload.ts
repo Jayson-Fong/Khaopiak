@@ -1,4 +1,4 @@
-import { Bool, OpenAPIRoute, Str } from 'chanfana';
+import { Bool, Str } from 'chanfana';
 import { z } from 'zod';
 import { Context } from 'hono';
 import { bufferToNumber, toAESKeyData } from '../../util/buffer';
@@ -10,11 +10,8 @@ import {
 	GENERIC_HEADER_CLOUDFLARE_ACCESS,
 	MNEMONIC_STRING
 } from '../../util/schema';
-import {
-	extractMnemonic,
-	generateResponse,
-	importServerPrivateKey
-} from '../../util/pki';
+import { generateResponse } from '../../util/pki';
+import { OpenAPIFormRoute } from '../../util/OpenAPIFormRoute';
 
 /**
  * OpenAPI endpoint to download a file based on
@@ -27,7 +24,7 @@ import {
  * will be returned to the client as if it did
  * not exist.
  */
-export class FileDownload extends OpenAPIRoute {
+export class FileDownload extends OpenAPIFormRoute {
 	schema = {
 		tags: ['File'],
 		summary: 'Download a file',
@@ -103,65 +100,31 @@ export class FileDownload extends OpenAPIRoute {
 	};
 
 	async handle(c: Context) {
-		// Get the validated, typed data from the context.
-		// TODO: Chanfana has a bug causing it not to parse the body with `this.getValidatedData`. Eventually, simplify.
-		// Really this only depends on the body anyways, but nonetheless...
-		const data = {
-			...(await this.getValidatedData<typeof this.schema>()),
-			body: this.schema.request.body.content[
-				'multipart/form-data'
-			].schema.parse(await c.req.parseBody())
-		};
+		const data = await this.getValidatedData<typeof this.schema>();
 
-		let publicKey;
-		let mnemonic;
-
-		try {
-			({ publicKey, mnemonic } = await extractMnemonic(
-				data.body.mnemonic,
-				importServerPrivateKey(c.env)
-			));
-		} catch (e) {
-			// This indicates a potentially encrypted request,
-			// and the client might want an encrypted response.
-			// We can't honor it without their public key, so
-			// we error on the side of caution.
-			return new Response(null);
-		}
-
-		if (!mnemonic.isValid()) {
-			return generateResponse(
-				publicKey,
-				c.json,
-				{
-					success: false,
-					error: 'Invalid mnemonic'
-				},
-				400
-			);
-		}
+		const { bip39, extractedData } = await this.extractMnemonicOrError(c);
 
 		const cryptoKey = await crypto.subtle.importKey(
 			'raw',
-			toAESKeyData(mnemonic.toEntropy()),
+			toAESKeyData(bip39.toEntropy()),
 			{ name: 'AES-GCM' },
 			true,
 			['decrypt']
 		);
 
-		const theoreticalObject = await mnemonic.toTheoreticalObject();
+		const theoreticalObject = await bip39.toTheoreticalObject();
 		const object = await theoreticalObject.get(c.env.STORAGE);
 
 		// If the object does not exist...
 		if (!object) {
 			return generateResponse(
-				publicKey,
+				extractedData.publicKey,
 				c.json,
 				{
 					success: false,
 					error: 'Failed to find file by mnemonic'
 				},
-				404
+				{ status: 404 }
 			);
 		}
 
@@ -178,13 +141,13 @@ export class FileDownload extends OpenAPIRoute {
 			await theoreticalObject.delete(c.env.STORAGE);
 
 			return generateResponse(
-				publicKey,
+				extractedData.publicKey,
 				c.json,
 				{
 					success: false,
 					error: 'Failed to find file by mnemonic'
 				},
-				404
+				{ status: 404 }
 			);
 		}
 
@@ -224,13 +187,11 @@ export class FileDownload extends OpenAPIRoute {
 		// We've got the file and got this far...now to destroy it
 		await theoreticalObject.delete(c.env.STORAGE);
 
-		// TODO: Add secure headers
 		return generateResponse(
-			publicKey,
+			extractedData.publicKey,
 			c.json,
 			decryptedBuffer.slice(contentStart),
-			200,
-			headers
+			{ headers }
 		);
 	}
 }
