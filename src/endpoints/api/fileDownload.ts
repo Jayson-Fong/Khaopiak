@@ -8,7 +8,8 @@ import {
 	GENERIC_400,
 	GENERIC_401,
 	GENERIC_HEADER_CLOUDFLARE_ACCESS,
-	MNEMONIC_STRING
+	MNEMONIC_STRING,
+	RESPONSE_SUCCESS
 } from '../../util/schema';
 import { generateResponse } from '../../util/pki';
 import { OpenAPIFormRoute } from '../../util/OpenAPIFormRoute';
@@ -79,13 +80,7 @@ export class FileDownload extends OpenAPIFormRoute {
 				content: {
 					'application/json': {
 						schema: z.object({
-							success: Bool({
-								description:
-									'Whether the download operation succeeded',
-								required: true,
-								default: false,
-								example: false
-							}),
+							success: RESPONSE_SUCCESS(false),
 							error: Str({
 								default: 'Failed to find file by mnemonic',
 								description: 'File not found error',

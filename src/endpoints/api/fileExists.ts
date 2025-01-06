@@ -8,7 +8,8 @@ import {
 	GENERIC_400,
 	GENERIC_401,
 	GENERIC_HEADER_CLOUDFLARE_ACCESS,
-	MNEMONIC_STRING
+	MNEMONIC_STRING,
+	RESPONSE_SUCCESS
 } from '../../util/schema';
 import { OpenAPIFormRoute } from '../../util/OpenAPIFormRoute';
 
@@ -45,13 +46,7 @@ export class FileExists extends OpenAPIFormRoute {
 				content: {
 					'application/json': {
 						schema: z.object({
-							success: Bool({
-								description:
-									'Whether the existence check operation succeeded',
-								required: true,
-								default: true,
-								example: true
-							}),
+							success: RESPONSE_SUCCESS(true),
 							exists: Bool({
 								description:
 									'Whether the file exists at the time of querying',

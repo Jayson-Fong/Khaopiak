@@ -8,17 +8,21 @@ export const GENERIC_NULL_RESPONSE_SCHEMA = {
 	})
 };
 
+export const RESPONSE_SUCCESS = (exampleValue: boolean) => {
+	return Bool({
+		description: 'Whether the operation was executed successfully',
+		required: true,
+		default: exampleValue,
+		example: exampleValue
+	});
+};
+
 export const GENERIC_400 = {
 	description: 'Bad request',
 	content: {
 		'application/json': {
 			schema: z.object({
-				success: Bool({
-					description: 'Whether the operation succeeded',
-					required: true,
-					default: false,
-					example: false
-				}),
+				success: RESPONSE_SUCCESS(false),
 				error: Str({
 					default: 'Invalid mnemonic',
 					description: 'Bad request error',
@@ -36,12 +40,7 @@ export const GENERIC_401 = {
 	content: {
 		'application/json': {
 			schema: z.object({
-				success: Bool({
-					description: 'Whether the operation succeeded',
-					required: true,
-					default: false,
-					example: false
-				}),
+				success: RESPONSE_SUCCESS(false),
 				error: Str({
 					default: 'Missing or bad authentication',
 					description: 'Authentication error',

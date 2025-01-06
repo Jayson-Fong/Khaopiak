@@ -7,7 +7,8 @@ import {
 	GENERIC_400,
 	GENERIC_401,
 	GENERIC_HEADER_CLOUDFLARE_ACCESS,
-	MNEMONIC_STRING
+	MNEMONIC_STRING,
+	RESPONSE_SUCCESS
 } from '../../util/schema';
 import { OpenAPIFormRoute } from '../../util/OpenAPIFormRoute';
 
@@ -42,13 +43,7 @@ export class FileDelete extends OpenAPIFormRoute {
 				content: {
 					'application/json': {
 						schema: z.object({
-							success: Bool({
-								description:
-									'Whether the delete operation succeeded; however, does not indicate that the file existed',
-								required: true,
-								default: true,
-								example: true
-							})
+							success: RESPONSE_SUCCESS(true)
 						})
 					},
 					'application/octet-stream': {

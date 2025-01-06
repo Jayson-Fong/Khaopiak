@@ -4,10 +4,10 @@ import { hexToArrayBuffer } from './buffer';
 import { TheoreticalObject } from './TheoreticalObject';
 
 export default class BIP39 {
-	mnemonic: string | null | undefined;
-	entropy: ArrayBuffer | undefined;
+	mnemonic?: string | null;
+	entropy?: ArrayBuffer;
 
-	constructor(mnemonic: string | null | undefined = undefined) {
+	constructor(mnemonic?: string | null) {
 		this.mnemonic = mnemonic;
 	}
 

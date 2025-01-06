@@ -6,6 +6,6 @@ module.exports = [
 		}
 	},
 	{
-		ignores: ['.wrangler/', '.tsimp/']
+		ignores: ['.wrangler/', '.tsimp/', 'docs/themes', 'docs/public']
 	}
 ];

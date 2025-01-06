@@ -1,4 +1,4 @@
-import { Bool, OpenAPIRoute, Str } from 'chanfana';
+import { Str } from 'chanfana';
 import { z } from 'zod';
 import { Context } from 'hono';
 import { generateMnemonic, mnemonicToEntropy } from 'bip39';
@@ -12,8 +12,12 @@ import { digestToKey, fileToContentPrefix } from '../../util/format';
 import config from '../../../config.json';
 import {
 	GENERIC_401,
-	GENERIC_HEADER_CLOUDFLARE_ACCESS
+	GENERIC_HEADER_CLOUDFLARE_ACCESS,
+	RESPONSE_SUCCESS
 } from '../../util/schema';
+import { OpenAPIFormRoute } from '../../util/OpenAPIFormRoute';
+import { fileExtractor } from '../../extractor/file';
+import { generateResponse } from '../../util/pki';
 
 /**
  * Uploads a file to Cloudflare R2 after
@@ -21,7 +25,7 @@ import {
  * derived from a BIP39 mnemonic of a length
  * specified by the client.
  */
-export class FileUpload extends OpenAPIRoute {
+export class FileUpload extends OpenAPIFormRoute {
 	schema = {
 		tags: ['File'],
 		summary: 'Upload a file',
@@ -78,13 +82,7 @@ export class FileUpload extends OpenAPIRoute {
 				content: {
 					'application/json': {
 						schema: z.object({
-							success: Bool({
-								description:
-									'Whether the upload operation succeeded',
-								required: true,
-								default: true,
-								example: true
-							}),
+							success: RESPONSE_SUCCESS(true),
 							mnemonic: Str({
 								description:
 									'BIP39 mnemonic used for file retrieval and server-side decryption',
@@ -101,20 +99,24 @@ export class FileUpload extends OpenAPIRoute {
 	};
 
 	async handle(c: Context) {
-		// Get the validated, typed data from the context.
-		// TODO: Chanfana has a bug causing it not to parse the body with `this.getValidatedData`. Eventually, simplify.
-		// Really this only depends on the body anyways, but nonetheless...
-		const data = {
-			...(await this.getValidatedData<typeof this.schema>()),
-			body: this.schema.request.body.content[
-				'multipart/form-data'
-			].schema.parse(await c.req.parseBody())
-		};
+		let extractedData = await this.extractData<{
+			padding: number;
+			entropy: number;
+			expiry: number;
+			file: File;
+		}>(c, fileExtractor);
+
+		const {
+			padding,
+			entropy: entropyByteCount,
+			expiry,
+			file
+		} = await extractedData.data;
 
 		// We'll use a mnemonic to identify the file and act as an encryption key, shared with the client.
 		// The client has their own mnemonic for client-side encryption. When requesting files, the client
 		// will only send the Workers-generated mnemonic.
-		const mnemonic = generateMnemonic(data.body.entropy);
+		const mnemonic = generateMnemonic(entropyByteCount);
 		const entropy = mnemonicToEntropy(mnemonic);
 
 		const entropyBytes = hexToArrayBuffer(entropy);
@@ -140,14 +142,11 @@ export class FileUpload extends OpenAPIRoute {
 		const cipherText = await crypto.subtle.encrypt(
 			{ name: 'AES-GCM', iv: iv },
 			cryptoKey,
-			bufferConcat([
-				fileToContentPrefix(data.body.file),
-				await data.body.file.arrayBuffer()
-			])
+			bufferConcat([fileToContentPrefix(file), await file.arrayBuffer()])
 		);
 
 		// Adding in 6 bytes to account for expiry time and 12 bytes to account for the IV
-		const fileExpiryTime = Date.now() + data.body.expiry * 1000;
+		const fileExpiryTime = Date.now() + expiry * 1000;
 		const ivInjectedFileBuffer = bufferConcat([
 			msTimeToBuffer(fileExpiryTime),
 			iv,
@@ -156,10 +155,9 @@ export class FileUpload extends OpenAPIRoute {
 
 		// Enqueue the file for deletion if it's configured to be delete-able
 		if (
-			data.body.expiry >= 0 &&
+			expiry >= 0 &&
 			(!config.upload.expiry.excessiveExpiryAsInfinite ||
-				data.body.expiry <=
-					config.queue.maxRetries * config.queue.maxRetryDelay)
+				expiry <= config.queue.maxRetries * config.queue.maxRetryDelay)
 		) {
 			await c.env.CLEANUP_QUEUE.send(
 				{
@@ -167,10 +165,7 @@ export class FileUpload extends OpenAPIRoute {
 					expiry: fileExpiryTime
 				},
 				{
-					delaySeconds: Math.min(
-						data.body.expiry,
-						config.queue.maxRetryDelay
-					),
+					delaySeconds: Math.min(expiry, config.queue.maxRetryDelay),
 					contentType: 'json'
 				}
 			);
@@ -179,6 +174,9 @@ export class FileUpload extends OpenAPIRoute {
 		// Upload the ciphertext to Cloudflare R2
 		await c.env.STORAGE.put(objectKey, ivInjectedFileBuffer);
 
-		return c.json({ success: true, mnemonic: mnemonic });
+		return generateResponse(extractedData.publicKey, c.json, {
+			success: true,
+			mnemonic: mnemonic
+		});
 	}
 }
