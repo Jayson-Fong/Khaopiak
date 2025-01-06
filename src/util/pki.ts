@@ -1,26 +1,14 @@
 import { bufferConcat, bufferToNumber, hexToArrayBuffer } from './buffer';
-import { Bindings } from '../types';
-import BIP39 from './bip39';
+import { ResponseInitStrictHeader } from '../types';
 
 export const decryptServerKeyed = async (
-	input: File,
-	privateKey: CryptoKey
-) => {
-	return crypto.subtle.decrypt(
-		{ name: 'RSA-OAEP' },
-		privateKey,
-		await input.bytes()
-	);
-};
-
-export const decryptServerKeyedV2 = async (
 	input: Uint8Array,
 	privateKey: CryptoKey
 ) => {
 	return crypto.subtle.decrypt({ name: 'RSA-OAEP' }, privateKey, input);
 };
 
-export type ExtractionData<T> = {
+export type ExtractionData<T = object> = {
 	version?: number;
 	publicKey?: CryptoKey;
 	data: Promise<T>;
@@ -54,7 +42,7 @@ export const extractData = async <T extends object>(
 	}
 
 	const payload = new Uint8Array(
-		await decryptServerKeyedV2(bytes, await privateKey())
+		await decryptServerKeyed(bytes, await privateKey())
 	);
 
 	// Minimally, the response must include at least 2 bytes
@@ -99,67 +87,7 @@ export const extractData = async <T extends object>(
 	};
 };
 
-export const extractMnemonic = async (
-	input: string | File,
-	privateKey: Promise<CryptoKey>
-): Promise<{
-	publicKey: null | CryptoKey;
-	mnemonic: BIP39;
-}> => {
-	if (input instanceof File) {
-		// Across all versions, the first 2 bytes
-		// specify the protocol version in plaintext
-
-		const inputBytes = new Uint8Array(
-			await decryptServerKeyed(input, await privateKey)
-		);
-
-		// For version 1, it should be 2 bytes to specify
-		// public key length, followed by content.
-		if (inputBytes.byteLength < 3) {
-			return {
-				publicKey: null,
-				mnemonic: new BIP39()
-			};
-		}
-
-		const keyByteCount = bufferToNumber(inputBytes.slice(0, 2));
-		if (inputBytes.length - keyByteCount - 2 < 0) {
-			return {
-				publicKey: null,
-				mnemonic: new BIP39()
-			};
-		}
-
-		const textDecoder = new TextDecoder();
-		return {
-			publicKey:
-				keyByteCount > 0
-					? await crypto.subtle.importKey(
-							'spki',
-							inputBytes.slice(2, keyByteCount + 2),
-							{ name: 'RSA-OAEP', hash: 'SHA-512' },
-							true,
-							['decrypt']
-						)
-					: null,
-			mnemonic: new BIP39(
-				textDecoder.decode(inputBytes.slice(keyByteCount + 2))
-			)
-		};
-	}
-
-	return {
-		publicKey: null,
-		mnemonic: new BIP39(input)
-	};
-};
-
-export const responseInitToBytes = (
-	responseInit: ResponseInit & {
-		headers?: Headers;
-	}
-) => {
+export const responseInitToBytes = (responseInit: ResponseInitStrictHeader) => {
 	if (!responseInit.headers) {
 		const statusNoHeaderBuffer = new ArrayBuffer(3);
 		const statusNoHeaderView = new DataView(statusNoHeaderBuffer);
@@ -271,10 +199,8 @@ export const sanitizeResponseInit = (
 export const generateResponse = async (
 	publicKey: CryptoKey | null | undefined,
 	jsonWrapper: (payload: object, responseInit: ResponseInit) => Response,
-	payload: object | Uint8Array | null,
-	responseInit: ResponseInit & {
-		headers?: Headers;
-	} = {}
+	payload: object | Uint8Array | null = null,
+	responseInit: ResponseInitStrictHeader = {}
 ): Promise<Response> => {
 	if (!payload) {
 		return new Response(payload, responseInit);
@@ -315,10 +241,10 @@ export const generateResponse = async (
 	}
 };
 
-export const importServerPrivateKey = (env: Bindings) => {
+export const importServerPrivateKey = (key: string) => {
 	return crypto.subtle.importKey(
 		'pkcs8',
-		hexToArrayBuffer(env.PRIVATE_KEY_HEX),
+		hexToArrayBuffer(key),
 		{ name: 'RSA-OAEP', hash: 'SHA-512' },
 		true,
 		['decrypt']

@@ -1,18 +1,18 @@
 import { Bool, Str } from 'chanfana';
 import { z } from 'zod';
 import { Context } from 'hono';
-import { bufferToNumber, toAESKeyData } from '../../util/buffer';
-import { extractContentPrefix, isPDF } from '../../util/format';
-import config from '../../../config.json';
+import { bufferToNumber, toAESKeyData } from '../../../util/buffer';
+import { extractContentPrefix, isPDF } from '../../../util/format';
+import config from '../../../../config.json';
 import {
 	GENERIC_400,
 	GENERIC_401,
 	GENERIC_HEADER_CLOUDFLARE_ACCESS,
 	MNEMONIC_STRING,
 	RESPONSE_SUCCESS
-} from '../../util/schema';
-import { generateResponse } from '../../util/pki';
-import { OpenAPIFormRoute } from '../../util/OpenAPIFormRoute';
+} from '../../../util/schema';
+import { OpenAPIFormRoute } from '../../../util/OpenAPIFormRoute';
+import { ClientError } from '../../../error/ClientError';
 
 /**
  * OpenAPI endpoint to download a file based on
@@ -97,7 +97,7 @@ export class FileDownload extends OpenAPIFormRoute {
 	async handle(c: Context) {
 		const data = await this.getValidatedData<typeof this.schema>();
 
-		const { bip39, extractedData } = await this.extractMnemonicOrError(c);
+		const { bip39 } = await this.extractMnemonicOrError(c);
 
 		const cryptoKey = await crypto.subtle.importKey(
 			'raw',
@@ -112,13 +112,8 @@ export class FileDownload extends OpenAPIFormRoute {
 
 		// If the object does not exist...
 		if (!object) {
-			return generateResponse(
-				extractedData.publicKey,
-				c.json,
-				{
-					success: false,
-					error: 'Failed to find file by mnemonic'
-				},
+			throw new ClientError(
+				{ success: false, error: 'Failed to find file by mnemonic' },
 				{ status: 404 }
 			);
 		}
@@ -135,13 +130,8 @@ export class FileDownload extends OpenAPIFormRoute {
 			// And that's not wrong since it is indeed about to be gone...
 			await theoreticalObject.delete(c.env.STORAGE);
 
-			return generateResponse(
-				extractedData.publicKey,
-				c.json,
-				{
-					success: false,
-					error: 'Failed to find file by mnemonic'
-				},
+			throw new ClientError(
+				{ success: false, error: 'Failed to find file by mnemonic' },
 				{ status: 404 }
 			);
 		}
@@ -181,12 +171,8 @@ export class FileDownload extends OpenAPIFormRoute {
 
 		// We've got the file and got this far...now to destroy it
 		await theoreticalObject.delete(c.env.STORAGE);
-
-		return generateResponse(
-			extractedData.publicKey,
-			c.json,
-			decryptedBuffer.slice(contentStart),
-			{ headers }
-		);
+		return this.secureRespond(c, decryptedBuffer.slice(contentStart), {
+			headers
+		});
 	}
 }

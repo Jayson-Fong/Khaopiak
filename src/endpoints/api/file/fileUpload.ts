@@ -7,17 +7,16 @@ import {
 	hexToArrayBuffer,
 	msTimeToBuffer,
 	toAESKeyData
-} from '../../util/buffer';
-import { digestToKey, fileToContentPrefix } from '../../util/format';
-import config from '../../../config.json';
+} from '../../../util/buffer';
+import { digestToKey, fileToContentPrefix } from '../../../util/format';
+import config from '../../../../config.json';
 import {
 	GENERIC_401,
 	GENERIC_HEADER_CLOUDFLARE_ACCESS,
 	RESPONSE_SUCCESS
-} from '../../util/schema';
-import { OpenAPIFormRoute } from '../../util/OpenAPIFormRoute';
-import { fileExtractor } from '../../extractor/file';
-import { generateResponse } from '../../util/pki';
+} from '../../../util/schema';
+import { OpenAPIFormRoute } from '../../../util/OpenAPIFormRoute';
+import { fileExtractor } from '../../../extractor/file';
 
 /**
  * Uploads a file to Cloudflare R2 after
@@ -174,9 +173,6 @@ export class FileUpload extends OpenAPIFormRoute {
 		// Upload the ciphertext to Cloudflare R2
 		await c.env.STORAGE.put(objectKey, ivInjectedFileBuffer);
 
-		return generateResponse(extractedData.publicKey, c.json, {
-			success: true,
-			mnemonic: mnemonic
-		});
+		return this.secureRespond(c, { success: true, mnemonic: mnemonic });
 	}
 }

@@ -1,16 +1,15 @@
-import { Bool, Str } from 'chanfana';
+import { Str } from 'chanfana';
 import { z } from 'zod';
 import { Context } from 'hono';
-import config from '../../../config.json';
-import { generateResponse } from '../../util/pki';
+import config from '../../../../config.json';
 import {
 	GENERIC_400,
 	GENERIC_401,
 	GENERIC_HEADER_CLOUDFLARE_ACCESS,
 	MNEMONIC_STRING,
 	RESPONSE_SUCCESS
-} from '../../util/schema';
-import { OpenAPIFormRoute } from '../../util/OpenAPIFormRoute';
+} from '../../../util/schema';
+import { OpenAPIFormRoute } from '../../../util/OpenAPIFormRoute';
 
 /**
  * OpenAPI endpoint to delete a file based on a BIP39 mnemonic
@@ -61,11 +60,9 @@ export class FileDelete extends OpenAPIFormRoute {
 	};
 
 	async handle(c: Context) {
-		const { bip39, extractedData } = await this.extractMnemonicOrError(c);
+		const { bip39 } = await this.extractMnemonicOrError(c);
 
 		await (await bip39.toTheoreticalObject()).delete(c.env.STORAGE);
-		return generateResponse(extractedData.publicKey, c.json, {
-			success: true
-		});
+		return this.secureRespond(c, { success: true });
 	}
 }

@@ -1,4 +1,5 @@
 import { bufferToHex } from './buffer';
+import { ClientError } from '../error/ClientError';
 
 /**
  * Remove all null characters from a string
@@ -39,7 +40,10 @@ export const extractContentPrefix = (
 	}
 
 	if (separatorIndices.length < 2) {
-		throw Error('Failed to locate file name/type/expiry separators');
+		throw new ClientError({
+			success: false,
+			error: 'Failed to locate file name/type/expiry separators'
+		});
 	}
 
 	const decoder = new TextDecoder();

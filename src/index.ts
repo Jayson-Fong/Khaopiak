@@ -1,20 +1,22 @@
 import { fromHono } from 'chanfana';
 import { Hono } from 'hono';
-import { FileUpload } from './endpoints/api/fileUpload';
+import { FileUpload } from './endpoints/api/file/fileUpload';
 import { Buffer } from 'node:buffer';
-import { FileDownload } from './endpoints/api/fileDownload';
-import { FileExists } from './endpoints/api/fileExists';
-import { FileDelete } from './endpoints/api/fileDelete';
+import { FileDownload } from './endpoints/api/file/fileDownload';
+import { FileExists } from './endpoints/api/file/fileExists';
+import { FileDelete } from './endpoints/api/file/fileDelete';
 import { queue } from './handler/cleanupQueue';
-import { Bindings } from './types';
+import { Environment } from './types';
 import { PortalIndex } from './endpoints';
+import { httpErrorHandler } from './handler/httpError';
 
 globalThis.Buffer = Buffer;
 
 // Start a Hono app
-const app = new Hono<{ Bindings: Bindings }>();
+const app = new Hono<Environment>();
 
 app.get('/', PortalIndex);
+app.onError(httpErrorHandler);
 
 // Setup OpenAPI registry
 const openapi = fromHono(app, {

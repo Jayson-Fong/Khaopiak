@@ -1,17 +1,16 @@
 import { Bool, Str } from 'chanfana';
 import { z } from 'zod';
 import { Context } from 'hono';
-import { bufferToNumber } from '../../util/buffer';
-import config from '../../../config.json';
-import { generateResponse } from '../../util/pki';
+import { bufferToNumber } from '../../../util/buffer';
+import config from '../../../../config.json';
 import {
 	GENERIC_400,
 	GENERIC_401,
 	GENERIC_HEADER_CLOUDFLARE_ACCESS,
 	MNEMONIC_STRING,
 	RESPONSE_SUCCESS
-} from '../../util/schema';
-import { OpenAPIFormRoute } from '../../util/OpenAPIFormRoute';
+} from '../../../util/schema';
+import { OpenAPIFormRoute } from '../../../util/OpenAPIFormRoute';
 
 /**
  * Checks if a file exists based on a BIP39
@@ -71,16 +70,13 @@ export class FileExists extends OpenAPIFormRoute {
 	};
 
 	async handle(c: Context) {
-		const { bip39, extractedData } = await this.extractMnemonicOrError(c);
+		const { bip39 } = await this.extractMnemonicOrError(c);
 
 		const theoreticalObject = await bip39.toTheoreticalObject();
 		const object = await theoreticalObject.get(c.env.STORAGE);
 
 		if (!object) {
-			return generateResponse(extractedData.publicKey, c.json, {
-				success: true,
-				exists: false
-			});
+			return this.secureRespond(c, { success: true, exists: false });
 		}
 
 		const expiry = bufferToNumber(
@@ -91,15 +87,9 @@ export class FileExists extends OpenAPIFormRoute {
 			// And that's not wrong since it is indeed about to be gone...
 			await theoreticalObject.delete(c.env.STORAGE);
 
-			return generateResponse(extractedData.publicKey, c.json, {
-				success: true,
-				exists: false
-			});
+			return this.secureRespond(c, { success: true, exists: false });
 		}
 
-		return generateResponse(extractedData.publicKey, c.json, {
-			success: true,
-			exists: !!object
-		});
+		return this.secureRespond(c, { success: true, exists: !!object });
 	}
 }

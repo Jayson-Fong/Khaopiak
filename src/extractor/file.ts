@@ -1,6 +1,7 @@
 import { bufferToNumber } from '../util/buffer';
 import { extractContentPrefix } from '../util/format';
 import config from '../../config.json';
+import { ClientError } from '../error/ClientError';
 
 export const fileExtractor = (
 	input: Uint8Array
@@ -17,7 +18,10 @@ export const fileExtractor = (
 		file: File;
 	}>(async () => {
 		if (input.byteLength < 8) {
-			throw new Error('Malformed payload');
+			throw new ClientError({
+				success: false,
+				error: 'Malformed payload'
+			});
 		}
 
 		const { contentStart, name, type } = extractContentPrefix(
@@ -36,7 +40,10 @@ export const fileExtractor = (
 		};
 
 		if (extracted.padding > Math.max(extracted.file.size * 0.5, 2048)) {
-			throw new Error('Excessive padding request');
+			throw new ClientError({
+				success: false,
+				error: 'Excessive padding request'
+			});
 		}
 
 		if (
@@ -44,14 +51,20 @@ export const fileExtractor = (
 			extracted.entropy < 128 ||
 			extracted.entropy > 256
 		) {
-			throw new Error('Invalid entropy request');
+			throw new ClientError({
+				success: false,
+				error: 'Invalid entropy request'
+			});
 		}
 
 		if (
 			extracted.expiry > config.upload.expiry.max ||
 			extracted.expiry < config.upload.expiry.min
 		) {
-			throw new Error('Invalid expiry request');
+			throw new ClientError({
+				success: false,
+				error: 'Invalid expiry request'
+			});
 		}
 
 		return extracted;

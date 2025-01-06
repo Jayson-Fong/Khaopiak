@@ -2,6 +2,7 @@ import { mnemonicToEntropy, validateMnemonic } from 'bip39';
 import { digestToKey } from './format';
 import { hexToArrayBuffer } from './buffer';
 import { TheoreticalObject } from './TheoreticalObject';
+import { ClientError } from '../error/ClientError';
 
 export default class BIP39 {
 	mnemonic?: string | null;
@@ -21,7 +22,10 @@ export default class BIP39 {
 		}
 
 		if (!this.mnemonic) {
-			throw Error('Mnemonic is invalid.');
+			throw new ClientError({
+				success: false,
+				error: 'Invalid mnemonic'
+			});
 		}
 
 		this.entropy = hexToArrayBuffer(mnemonicToEntropy(this.mnemonic));
