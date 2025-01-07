@@ -1,7 +1,7 @@
 import { Bool, Str } from 'chanfana';
 import { z } from 'zod';
 import { Context } from 'hono';
-import { bufferToNumber, toAESKeyData } from '../../../util/buffer';
+import { bufferToNumber } from '../../../util/buffer';
 import { extractContentPrefix, isPDF } from '../../../util/format';
 import config from '../../../../config.json';
 import {
@@ -96,17 +96,9 @@ export class FileDownload extends OpenAPIFormRoute {
 
 	async handle(c: Context) {
 		const data = await this.getValidatedData<typeof this.schema>();
-
 		const { bip39 } = await this.extractMnemonicOrError(c);
 
-		const cryptoKey = await crypto.subtle.importKey(
-			'raw',
-			toAESKeyData(bip39.toEntropy()),
-			{ name: 'AES-GCM' },
-			true,
-			['decrypt']
-		);
-
+		const cryptoKey = await bip39.toCryptoKey(['decrypt']);
 		const theoreticalObject = await bip39.toTheoreticalObject();
 		const object = await theoreticalObject.get(c.env.STORAGE);
 

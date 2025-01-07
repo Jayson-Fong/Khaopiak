@@ -1,14 +1,9 @@
 import { Str } from 'chanfana';
 import { z } from 'zod';
 import { Context } from 'hono';
-import { generateMnemonic, mnemonicToEntropy } from 'bip39';
-import {
-	bufferConcat,
-	hexToArrayBuffer,
-	msTimeToBuffer,
-	toAESKeyData
-} from '../../../util/buffer';
-import { digestToKey, fileToContentPrefix } from '../../../util/format';
+import { generateMnemonic } from 'bip39';
+import { bufferConcat, msTimeToBuffer } from '../../../util/buffer';
+import { fileToContentPrefix } from '../../../util/format';
 import config from '../../../../config.json';
 import {
 	GENERIC_401,
@@ -17,6 +12,7 @@ import {
 } from '../../../util/schema';
 import { OpenAPIFormRoute } from '../../../util/OpenAPIFormRoute';
 import { fileExtractor } from '../../../extractor/file';
+import BIP39 from '../../../util/bip39';
 
 /**
  * Uploads a file to Cloudflare R2 after
@@ -116,23 +112,10 @@ export class FileUpload extends OpenAPIFormRoute {
 		// The client has their own mnemonic for client-side encryption. When requesting files, the client
 		// will only send the Workers-generated mnemonic.
 		const mnemonic = generateMnemonic(entropyByteCount);
-		const entropy = mnemonicToEntropy(mnemonic);
-
-		const entropyBytes = hexToArrayBuffer(entropy);
-
-		// Generate the file hash for generation of the R2 file path
-		const objectKey = digestToKey(
-			await crypto.subtle.digest({ name: 'SHA-256' }, entropyBytes)
-		);
+		const bip39 = new BIP39(mnemonic);
 
 		// For AES-GCM encryption, use the entropy bits as a key.
-		const cryptoKey = await crypto.subtle.importKey(
-			'raw',
-			toAESKeyData(entropyBytes),
-			{ name: 'AES-GCM' },
-			true,
-			['encrypt']
-		);
+		const cryptoKey = bip39.toCryptoKey(['encrypt']);
 
 		// The IV will be stored later as a prefix to the ciphertext
 		const iv = crypto.getRandomValues(new Uint8Array(0xc));
@@ -140,7 +123,7 @@ export class FileUpload extends OpenAPIFormRoute {
 		// Encrypt the file content prefixed with a null-separated name and type using AES-GCM
 		const cipherText = await crypto.subtle.encrypt(
 			{ name: 'AES-GCM', iv: iv },
-			cryptoKey,
+			await cryptoKey,
 			bufferConcat([fileToContentPrefix(file), await file.arrayBuffer()])
 		);
 
@@ -153,6 +136,7 @@ export class FileUpload extends OpenAPIFormRoute {
 		]);
 
 		// Enqueue the file for deletion if it's configured to be delete-able
+		const theoreticalObject = await bip39.toTheoreticalObject();
 		if (
 			expiry >= 0 &&
 			(!config.upload.expiry.excessiveExpiryAsInfinite ||
@@ -160,7 +144,7 @@ export class FileUpload extends OpenAPIFormRoute {
 		) {
 			await c.env.CLEANUP_QUEUE.send(
 				{
-					key: objectKey,
+					key: theoreticalObject.getObjectKey(),
 					expiry: fileExpiryTime
 				},
 				{
@@ -171,7 +155,7 @@ export class FileUpload extends OpenAPIFormRoute {
 		}
 
 		// Upload the ciphertext to Cloudflare R2
-		await c.env.STORAGE.put(objectKey, ivInjectedFileBuffer);
+		await theoreticalObject.put(c.env.STORAGE, ivInjectedFileBuffer);
 
 		return this.secureRespond(c, { success: true, mnemonic: mnemonic });
 	}
