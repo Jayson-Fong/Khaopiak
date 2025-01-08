@@ -6,8 +6,8 @@ toc: true
 ## Endpoints
 
 {{< cards >}}
-{{< card link="upload" title="Upload" icon="upload" >}}
-{{< card link="download" title="Download" icon="download" >}}
-{{< card link="delete" title="Delete" icon="trash" >}}
-{{< card link="exists" title="Exists" icon="check" >}}
+{{< card link="endpoints/upload" title="Upload" icon="upload" >}}
+{{< card link="endpoints/download" title="Download" icon="download" >}}
+{{< card link="endpoints/delete" title="Delete" icon="trash" >}}
+{{< card link="endpoints/exists" title="Exists" icon="check" >}}
 {{< /cards >}}
