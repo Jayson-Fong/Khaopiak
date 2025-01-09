@@ -144,6 +144,18 @@ assurance that data confidentiality is protected.
 
 </details>
 
+<details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
+<summary>😵‍💫 File obscurity</summary>
+
+End-users can specify a number of randomized padding bytes for appending to their data at both the client and server
+levels, altering file sizes and helping obscure the identity of the original file that was uploaded. As a result, the
+content clients upload to the Khaopiak server is always more than or equal to the amount bytes of the original file, and
+the amount of bytes the download client receives is always more than or equal to the amount of bytes that was uploaded,
+making it difficult to identify the original file (and thereby assume the original file's contents) based on strictly
+file size.
+
+</details>
+
 ### For administrators
 
 <details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
@@ -162,6 +174,18 @@ Khaopiak is designed for deployment on <a href="https://workers.cloudflare.com/"
 leveraging <a href="https://developers.cloudflare.com/r2/" target="_blank">Cloudflare R2</a> for file storage
 and <a href="https://developers.cloudflare.com/queues/" target="_blank">Cloudflare Queues</a> for file expiry, allowing
 deployment and automated scaling without having to maintain servers.
+
+</details>
+
+<details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
+<summary>💰 Deploy for free</summary>
+
+For small-scale users, Khaopiak can be deployed on <a href="https://workers.cloudflare.com/" target="_blank">Cloudflare
+Workers</a>'s free tier; however, requires disabling Khaopiak's automated expiry-based deletion system as it
+uses <a href="https://developers.cloudflare.com/queues/" target="_blank">Cloudflare Queues</a>, a Workers Paid feature.
+However, automated file deletion can still be accomplished through
+using [Cloudflare R2's object lifecycle rules](https://developers.cloudflare.com/r2/buckets/object-lifecycles/) and
+expired files will remain inaccessible to clients.
 
 </details>
 
@@ -273,10 +297,53 @@ Cloudflare R2</a>.
 
 </details>
 
-Additional security concerns:
+<details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
+<summary>🦠 Alteration of client code</summary>
 
-- [ ] Alteration of DNS responses
-- [ ] Alteration of client code
+As with all end-to-end encrypted solutions, the integrity of the client is crucial for ensuring secure communications. A
+maliciously altered client may send unencrypted data to a third party, generate cryptographically insecure entropy, or
+record mnemonics without end-user knowledge.
+
+The native, web-based client Khaopiak ships with works to mitigate these threats through recommending that browsers
+verifying script and stylesheet integrity, rejecting certain attributes (such as in-line scripts and styles), upgrade
+requests to secure HTTP when possible, and relying on no third party assets.
+
+Additional mitigations are deployment-specific, such as enabling
+the [Domain Name System Security Extensions (DNSSEC)](https://www.icann.org/resources/pages/dnssec-what-is-it-why-important-2019-03-05-en)
+and configuring [certain response headers](#recommended-headers).
+
+Despite these mitigations, the security of upload and download devices alongside the client's integrity remains the
+primary concern to the usage of Khaopiak. Malicious browser extensions (or the browser itself) may alter the native
+client's functions. Further, devices may trust untrustworthy certificates, compromising the confidentiality and
+integrity benefits
+[Transport Layer Security (TLS)](https://www.cloudflare.com/learning/ssl/transport-layer-security-tls/)
+encryption provides.
+
+The native Khaopiak client works to combat the risk of compromised download devices through rendering certain content
+types, such as PDF files, in browser when possible instead of forcing the client to download them, which can help
+prevent threat actors from acquiring downloaded files.
+
+</details>
+
+<details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
+<summary>🌎 Dependency on third-party DNS resolvers</summary>
+
+The native Khaopiak client relies on a [Domain Name System (DNS)](https://www.cloudflare.com/learning/dns/what-is-dns/)
+query to retrieve a public key for the Khaopiak server, stored in text format. The web-based client retrieves DNS
+records through employing a [DNS over HTTPS (DoH)](https://datatracker.ietf.org/doc/html/rfc8484) server; however, this
+adds a party now capable of identifying the fact that a client is using a Khaopiak server with PKI and potentially have
+the ability to alter the key.
+
+The native Khaopiak client mitigates this risk through generating a BIP39 mnemonic of the public key's hash, making it
+easier for end-users to visually verify it is correct. Further, end-users may elect to use multiple DNS resolvers for
+cross-reference purposes and improve confidence in the public key's correctness.
+
+As the public key is only used for PKI encryption to the Khaopiak server, the client remains dependent on the DNS server
+configured for their browser or device to determine the internet location of the Khaopiak server, making it such that
+alteration of the public key does not inherently lead to compromises in data confidentiality nor integrity. This is
+further reinforced by Khaopiak's client-side mnemonics, providing end-to-end encryption even without leveraging PKI.
+
+</details>
 
 ## To do
 
