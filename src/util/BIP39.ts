@@ -1,7 +1,7 @@
 import { mnemonicToEntropy, validateMnemonic } from 'bip39';
 import { digestToKey } from './format';
 import { hexToArrayBuffer, toAESKeyData } from './buffer';
-import { TheoreticalObject } from './TheoreticalObject';
+import TheoreticalObject from './TheoreticalObject';
 import { ClientError } from '../error/ClientError';
 
 export default class BIP39 {
@@ -12,11 +12,11 @@ export default class BIP39 {
 		this.mnemonic = mnemonic;
 	}
 
-	isValid() {
-		return this.mnemonic && validateMnemonic(this.mnemonic);
+	isValid(): boolean {
+		return !!this.mnemonic && validateMnemonic(this.mnemonic);
 	}
 
-	toEntropy() {
+	toEntropy(): ArrayBuffer {
 		if (this.entropy) {
 			return this.entropy;
 		}
@@ -43,7 +43,7 @@ export default class BIP39 {
 		);
 	}
 
-	async toTheoreticalObject() {
+	async toTheoreticalObject(): Promise<TheoreticalObject> {
 		return new TheoreticalObject(
 			digestToKey(
 				await crypto.subtle.digest(

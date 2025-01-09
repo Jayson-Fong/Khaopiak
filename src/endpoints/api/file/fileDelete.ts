@@ -10,6 +10,7 @@ import {
 	RESPONSE_SUCCESS
 } from '../../../util/schema';
 import { OpenAPIFormRoute } from '../../../util/OpenAPIFormRoute';
+import { Environment } from '../../../types';
 
 /**
  * OpenAPI endpoint to delete a file based on a BIP39 mnemonic
@@ -59,7 +60,7 @@ export class FileDelete extends OpenAPIFormRoute {
 		}
 	};
 
-	async handle(c: Context) {
+	async handle(c: Context<Environment>): Promise<Response> {
 		const { bip39 } = await this.extractMnemonicOrError(c);
 
 		await (await bip39.toTheoreticalObject()).delete(c.env.STORAGE);

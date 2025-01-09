@@ -11,6 +11,7 @@ import {
 	RESPONSE_SUCCESS
 } from '../../../util/schema';
 import { OpenAPIFormRoute } from '../../../util/OpenAPIFormRoute';
+import { Environment } from '../../../types';
 
 /**
  * Checks if a file exists based on a BIP39
@@ -69,7 +70,7 @@ export class FileExists extends OpenAPIFormRoute {
 		}
 	};
 
-	async handle(c: Context) {
+	async handle(c: Context<Environment>): Promise<Response> {
 		const { bip39 } = await this.extractMnemonicOrError(c);
 
 		const theoreticalObject = await bip39.toTheoreticalObject();

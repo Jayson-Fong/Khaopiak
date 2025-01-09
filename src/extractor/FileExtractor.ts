@@ -3,7 +3,7 @@ import { extractContentPrefix } from '../util/format';
 import config from '../../config.json';
 import { ClientError } from '../error/ClientError';
 
-export const fileExtractor = (
+const FileExtractor = (
 	input: Uint8Array
 ): Promise<{
 	padding: number;
@@ -70,3 +70,5 @@ export const fileExtractor = (
 		return extracted;
 	});
 };
+
+export default FileExtractor;

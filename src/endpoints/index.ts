@@ -1,11 +1,12 @@
 import { Context } from 'hono';
+import { Environment } from '../types';
 
 /**
  * Displays the Khaopiak portal page to regular users,
  * and returns the Khaopiak shell script for curl/wget.
  * @param c Hono context
  */
-export const PortalIndex = (c: Context) => {
+export const PortalIndex = (c: Context<Environment>): Promise<Response> => {
 	const userAgent = (c.req.header('User-Agent') ?? '')
 		.split('/')[0]
 		.toLowerCase();

@@ -1,4 +1,4 @@
-export const mnemonicExtractor = (
+const MnemonicExtractor = (
 	input: Uint8Array
 ): Promise<{ mnemonic: string }> => {
 	return new Promise<{ mnemonic: string }>(() => {
@@ -8,3 +8,5 @@ export const mnemonicExtractor = (
 		};
 	});
 };
+
+export default MnemonicExtractor;

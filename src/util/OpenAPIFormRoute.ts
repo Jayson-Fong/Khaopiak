@@ -6,8 +6,8 @@ import {
 	importServerPrivateKey
 } from './pki';
 import { Context } from 'hono';
-import { mnemonicExtractor } from '../extractor/mnemonic';
-import BIP39 from './bip39';
+import MnemonicExtractor from '../extractor/MnemonicExtractor';
+import BIP39 from './BIP39';
 import { ClientError } from '../error/ClientError';
 import { Environment, ResponseInitStrictHeader } from '../types';
 
@@ -51,7 +51,7 @@ export class OpenAPIFormRoute extends OpenAPIRoute {
 	async extractMnemonicOrError(c: Context) {
 		let extractedData = await this.extractData<{ mnemonic: string }>(
 			c,
-			mnemonicExtractor
+			MnemonicExtractor
 		);
 
 		c.set('extracted', extractedData);

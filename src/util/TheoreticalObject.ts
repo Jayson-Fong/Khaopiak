@@ -6,7 +6,7 @@ import {
 	ReadableStream
 } from '@cloudflare/workers-types/2023-07-01/index';
 
-export class TheoreticalObject {
+class TheoreticalObject {
 	objectKey: string;
 
 	constructor(objectKey: string) {
@@ -41,3 +41,5 @@ export class TheoreticalObject {
 		return bucket.put(this.objectKey, value, options);
 	}
 }
+
+export default TheoreticalObject;

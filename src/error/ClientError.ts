@@ -5,7 +5,7 @@ export class ClientError extends Error {
 	responseInit?: ResponseInitStrictHeader;
 
 	constructor(
-		responseObject: Object | { success: boolean },
+		responseObject: Object | { success: boolean } = { success: false },
 		responseInit?: ResponseInitStrictHeader
 	) {
 		super();

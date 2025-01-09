@@ -11,8 +11,9 @@ import {
 	RESPONSE_SUCCESS
 } from '../../../util/schema';
 import { OpenAPIFormRoute } from '../../../util/OpenAPIFormRoute';
-import { fileExtractor } from '../../../extractor/file';
-import BIP39 from '../../../util/bip39';
+import FileExtractor from '../../../extractor/FileExtractor';
+import BIP39 from '../../../util/BIP39';
+import { Environment } from '../../../types';
 
 /**
  * Uploads a file to Cloudflare R2 after
@@ -93,13 +94,13 @@ export class FileUpload extends OpenAPIFormRoute {
 		}
 	};
 
-	async handle(c: Context) {
+	async handle(c: Context<Environment>): Promise<Response> {
 		let extractedData = await this.extractData<{
 			padding: number;
 			entropy: number;
 			expiry: number;
 			file: File;
-		}>(c, fileExtractor);
+		}>(c, FileExtractor);
 
 		const {
 			padding,

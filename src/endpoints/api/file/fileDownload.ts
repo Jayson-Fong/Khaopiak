@@ -13,6 +13,7 @@ import {
 } from '../../../util/schema';
 import { OpenAPIFormRoute } from '../../../util/OpenAPIFormRoute';
 import { ClientError } from '../../../error/ClientError';
+import { Environment } from '../../../types';
 
 /**
  * OpenAPI endpoint to download a file based on
@@ -94,7 +95,7 @@ export class FileDownload extends OpenAPIFormRoute {
 		}
 	};
 
-	async handle(c: Context) {
+	async handle(c: Context<Environment>): Promise<Response> {
 		const data = await this.getValidatedData<typeof this.schema>();
 		const { bip39 } = await this.extractMnemonicOrError(c);
 
