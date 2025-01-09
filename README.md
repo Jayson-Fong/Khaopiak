@@ -5,11 +5,15 @@
 An account-less and end-to-end encrypted storage system leveraging Cloudflare Workers with OpenAPI 3.1
 using [chanfana](https://github.com/cloudflare/chanfana) and [Hono](https://github.com/honojs/hono).
 
+> [!WARNING]  
+> Khaopiak is still undergoing heavy, active development and is currently not in a stable state. It should **not** be
+> used in a production environment at this time.
+
 <hr />
 
 <div align="center">
 
-   [Purpose](#purpose) | [Features](#features) | [Security](#security-considerations) | [Get started](#get-started) | [Contributing](#contributing)
+[💼 Purpose](#purpose) | [🪀 Features](#features) | [🛡️ Security](#security-considerations) | [🏁 Get started](#get-started) | [🦺 Contributing](#contributing)
 
 </div>
 
