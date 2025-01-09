@@ -1,5 +1,6 @@
 <div align="center">
-    <h1>🍜 Khaopiak</h1>
+   <h1>🍜 Khaopiak</h1>
+   <a href="#purpose">Purpose</a> | <a href="#features">Features</a> | <a href="#security-considerations">Security</a>
 </div>
 
 An account-less and end-to-end encrypted storage system leveraging Cloudflare Workers with OpenAPI 3.1
@@ -343,8 +344,8 @@ Response:
 
 ```json
 {
-	"success": true,
-	"mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
+  "success": true,
+  "mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
 }
 ```
 
@@ -401,7 +402,7 @@ Response:
 
 ```json
 {
-	"success": true
+  "success": true
 }
 ```
 
@@ -416,6 +417,6 @@ Response:
 ## Development
 
 1. Run `wrangler dev` to start a local instance of the API.
-2. Open `http://localhost:8787/` in your browser to see the Swagger interface where you can try the endpoints.
+2. Open `http://localhost:8787/api` in your browser to see the Swagger interface where you can try the endpoints.
 3. Changes made in the `src/` folder will automatically trigger the server to reload, you only need to refresh the
    Swagger interface.
