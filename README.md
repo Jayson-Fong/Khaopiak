@@ -272,6 +272,7 @@ Cloudflare R2</a>.
 </details>
 
 Additional security concerns:
+
 - [ ] Alteration of DNS responses
 - [ ] Alteration of client code
 
@@ -316,7 +317,8 @@ X-Content-Type-Options: nosniff
 
 > [!WARNING]  
 > Endpoints that require sending a mnemonic to the server should **only** send server-generated mnemonics, and not ones
-> generated locally, which can compromise end-to-end encryption.
+> generated locally, which can compromise end-to-end encryption. All examples do not use the Khaopiak server's PKI
+> encryption, which may lead to internal data leakage if your device trusts an untrustworthy root certificate.
 
 #### Uploading files
 
@@ -333,15 +335,16 @@ curl -X 'POST' \
   -H 'Content-Type: multipart/form-data' \
   -F 'file=@/home/username/Desktop/file.pdf' \
   -F 'entropy=128' \
-  -F 'expiry=43200'
+  -F 'expiry=43200' \
+  -F 'padding=1024'
 ```
 
 Response:
 
 ```json
 {
-  "success": true,
-  "mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
+	"success": true,
+	"mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
 }
 ```
 
@@ -398,7 +401,7 @@ Response:
 
 ```json
 {
-  "success": true
+	"success": true
 }
 ```
 
