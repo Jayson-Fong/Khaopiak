@@ -455,7 +455,7 @@ curl -X 'POST' \
 
 Response:
 
-```shell
+```json
 {
   "success": true,
   "exists": true
