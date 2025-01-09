@@ -11,10 +11,14 @@ params:
 
 A non-negative integer representing the number of padding bytes to append at the end of the plaintext prior to
 encrypting. End-users may specify padding to help prevent association between upload and download clients through file
-transfer sizes.
+transfer sizes when using [Public Key Infrastructure (PKI)](../pki) as additional random bytes of the specified amount
+will be appended to the response from the server, obscuring the true amount of content bytes. When the downloading
+client does not use [PKI](../pki), the server will remove padding bytes and return the originally uploaded file;
+however, padding can still help prevent association of the file with the uploader in the event that access to
+the [Cloudflare R2](https://www.cloudflare.com/developer-platform/products/r2/) bucket used for storage is compromised.
 
-The amount of padding bytes is limited to the greater of 2048 bytes and 0.5 times the amount of the uploaded file's byte
-length.
+The amount of padding bytes is limited to the greatest of 2048 bytes and 0.5 times the amount of the uploaded file's
+byte length.
 
 ### entropy: Number
 
@@ -53,7 +57,7 @@ ciphertext.
 
 ### multipart/form-data
 
-When sending payloads without using [Public Key Infrastructure (PKI)](../pki), the `Content-Type` header must be set
+When sending payloads without using [PKI](../pki), the `Content-Type` header must be set
 to `multipart/form-data`.
 
 ### application/octet-stream
@@ -61,11 +65,11 @@ to `multipart/form-data`.
 Use the `Content-Type` header `application/octet-stream` when sending data using [PKI](../pki). After including the
 required [PKI](../pki) components, the following byte format must be used.
 
-The first two bytes must indicate the number of padding bytes the server should append to the plaintext, meeting the
+The first six bytes must indicate the number of padding bytes the server should append to the plaintext, meeting the
 same qualifications as the [padding](#padding-number) field, followed by 2 bytes indicating the number
 of [entropy](#entropy-number) bits.
 
-The server then looks for 4 bytes indicating the number of seconds until the file should be deleted, equivilent to
+The server then looks for 4 bytes indicating the number of seconds until the file should be deleted, equivalent to
 the [expiry](#expiry-number) field.
 
 The remaining bytes are used for file content.

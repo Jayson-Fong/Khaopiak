@@ -2,7 +2,11 @@ import { Bool, Str } from 'chanfana';
 import { z } from 'zod';
 import { Context } from 'hono';
 import { bufferToNumber } from '../../../util/buffer';
-import { extractContentPrefix, isPDF } from '../../../util/format';
+import {
+	extractContentPrefix,
+	extractPaddingData,
+	isPDF
+} from '../../../util/format';
 import config from '../../../../config.json';
 import {
 	GENERIC_400,
@@ -164,8 +168,19 @@ export class FileDownload extends OpenAPIFormRoute {
 
 		// We've got the file and got this far...now to destroy it
 		await theoreticalObject.delete(c.env.STORAGE);
-		return this.secureRespond(c, decryptedBuffer.slice(contentStart), {
-			headers
-		});
+
+		let contentBuffer = decryptedBuffer.slice(contentStart);
+		return this.secureRespond(
+			c,
+			contentBuffer.slice(
+				0,
+				this.isPKIDownload(c)
+					? undefined
+					: -extractPaddingData(contentBuffer)
+			),
+			{
+				headers
+			}
+		);
 	}
 }

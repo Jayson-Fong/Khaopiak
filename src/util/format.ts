@@ -1,4 +1,4 @@
-import { bufferToHex } from './buffer';
+import { bufferToHex, bufferToNumber } from './buffer';
 import { ClientError } from '../error/ClientError';
 
 /**
@@ -17,6 +17,23 @@ export const fileToContentPrefix = (file: File): Uint8Array => {
 	return new TextEncoder().encode(
 		`${stripNulls(file.name)}\0${stripNulls(file.type)}\0`
 	);
+};
+
+export const extractPaddingData = (buffer: Uint8Array) => {
+	if (buffer.byteLength < 6) {
+		throw Error(
+			'Buffer contains insufficient bytes to extract padding data'
+		);
+	}
+
+	let paddingByteCount = bufferToNumber(buffer.slice(-6));
+	if (buffer.byteLength < paddingByteCount + paddingByteCount) {
+		throw Error(
+			'Buffer contains insufficient bytes compared to reported padding byte count'
+		);
+	}
+
+	return paddingByteCount + 6;
 };
 
 /**

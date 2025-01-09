@@ -25,16 +25,16 @@ const FileExtractor = (
 		}
 
 		const { contentStart, name, type } = extractContentPrefix(
-			input.slice(6)
+			input.slice(10)
 		);
 
 		const extracted = {
-			padding: bufferToNumber(input.slice(0, 2)),
-			entropy: bufferToNumber(input.slice(2, 4)) ?? 128,
+			padding: bufferToNumber(input.slice(0, 4)),
+			entropy: bufferToNumber(input.slice(4, 6)) ?? 128,
 			expiry:
-				bufferToNumber(input.slice(4, 6)) ??
+				bufferToNumber(input.slice(6, 10)) ??
 				config.upload.expiry.default,
-			file: new File([input.slice(6 + contentStart)], name, {
+			file: new File([input.slice(10 + contentStart)], name, {
 				type: type
 			})
 		};

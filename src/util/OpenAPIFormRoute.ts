@@ -86,4 +86,8 @@ export class OpenAPIFormRoute extends OpenAPIRoute {
 			responseInit
 		);
 	}
+
+	isPKIDownload(c: Context<Environment>): boolean {
+		return !!c.get('extractedData')?.publicKey;
+	}
 }

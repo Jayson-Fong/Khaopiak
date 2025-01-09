@@ -82,6 +82,17 @@ export const bufferToNumber = (buffer: Uint8Array): number => {
 	return num;
 };
 
+export const numberToBuffer = (byteLength: number, num: number): Uint8Array => {
+	let buffer = new Uint8Array(byteLength);
+
+	for (let i = 0; i < buffer.byteLength; i++) {
+		buffer[i] = num % 256;
+		num = Math.floor(num / 256);
+	}
+
+	return buffer;
+};
+
 /**
  * Takes a hex string and converts it into an ArrayBuffer
  * @param hex A hexadecimal string
@@ -90,4 +101,21 @@ export const hexToArrayBuffer = (hex: string): ArrayBuffer => {
 	return Uint8Array.from(
 		(hex.match(/.{1,2}/g) as RegExpMatchArray).map((b) => parseInt(b, 16))
 	).buffer;
+};
+
+export const generateRandomBytes = (byteLength: number): Uint8Array => {
+	// crypto.getRandomValues only supports 64K bytes at a time (65536 bytes),
+	// so this generates it in chunks!
+	const randomByteArrays = [];
+
+	let remainingByteLength = byteLength;
+	while (remainingByteLength > 0) {
+		let iterationBytes = Math.min(65536, remainingByteLength);
+		randomByteArrays.push(
+			crypto.getRandomValues(new Uint8Array(iterationBytes))
+		);
+		remainingByteLength -= iterationBytes;
+	}
+
+	return new Uint8Array(bufferConcat(randomByteArrays));
 };

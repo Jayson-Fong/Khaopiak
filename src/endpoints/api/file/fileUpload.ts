@@ -2,7 +2,12 @@ import { Str } from 'chanfana';
 import { z } from 'zod';
 import { Context } from 'hono';
 import { generateMnemonic } from 'bip39';
-import { bufferConcat, msTimeToBuffer } from '../../../util/buffer';
+import {
+	bufferConcat,
+	generateRandomBytes,
+	msTimeToBuffer,
+	numberToBuffer
+} from '../../../util/buffer';
 import { fileToContentPrefix } from '../../../util/format';
 import config from '../../../../config.json';
 import {
@@ -121,11 +126,19 @@ export class FileUpload extends OpenAPIFormRoute {
 		// The IV will be stored later as a prefix to the ciphertext
 		const iv = crypto.getRandomValues(new Uint8Array(0xc));
 
+		// Generate padding to falsify the file's size
+		const paddingBytes = generateRandomBytes(padding);
+
 		// Encrypt the file content prefixed with a null-separated name and type using AES-GCM
 		const cipherText = await crypto.subtle.encrypt(
 			{ name: 'AES-GCM', iv: iv },
 			await cryptoKey,
-			bufferConcat([fileToContentPrefix(file), await file.arrayBuffer()])
+			bufferConcat([
+				fileToContentPrefix(file),
+				await file.arrayBuffer(),
+				paddingBytes,
+				numberToBuffer(6, padding)
+			])
 		);
 
 		// Adding in 6 bytes to account for expiry time and 12 bytes to account for the IV

@@ -32,6 +32,7 @@ export const httpErrorHandler = (
 		);
 	}
 
+	console.log(err);
 	return generateResponse(
 		c.get('extractedData')?.publicKey,
 		c.json,
