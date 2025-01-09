@@ -32,6 +32,7 @@ export class OpenAPIFormRoute extends OpenAPIRoute {
 		c: Context<Environment>,
 		extractor: (input: Uint8Array) => Promise<T>
 	): Promise<ExtractionData<T>> {
+		// TODO: Make extractors nicer. Run validation through Zod instead of throwing ClientError.
 		const data = await extractData<T>(
 			c.req.header('Content-Type'),
 			c.req.raw.body,
@@ -89,5 +90,15 @@ export class OpenAPIFormRoute extends OpenAPIRoute {
 
 	isPKIDownload(c: Context<Environment>): boolean {
 		return !!c.get('extractedData')?.publicKey;
+	}
+
+	error(
+		message: string,
+		responseInit?: ResponseInitStrictHeader | number
+	): ClientError {
+		return new ClientError(
+			{ success: false, error: message },
+			responseInit
+		);
 	}
 }

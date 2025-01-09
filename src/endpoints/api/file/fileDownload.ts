@@ -16,7 +16,6 @@ import {
 	RESPONSE_SUCCESS
 } from '../../../util/schema';
 import { OpenAPIFormRoute } from '../../../util/OpenAPIFormRoute';
-import { ClientError } from '../../../error/ClientError';
 import { Environment } from '../../../types';
 
 /**
@@ -104,15 +103,14 @@ export class FileDownload extends OpenAPIFormRoute {
 		const { bip39 } = await this.extractMnemonicOrError(c);
 
 		const cryptoKey = await bip39.toCryptoKey(['decrypt']);
-		const theoreticalObject = await bip39.toTheoreticalObject();
+		const theoreticalObject = await bip39.toTheoreticalObject(
+			c.env.OBJECT_KEY_SECRET
+		);
 		const object = await theoreticalObject.get(c.env.STORAGE);
 
 		// If the object does not exist...
 		if (!object) {
-			throw new ClientError(
-				{ success: false, error: 'Failed to find file by mnemonic' },
-				{ status: 404 }
-			);
+			throw this.error('Failed to find file by mnemonic', 404);
 		}
 
 		// The object's body is composed of the expiry (6 bytes) + IV (12 bytes) + ciphertext
@@ -127,10 +125,7 @@ export class FileDownload extends OpenAPIFormRoute {
 			// And that's not wrong since it is indeed about to be gone...
 			await theoreticalObject.delete(c.env.STORAGE);
 
-			throw new ClientError(
-				{ success: false, error: 'Failed to find file by mnemonic' },
-				{ status: 404 }
-			);
+			throw this.error('Failed to find file by mnemonic', 404);
 		}
 
 		// Decrypt the file using AES-GCM given bytes 6 - 17 of the stored file is the IV

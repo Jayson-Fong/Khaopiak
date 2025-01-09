@@ -6,12 +6,16 @@ export class ClientError extends Error {
 
 	constructor(
 		responseObject: Object | { success: boolean } = { success: false },
-		responseInit?: ResponseInitStrictHeader
+		responseInit?: ResponseInitStrictHeader | number
 	) {
 		super();
 
 		this.responseObject = responseObject;
-		this.responseInit = responseInit ?? { status: 400 };
+		this.responseInit = responseInit
+			? typeof responseInit === 'number'
+				? { status: responseInit }
+				: responseInit
+			: { status: 400 };
 	}
 
 	getResponseObject(): Object {

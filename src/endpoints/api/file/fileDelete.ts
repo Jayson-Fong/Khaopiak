@@ -63,7 +63,9 @@ export class FileDelete extends OpenAPIFormRoute {
 	async handle(c: Context<Environment>): Promise<Response> {
 		const { bip39 } = await this.extractMnemonicOrError(c);
 
-		await (await bip39.toTheoreticalObject()).delete(c.env.STORAGE);
+		await (
+			await bip39.toTheoreticalObject(c.env.OBJECT_KEY_SECRET)
+		).delete(c.env.STORAGE);
 		return this.secureRespond(c, { success: true });
 	}
 }

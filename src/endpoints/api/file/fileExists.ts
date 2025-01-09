@@ -73,7 +73,9 @@ export class FileExists extends OpenAPIFormRoute {
 	async handle(c: Context<Environment>): Promise<Response> {
 		const { bip39 } = await this.extractMnemonicOrError(c);
 
-		const theoreticalObject = await bip39.toTheoreticalObject();
+		const theoreticalObject = await bip39.toTheoreticalObject(
+			c.env.OBJECT_KEY_SECRET
+		);
 		const object = await theoreticalObject.get(c.env.STORAGE);
 
 		if (!object) {

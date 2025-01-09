@@ -2,7 +2,7 @@
 title: Upload
 toc: true
 params:
-  author: 'Jayson Fong'
+    author: 'Jayson Fong'
 ---
 
 ## Fields
@@ -30,7 +30,7 @@ Per BIP39, the number of entropy bits must be between 128 and 256 bits and be a 
 entropy bits results in a greater amount of mnemonic words, as listed below:
 
 | Entropy | Checksum | Entropy + checksum | Mnemonic sentence words |
-|---------|----------|--------------------|-------------------------|
+| ------- | -------- | ------------------ | ----------------------- |
 | 128     | 4        | 132                | 12                      |
 | 160     | 5        | 165                | 15                      |
 | 192     | 6        | 198                | 18                      |

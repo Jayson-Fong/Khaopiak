@@ -150,7 +150,9 @@ export class FileUpload extends OpenAPIFormRoute {
 		]);
 
 		// Enqueue the file for deletion if it's configured to be delete-able
-		const theoreticalObject = await bip39.toTheoreticalObject();
+		const theoreticalObject = await bip39.toTheoreticalObject(
+			c.env.OBJECT_KEY_SECRET
+		);
 		if (
 			expiry >= 0 &&
 			(!config.upload.expiry.excessiveExpiryAsInfinite ||

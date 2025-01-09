@@ -7,6 +7,7 @@ export interface Bindings {
 
 	PUBLIC_KEY_HEX: string;
 	PRIVATE_KEY_HEX: string;
+	OBJECT_KEY_SECRET: string;
 }
 
 export interface Variables {

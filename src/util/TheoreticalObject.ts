@@ -13,15 +13,15 @@ class TheoreticalObject {
 		this.objectKey = objectKey;
 	}
 
-	getObjectKey() {
+	getObjectKey(): string {
 		return this.objectKey;
 	}
 
-	delete(bucket: R2Bucket) {
+	delete(bucket: R2Bucket): Promise<void> {
 		return bucket.delete(this.objectKey);
 	}
 
-	get(bucket: R2Bucket) {
+	get(bucket: R2Bucket): Promise<R2ObjectBody | null> {
 		return bucket.get(this.objectKey);
 	}
 
@@ -37,7 +37,7 @@ class TheoreticalObject {
 		options?: R2PutOptions & {
 			onlyIf: R2Conditional | Headers;
 		}
-	) {
+	): Promise<R2Object | null> {
 		return bucket.put(this.objectKey, value, options);
 	}
 }

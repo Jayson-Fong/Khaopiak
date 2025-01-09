@@ -43,11 +43,24 @@ export default class BIP39 {
 		);
 	}
 
-	async toTheoreticalObject(): Promise<TheoreticalObject> {
+	async toTheoreticalObject(
+		serverSecret: string
+	): Promise<TheoreticalObject> {
+		let textEncoder = new TextEncoder();
 		return new TheoreticalObject(
 			digestToKey(
-				await crypto.subtle.digest(
-					{ name: 'SHA-256' },
+				await crypto.subtle.sign(
+					'HMAC',
+					await crypto.subtle.importKey(
+						'raw',
+						hexToArrayBuffer(serverSecret),
+						{
+							name: 'HMAC',
+							hash: 'SHA-256'
+						},
+						false,
+						['sign']
+					),
 					this.toEntropy()
 				)
 			)
