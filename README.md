@@ -8,7 +8,9 @@ using [chanfana](https://github.com/cloudflare/chanfana) and [Hono](https://gith
 <hr />
 
 <div align="center">
-   <a href="#purpose">Purpose</a> | <a href="#features">Features</a> | <a href="#security-considerations">Security</a>
+
+   [Purpose](#purpose) | [Features](#features) | [Security](#security-considerations) | [Get started](#get-started) | [Contributing](#contributing)
+
 </div>
 
 <hr />
