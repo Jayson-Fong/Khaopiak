@@ -1,6 +1,5 @@
 <div align="center">
    <h1>🍜 Khaopiak</h1>
-   <a href="#purpose">Purpose</a> | <a href="#features">Features</a> | <a href="#security-considerations">Security</a>
 </div>
 
 An account-less and end-to-end encrypted storage system leveraging Cloudflare Workers with OpenAPI 3.1
@@ -8,7 +7,9 @@ using [chanfana](https://github.com/cloudflare/chanfana) and [Hono](https://gith
 
 <hr />
 
-**Source Code**: <a href="https://github.com/Jayson-Fong/khaopiak/">github.com/Jayson-Fong/khaopiak</a>
+<div align="center">
+   <a href="#purpose">Purpose</a> | <a href="#features">Features</a> | <a href="#security-considerations">Security</a>
+</div>
 
 <hr />
 
