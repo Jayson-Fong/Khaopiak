@@ -341,13 +341,19 @@ further reinforced by Khaopiak's client-side mnemonics, providing end-to-end enc
 
 </details>
 
-## To do
+## Get started
 
-- [ ] POSIX-based upload/download script
-- [ ] Web portal
-- [ ] Encrypt-then-MAC CBC client-side
+> [!NOTE]  
+> Khaopiak is in active, heavy development. This guide will be updated at a later time when the project becomes more
+> stable.
 
-## Recommended headers
+1. Sign up for [Cloudflare Workers](https://workers.dev). The free tier is more than enough for most use cases.
+2. Clone this project and install dependencies with `npm install`
+3. Run `wrangler login` to login to your Cloudflare account in wrangler
+4. Run `wrangler r2 bucket create khaopiak` to create a Cloudflare R2 bucket
+5. Run `wrangler deploy` to publish the API to Cloudflare Workers
+
+### Recommended headers
 
 > [!IMPORTANT]  
 > To prevent access issues, including for other applications using the same domain, review headers before setting them.
@@ -376,16 +382,16 @@ Vary: Origin
 X-Content-Type-Options: nosniff
 ```
 
-## Examples
+### Examples
 
-### Khaopiak server cURL examples
+#### Khaopiak server cURL examples
 
 > [!WARNING]  
 > Endpoints that require sending a mnemonic to the server should **only** send server-generated mnemonics, and not ones
 > generated locally, which can compromise end-to-end encryption. All examples do not use the Khaopiak server's PKI
 > encryption, which may lead to internal data leakage if your device trusts an untrustworthy root certificate.
 
-#### Uploading files
+##### Uploading files
 
 > [!IMPORTANT]  
 > This example does not leverage client-side encryption. Encrypt sensitive files before transmitting them using this
@@ -413,7 +419,7 @@ Response:
 }
 ```
 
-#### Downloading files
+##### Downloading files
 
 > [!NOTE]  
 > If the file was encrypted client-side before uploading, this command will not fully decrypt it.
@@ -429,7 +435,7 @@ curl -X 'POST' \
   --output "/home/username/Desktop/file.pdf"
 ```
 
-#### Checking if files exist
+##### Checking if files exist
 
 Request:
 
@@ -450,7 +456,7 @@ Response:
 }
 ```
 
-#### Deleting a file
+##### Deleting a file
 
 Request:
 
@@ -470,17 +476,21 @@ Response:
 }
 ```
 
-## Get started
+## Contributing
 
-1. Sign up for [Cloudflare Workers](https://workers.dev). The free tier is more than enough for most use cases.
-2. Clone this project and install dependencies with `npm install`
-3. Run `wrangler login` to login to your Cloudflare account in wrangler
-4. Run `wrangler r2 bucket create khaopiak` to create a Cloudflare R2 bucket
-5. Run `wrangler deploy` to publish the API to Cloudflare Workers
+### Development environment
 
-## Development
+> [!NOTE]  
+> Khaopiak is in active, heavy development. This guide will be updated at a later time when the project becomes more
+> stable.
 
 1. Run `wrangler dev` to start a local instance of the API.
 2. Open `http://localhost:8787/api` in your browser to see the Swagger interface where you can try the endpoints.
 3. Changes made in the `src/` folder will automatically trigger the server to reload, you only need to refresh the
    Swagger interface.
+
+### To do
+
+- [ ] POSIX-based upload/download script
+- [ ] Web portal
+- [ ] Encrypt-then-MAC CBC client-side
