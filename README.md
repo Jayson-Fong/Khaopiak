@@ -109,9 +109,8 @@ allowing end-to-end encryption. As a result, confidentiality of the original fil
 available to intermediaries.
 
 For all purposes of encryption at rest, Khaopiak uses the Advanced Encryption Standard (AES), with all clients
-supporting <a href="https://csrc.nist.gov/pubs/sp/800/38/a/final" target="_blank">Cipher Block Chaining (CBC)</a> and
-recommending <a href="https://csrc.nist.gov/pubs/sp/800/38/d/final" target="_blank">Galois/Counter Mode (GCM)</a> when
-possible.
+supporting [Cipher Block Chaining (CBC)](https://csrc.nist.gov/pubs/sp/800/38/a/final) and
+recommending [Galois/Counter Mode (GCM)](https://csrc.nist.gov/pubs/sp/800/38/d/final) when possible.
 
 </details>
 
@@ -170,20 +169,20 @@ prevents impersonating through stripping the header from client requests.
 <details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
 <summary>☁️ Serverless deployment</summary>
 
-Khaopiak is designed for deployment on <a href="https://workers.cloudflare.com/" target="_blank">Cloudflare Workers</a>,
-leveraging <a href="https://developers.cloudflare.com/r2/" target="_blank">Cloudflare R2</a> for file storage
-and <a href="https://developers.cloudflare.com/queues/" target="_blank">Cloudflare Queues</a> for file expiry, allowing
-deployment and automated scaling without having to maintain servers.
+Khaopiak is designed for deployment on [Cloudflare Workers](https://workers.cloudflare.com/),
+leveraging [Cloudflare R2](https://developers.cloudflare.com/r2/) for file storage
+and [Cloudflare Queues](https://developers.cloudflare.com/queues/) for file expiry, allowing deployment and automated
+scaling without having to maintain servers.
 
 </details>
 
 <details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
 <summary>💰 Deploy for free</summary>
 
-For small-scale users, Khaopiak can be deployed on <a href="https://workers.cloudflare.com/" target="_blank">Cloudflare
-Workers</a>'s free tier; however, requires disabling Khaopiak's automated expiry-based deletion system as it
-uses <a href="https://developers.cloudflare.com/queues/" target="_blank">Cloudflare Queues</a>, a Workers Paid feature.
-However, automated file deletion can still be accomplished through
+For small-scale users, Khaopiak can be deployed on [Cloudflare Workers](https://workers.cloudflare.com/)'s free tier;
+however, requires disabling Khaopiak's automated expiry-based deletion system as it
+uses [Cloudflare Queues](https://developers.cloudflare.com/queues/), a Workers Paid feature. However, automated file
+deletion can still be accomplished through
 using [Cloudflare R2's object lifecycle rules](https://developers.cloudflare.com/r2/buckets/object-lifecycles/) and
 expired files will remain inaccessible to clients.
 
@@ -206,8 +205,7 @@ server cannot be trusted, a private instance can quickly be deployed.
 <summary>🔐 Cryptographic strength of encryption algorithms</summary>
 
 Khaopiak supports AES-CBC and AES-GCM as they are available through
-the <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto" target="_blank">SubtleCrypto interface of
-the Web Crypto API</a>:
+the [SubtleCrypto interface of the Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto):
 
 <ul>
    <li><strong>RSA-OAEP</strong> is supported and required when encrypting payloads to the server or requesting an encrypted response. It is not supported for at-rest storage as it is a public-key encryption system, where current guidelines recommend a minimum of 2048 key bits. To meet this, 192+ BIP39 words would be required, which is unreasonable for an end-user. While client developers may use it for client-side encryption, server-side mnemonic-based encryption/decryption with RSA-OAEP will not be offered.</li>
@@ -256,12 +254,12 @@ encryption, it does not inherently increase the level of security assurance as t
 <details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
 <summary>🔎 Stored hash of entropy</summary>
 
-To locate the file in <a href="https://developers.cloudflare.com/r2/" target="_blank">Cloudflare R2</a>, the server
-generates a HMAC-SHA256 of the entropy used for mnemonic generation. As a result, the hash acts as a heuristic for
-determining the original entropy, and thereby the decryption key for server-side encryption; however, this is
-impractical due to the sheer number of possible combinations. This risk is further mitigated through leveraging an HMAC
-with a secret key for the server. As a result, even if entropy generated between two different Khaopiak servers are
-identical, the associated object key would differ given a different secret key.
+To locate the file in [Cloudflare R2](https://developers.cloudflare.com/r2/), the server generates a HMAC-SHA256 of the
+entropy used for mnemonic generation. As a result, the hash acts as a heuristic for determining the original entropy,
+and thereby the decryption key for server-side encryption; however, this is impractical due to the sheer number of
+possible combinations. This risk is further mitigated through leveraging an HMAC with a secret key for the server. As a
+result, even if entropy generated between two different Khaopiak servers are identical, the associated object key would
+differ given a different secret key.
 
 </details>
 
@@ -281,19 +279,17 @@ file.
 <details style="border: 1px solid; border-radius: 8px; padding: 8px; margin-top: 4px;">
 <summary>📋️ Unauthorized access to server-side storage</summary>
 
-If a threat actor obtains access to files in <a href="https://developers.cloudflare.com/r2/" target="_blank">Cloudflare
-R2</a>, they would have access to files encrypted using AES-CBC, where the plaintext may be padded, and itself a padded
-ciphertext generated by the client, which is not of immediate value without substantial computing resources and is
-generally infeasible. Through using a publicly accessible server, additional obscurity is provided through mixing files
-between end users, making it such that threat actors cannot easily differentiate between ciphertexts with valuable
-plaintexts.
+If a threat actor obtains access to files in [Cloudflare R2](https://developers.cloudflare.com/r2/), they would have
+access to files encrypted using AES-CBC, where the plaintext may be padded, and itself a padded ciphertext generated by
+the client, which is not of immediate value without substantial computing resources and is generally infeasible. Through
+using a publicly accessible server, additional obscurity is provided through mixing files between end users, making it
+such that threat actors cannot easily differentiate between ciphertexts with valuable plaintexts.
 
 If a threat actor lacks the ability to list files and only has the ability to download given an object key, they would
 need a HMAC-SHA256 hash, and it is generally infeasible to brute-force checking hashes due to the sheer number of
 possibilities. To generate a valid HMAC-SHA256 corresponding an object's key, a threat actor would require both the
 server's secret and the entropy used to generate the server-side mnemonic. Given a threat actor has this information, it
-would be easier to query the Khaopiak API rather than <a href="https://developers.cloudflare.com/r2/" target="_blank">
-Cloudflare R2</a>.
+would be easier to query the Khaopiak API rather than [Cloudflare R2](https://developers.cloudflare.com/r2/).
 
 </details>
 
