@@ -46,7 +46,6 @@ export default class BIP39 {
 	async toTheoreticalObject(
 		serverSecret: string
 	): Promise<TheoreticalObject> {
-		let textEncoder = new TextEncoder();
 		return new TheoreticalObject(
 			digestToKey(
 				await crypto.subtle.sign(

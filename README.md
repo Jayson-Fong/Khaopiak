@@ -420,8 +420,8 @@ Response:
 
 ```json
 {
-  "success": true,
-  "mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
+	"success": true,
+	"mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
 }
 ```
 
@@ -457,8 +457,8 @@ Response:
 
 ```json
 {
-  "success": true,
-  "exists": true
+	"success": true,
+	"exists": true
 }
 ```
 
@@ -478,7 +478,7 @@ Response:
 
 ```json
 {
-  "success": true
+	"success": true
 }
 ```
 
