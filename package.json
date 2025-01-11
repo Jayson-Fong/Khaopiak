@@ -7,10 +7,10 @@
 		"dev": "wrangler dev",
 		"start": "wrangler dev",
 		"cf-typegen": "wrangler types",
-		"clean": "npx prettier . -w && npx eslint ."
+		"lint": "npx prettier . -w && npx eslint ."
 	},
 	"dependencies": {
-		"bip39": "^3.1.0",
+		"@scure/bip39": "^1.5.1",
 		"chanfana": "^2.0.2",
 		"hono": "^4.4.7",
 		"js-yaml": "^4.1.0",

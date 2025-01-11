@@ -1,7 +1,6 @@
 import { fromHono } from 'chanfana';
 import { Hono } from 'hono';
 import { FileUpload } from './endpoints/api/file/fileUpload';
-import { Buffer } from 'node:buffer';
 import { FileDownload } from './endpoints/api/file/fileDownload';
 import { FileExists } from './endpoints/api/file/fileExists';
 import { FileDelete } from './endpoints/api/file/fileDelete';
@@ -9,8 +8,6 @@ import { queue } from './handler/cleanupQueue';
 import { Environment } from './types';
 import { PortalIndex } from './endpoints';
 import { httpErrorHandler } from './handler/httpError';
-
-globalThis.Buffer = Buffer;
 
 // Start a Hono app
 const app = new Hono<Environment>();

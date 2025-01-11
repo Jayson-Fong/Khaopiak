@@ -1,19 +1,25 @@
-import { mnemonicToEntropy, validateMnemonic } from 'bip39';
 import { digestToKey } from './format';
 import { hexToArrayBuffer, toAESKeyData } from './buffer';
 import TheoreticalObject from './TheoreticalObject';
 import { ClientError } from '../error/ClientError';
+import {
+	generateMnemonic,
+	mnemonicToEntropy,
+	validateMnemonic
+} from '@scure/bip39';
+import { wordlist as english } from '@scure/bip39/wordlists/english';
 
 export default class BIP39 {
 	mnemonic?: string | null;
 	entropy?: ArrayBuffer;
 
-	constructor(mnemonic?: string | null) {
+	constructor(mnemonic?: string | null, entropy?: ArrayBuffer) {
 		this.mnemonic = mnemonic;
+		this.entropy = entropy;
 	}
 
 	isValid(): boolean {
-		return !!this.mnemonic && validateMnemonic(this.mnemonic);
+		return !!this.mnemonic && validateMnemonic(this.mnemonic, english);
 	}
 
 	toEntropy(): ArrayBuffer {
@@ -28,9 +34,9 @@ export default class BIP39 {
 			});
 		}
 
-		this.entropy = hexToArrayBuffer(mnemonicToEntropy(this.mnemonic));
+		this.entropy = mnemonicToEntropy(this.mnemonic, english);
 
-		return this.entropy;
+		return this.entropy!;
 	}
 
 	toCryptoKey(keyUsages: ('encrypt' | 'decrypt')[]): Promise<CryptoKey> {
@@ -64,5 +70,17 @@ export default class BIP39 {
 				)
 			)
 		);
+	}
+
+	clear(): void {
+		if (this.entropy instanceof ArrayBuffer) {
+			new Uint8Array(this.entropy).set(
+				new Array(this.entropy.byteLength).fill(0)
+			);
+		}
+	}
+
+	static create(entropyBits: number): BIP39 {
+		return new BIP39(generateMnemonic(english, entropyBits));
 	}
 }

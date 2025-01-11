@@ -49,7 +49,7 @@ export const toAESKeyData = (entropy: ArrayBufferLike): ArrayBufferLike => {
  */
 export const bufferToHex = (buffer: ArrayBufferLike) => {
 	return [...new Uint8Array(buffer)]
-		.map((x) => x.toString(16).padStart(2, '0'))
+		.map((x) => Number(x).toString(16).padStart(2, '0'))
 		.join('');
 };
 

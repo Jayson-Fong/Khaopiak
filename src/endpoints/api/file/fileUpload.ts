@@ -1,7 +1,6 @@
 import { Str } from 'chanfana';
 import { z } from 'zod';
 import { Context } from 'hono';
-import { generateMnemonic } from 'bip39';
 import {
 	bufferConcat,
 	generateRandomBytes,
@@ -117,8 +116,7 @@ export class FileUpload extends OpenAPIFormRoute {
 		// We'll use a mnemonic to identify the file and act as an encryption key, shared with the client.
 		// The client has their own mnemonic for client-side encryption. When requesting files, the client
 		// will only send the Workers-generated mnemonic.
-		const mnemonic = generateMnemonic(entropyByteCount);
-		const bip39 = new BIP39(mnemonic);
+		const bip39 = BIP39.create(entropyByteCount);
 
 		// For AES-GCM encryption, use the entropy bits as a key.
 		const cryptoKey = bip39.toCryptoKey(['encrypt']);
@@ -172,7 +170,11 @@ export class FileUpload extends OpenAPIFormRoute {
 
 		// Upload the ciphertext to Cloudflare R2
 		await theoreticalObject.put(c.env.STORAGE, ivInjectedFileBuffer);
-
-		return this.secureRespond(c, { success: true, mnemonic: mnemonic });
+		const mnemonic = bip39.mnemonic!;
+		bip39.clear();
+		return this.secureRespond(c, {
+			success: true,
+			mnemonic: mnemonic
+		});
 	}
 }
