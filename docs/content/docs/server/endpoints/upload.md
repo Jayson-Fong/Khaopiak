@@ -5,9 +5,11 @@ params:
     author: 'Jayson Fong'
 ---
 
-## Fields
+## Payload
 
-### padding: Number
+### Fields
+
+#### padding: Number
 
 A non-negative integer representing the number of padding bytes to append at the end of the plaintext prior to
 encrypting. End-users may specify padding to help prevent association between upload and download clients through file
@@ -20,7 +22,7 @@ the [Cloudflare R2](https://www.cloudflare.com/developer-platform/products/r2/) 
 The amount of padding bytes is limited to the greatest of 2048 bytes and 0.5 times the amount of the uploaded file's
 byte length.
 
-### entropy: Number
+#### entropy: Number
 
 A non-negative integer representing the number of entropy bits the server should generate, used to generate a BIP39
 mnemonic, encrypt the uploaded file with associated data, and generate a hash to act as the file's object key. By
@@ -42,25 +44,25 @@ in [Galois/Counter Mode (GCM)](https://csrc.nist.gov/pubs/sp/800/38/d/final). As
 server will pad the bits in a deterministic means when the end-user specifies 160 or 224 bits in order to generate a 192
 or 256-bit key, respectively, while preserving entropy.
 
-### expiry: Number
+#### expiry: Number
 
 A non-negative integer representing the number of seconds from upload until the server should reject downloading a file
 and delete it. The expiry is stored unencrypted as a prefix to the ciphertext
 within [Cloudflare R2](https://www.cloudflare.com/developer-platform/products/r2/).
 
-### file: File
+#### file: File
 
 The file to upload. The file's name and content type are used to prefix the plaintext in the generation of the
 ciphertext.
 
-## Payload content type
+### Content type
 
-### multipart/form-data
+#### multipart/form-data
 
 When sending payloads without using [PKI](../pki), the `Content-Type` header must be set
 to `multipart/form-data`.
 
-### application/octet-stream
+#### application/octet-stream
 
 Use the `Content-Type` header `application/octet-stream` when sending data using [PKI](../pki). After including the
 required [PKI](../pki) components, the following byte format must be used.
@@ -73,3 +75,56 @@ The server then looks for 4 bytes indicating the number of seconds until the fil
 the [expiry](#expiry-number) field.
 
 The remaining bytes are used for file content.
+
+```mermaid
+---
+title: "Sample PKI-Encrypted Upload Payload"
+config:
+    packet:
+        bitsPerRow: 32
+---
+packet-beta
+0-1: "Version"
+2-3: "Key length"
+4-12: "Public key (variable length)"
+13-18: "Padding length"
+19-20: "Entropy bits"
+21-24: "Expiry seconds"
+25-31: "Data (variable length)"
+```
+
+## Response
+
+### Fields
+
+#### success: Boolean
+
+#### mnemonic: String
+
+### Content type
+
+#### application/json
+
+```json
+{
+  "success": true,
+  "mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
+}
+```
+
+#### application/octet-stream
+
+```mermaid
+---
+title: "Sample PKI-Encrypted Upload Response"
+config:
+    packet:
+        bitsPerRow: 8
+        bitWidth: 100
+---
+packet-beta
+0-1: "HTTP status"
+2-2: "Header count"
+3-7: "Headers (variable length)"
+8-15: "JSON response (variable length)"
+```
