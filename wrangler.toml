@@ -26,7 +26,8 @@ queue = "khaopiak"
 [[r2_buckets]]
 binding = "STORAGE"
 bucket_name = "khaopiak"
-preview_bucket_name = "khaopiak-preview"
+# This project uses Cloudflare Queues, which this project does not support.
+#preview_bucket_name = "khaopiak-preview"
 
 [assets]
 directory = "./public/"

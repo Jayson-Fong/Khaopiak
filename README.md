@@ -349,15 +349,19 @@ further reinforced by Khaopiak's client-side mnemonics, providing end-to-end enc
 
 ## Get started
 
-> [!NOTE]  
-> Khaopiak is in active, heavy development. This guide will be updated at a later time when the project becomes more
-> stable.
-
 1. Sign up for [Cloudflare Workers](https://workers.dev). The free tier is more than enough for most use cases.
 2. Clone this project and install dependencies with `npm install`
-3. Run `wrangler login` to login to your Cloudflare account in wrangler
-4. Run `wrangler r2 bucket create khaopiak` to create a Cloudflare R2 bucket
-5. Run `wrangler deploy` to publish the API to Cloudflare Workers
+3. Run `npx wrangler login` to login to your Cloudflare account in wrangler
+4. Run `npx wrangler r2 bucket create khaopiak` to create a Cloudflare R2 bucket
+5. Run `npx wrangler queues create khaopiak` to create a Cloudflare Queues queue 6
+    * For free tier users, disable queues in `wrangler.toml`
+6. Optionally, set a Cloudflare R2 lifecycle rule to automatically delete files over
+   time: `npx wrangler r2 bucket lifecycle add khaopiak --expire-days 50`
+7. Run `openssl rand -hex 8 | npx wrangler secret put OBJECT_KEY_SECRET` to generate and set a random object key hmac
+   secret
+8. Run `npx wrangler secret put PRIVATE_KEY_HEX` and set a private key hex value
+9. Run `npx wrangler secret put PUBLIC_KEY_HEX` and set a public key hex value
+10. Run `wrangler deploy` to publish the API to Cloudflare Workers
 
 ### Recommended headers
 
@@ -420,8 +424,8 @@ Response:
 
 ```json
 {
-	"success": true,
-	"mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
+  "success": true,
+  "mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
 }
 ```
 
@@ -457,8 +461,8 @@ Response:
 
 ```json
 {
-	"success": true,
-	"exists": true
+  "success": true,
+  "exists": true
 }
 ```
 
@@ -478,7 +482,7 @@ Response:
 
 ```json
 {
-	"success": true
+  "success": true
 }
 ```
 
