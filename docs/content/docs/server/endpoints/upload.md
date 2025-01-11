@@ -107,8 +107,8 @@ packet-beta
 
 ```json
 {
-  "success": true,
-  "mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
+	"success": true,
+	"mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
 }
 ```
 

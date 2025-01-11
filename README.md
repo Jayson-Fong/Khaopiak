@@ -356,7 +356,7 @@ To initially deploy Khaopiak:
 3. Run `npx wrangler login` to login to your Cloudflare account in wrangler
 4. Run `npx wrangler r2 bucket create khaopiak` to create a Cloudflare R2 bucket
 5. Run `npx wrangler queues create khaopiak` to create a Cloudflare Queues queue 6
-    * For free tier users, disable queues in `wrangler.toml`
+    - For free tier users, disable queues in `wrangler.toml`
 6. Optionally, set a Cloudflare R2 lifecycle rule to automatically delete files over
    time: `npx wrangler r2 bucket lifecycle add khaopiak --expire-days 50`
 7. Run `openssl rand -hex 8 | npx wrangler secret put OBJECT_KEY_SECRET` to generate and set a random object key hmac
@@ -367,7 +367,7 @@ To initially deploy Khaopiak:
 
 To deploy an updated version of Khaopiak:
 
-1. Run `npx wrangler deploy` to publish the API to Cloudflare Workers 
+1. Run `npx wrangler deploy` to publish the API to Cloudflare Workers
 
 ### Recommended headers
 
@@ -430,8 +430,8 @@ Response:
 
 ```json
 {
-  "success": true,
-  "mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
+	"success": true,
+	"mnemonic": "badge knife trim glimpse solution chaos nasty that quarter angle marine sniff"
 }
 ```
 
@@ -467,8 +467,8 @@ Response:
 
 ```json
 {
-  "success": true,
-  "exists": true
+	"success": true,
+	"exists": true
 }
 ```
 
@@ -488,7 +488,7 @@ Response:
 
 ```json
 {
-  "success": true
+	"success": true
 }
 ```
 

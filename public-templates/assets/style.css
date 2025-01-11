@@ -121,6 +121,8 @@ div.tab-opener-group {
 	overflow: hidden;
 	border: 1px solid var(--outline-color);
 	background-color: var(--primary-background-color);
+	border-top-left-radius: 8px;
+	border-top-right-radius: 8px;
 }
 
 div.tab-opener-group[data-tab-vertical] {

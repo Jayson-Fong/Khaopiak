@@ -52,8 +52,8 @@ packet-beta
 
 ```json
 {
-  "success": true,
-  "exists": true
+	"success": true,
+	"exists": true
 }
 ```
 
