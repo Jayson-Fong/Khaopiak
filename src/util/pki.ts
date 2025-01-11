@@ -12,7 +12,9 @@ export const extractData = async <T extends object>(
 	contentType: string | undefined,
 	primaryInputStream: ReadableStream | null,
 	extractor: (input: Uint8Array) => Promise<T>,
-	fallback: () => Promise<T>,
+	fallback: () => Promise<{ [x: string]: string | File | number }>,
+	normalizer: (data: Promise<Object>) => Promise<T>,
+	verifier: (data: Promise<T>) => Promise<T>,
 	privateKey: () => Promise<CryptoKey>
 ): Promise<ExtractionData<T>> => {
 	if (
@@ -21,7 +23,7 @@ export const extractData = async <T extends object>(
 		!primaryInputStream ||
 		primaryInputStream.locked
 	) {
-		return { data: fallback() };
+		return { data: verifier(normalizer(fallback())) };
 	}
 
 	let bytes;
@@ -76,7 +78,7 @@ export const extractData = async <T extends object>(
 
 	return {
 		version: version,
-		data: extractor(payload),
+		data: verifier(normalizer(extractor(payload))),
 		publicKey: publicKey
 	};
 };

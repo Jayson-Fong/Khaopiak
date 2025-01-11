@@ -29,7 +29,15 @@ export class OpenAPIFormRoute extends OpenAPIRoute {
 
 	async extractData<T extends object>(
 		c: Context<Environment>,
-		extractor: (input: Uint8Array) => Promise<T>
+		extractor: (input: Uint8Array) => Promise<T>,
+		normalizer: (raw: Promise<Object>) => Promise<T> = async (raw) => {
+			return this.schema.request.body.content[
+				'multipart/form-data'
+			].schema.parse(await raw);
+		},
+		verifier: (parsedData: Promise<T>) => Promise<T> = (parsedData) => {
+			return parsedData;
+		}
 	): Promise<ExtractionData<T>> {
 		// TODO: Make extractors nicer. Run validation through Zod instead of throwing ClientError.
 		const data: ExtractionData<T> = await extractData<T>(
@@ -37,10 +45,10 @@ export class OpenAPIFormRoute extends OpenAPIRoute {
 			c.req.raw.body,
 			extractor,
 			async () => {
-				return this.schema.request.body.content[
-					'multipart/form-data'
-				].schema.parse(await c.req.parseBody());
+				return await c.req.parseBody();
 			},
+			normalizer,
+			verifier,
 			() => importServerPrivateKey(c.env.PRIVATE_KEY_HEX)
 		);
 
