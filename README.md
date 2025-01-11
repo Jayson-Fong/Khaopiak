@@ -349,6 +349,8 @@ further reinforced by Khaopiak's client-side mnemonics, providing end-to-end enc
 
 ## Get started
 
+To initially deploy Khaopiak:
+
 1. Sign up for [Cloudflare Workers](https://workers.dev). The free tier is more than enough for most use cases.
 2. Clone this project and install dependencies with `npm install`
 3. Run `npx wrangler login` to login to your Cloudflare account in wrangler
@@ -361,7 +363,11 @@ further reinforced by Khaopiak's client-side mnemonics, providing end-to-end enc
    secret
 8. Run `npx wrangler secret put PRIVATE_KEY_HEX` and set a private key hex value
 9. Run `npx wrangler secret put PUBLIC_KEY_HEX` and set a public key hex value
-10. Run `wrangler deploy` to publish the API to Cloudflare Workers
+10. Run `npx wrangler deploy` to publish the API to Cloudflare Workers
+
+To deploy an updated version of Khaopiak:
+
+1. Run `npx wrangler deploy` to publish the API to Cloudflare Workers 
 
 ### Recommended headers
 
@@ -494,7 +500,7 @@ Response:
 > Khaopiak is in active, heavy development. This guide will be updated at a later time when the project becomes more
 > stable.
 
-1. Run `wrangler dev` to start a local instance of the API.
+1. Run `npx wrangler dev` to start a local instance of the API.
 2. Open `http://localhost:8787/api` in your browser to see the Swagger interface where you can try the endpoints.
 3. Changes made in the `src/` folder will automatically trigger the server to reload, you only need to refresh the
    Swagger interface.
