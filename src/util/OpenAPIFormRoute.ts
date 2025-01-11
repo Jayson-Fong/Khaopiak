@@ -39,7 +39,6 @@ export class OpenAPIFormRoute extends OpenAPIRoute {
 			return parsedData;
 		}
 	): Promise<ExtractionData<T>> {
-		// TODO: Make extractors nicer. Run validation through Zod instead of throwing ClientError.
 		const data: ExtractionData<T> = await extractData<T>(
 			c.req.header('Content-Type'),
 			c.req.raw.body,

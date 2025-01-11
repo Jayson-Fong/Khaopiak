@@ -107,13 +107,9 @@ export const responseInitToBytes = (responseInit: ResponseInitStrictHeader) => {
 	Array.from(responseInit.headers.keys()).forEach((key) => {
 		reformattedHeaders.push({
 			key: textEncoder.encode(key),
-			// TODO: Get rid of this condition? TypeScript is
-			//  complaining for some reason.
-			values: responseInit.headers
-				? responseInit.headers
-						.getAll(key)
-						.map((v) => textEncoder.encode(v))
-				: []
+			values: responseInit
+				.headers!.getAll(key)
+				.map((v) => textEncoder.encode(v))
 		});
 	});
 
