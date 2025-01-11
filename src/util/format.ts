@@ -19,7 +19,7 @@ export const fileToContentPrefix = (file: File): Uint8Array => {
 	);
 };
 
-export const extractPaddingData = (buffer: Uint8Array) => {
+export const extractPaddingData = (buffer: Uint8Array): number => {
 	if (buffer.byteLength < 6) {
 		throw Error(
 			'Buffer contains insufficient bytes to extract padding data'

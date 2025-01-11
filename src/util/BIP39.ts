@@ -1,5 +1,5 @@
 import { digestToKey } from './format';
-import { hexToArrayBuffer, toAESKeyData } from './buffer';
+import { clearBuffer, hexToArrayBuffer, toAESKeyData } from './buffer';
 import TheoreticalObject from './TheoreticalObject';
 import { ClientError } from '../error/ClientError';
 import {
@@ -74,9 +74,7 @@ export default class BIP39 {
 
 	clear(): void {
 		if (this.entropy instanceof ArrayBuffer) {
-			new Uint8Array(this.entropy).set(
-				new Array(this.entropy.byteLength).fill(0)
-			);
+			clearBuffer(this.entropy);
 		}
 	}
 

@@ -1,8 +1,16 @@
+export const clearBuffer = (buffer: ArrayBufferLike): void => {
+	new Uint8Array(buffer).set(new Array(buffer.byteLength).fill(0));
+};
+
 /**
  * Takes an array of ArrayBufferLike and concatenates them sequentially to produce a single ArrayBuffer
  * @param buffers An array of ArrayBufferLike to concatenate
+ * @param clear Whether to set the source buffer to 0 after concatenating
  */
-export const bufferConcat = (buffers: ArrayBufferLike[]): ArrayBuffer => {
+export const bufferConcat = (
+	buffers: ArrayBufferLike[],
+	clear: boolean = false
+): ArrayBuffer => {
 	// Create a new Uint8Array the size of the sum of all the buffers combined
 	const newBuffer = new Uint8Array(
 		buffers.map((b) => b.byteLength).reduce((a, b) => a + b)
@@ -12,6 +20,8 @@ export const bufferConcat = (buffers: ArrayBufferLike[]): ArrayBuffer => {
 	let cumulativeByteLength = 0;
 	buffers.forEach((buffer) => {
 		newBuffer.set(new Uint8Array(buffer), cumulativeByteLength);
+		if (clear) clearBuffer(buffer);
+
 		cumulativeByteLength += buffer.byteLength;
 	});
 
@@ -47,7 +57,7 @@ export const toAESKeyData = (entropy: ArrayBufferLike): ArrayBufferLike => {
  * Takes an ArrayBufferLike for conversion into a hex string
  * @param buffer An ArrayBufferLike to convert into a hex string
  */
-export const bufferToHex = (buffer: ArrayBufferLike) => {
+export const bufferToHex = (buffer: ArrayBufferLike): string => {
 	return [...new Uint8Array(buffer)]
 		.map((x) => Number(x).toString(16).padStart(2, '0'))
 		.join('');

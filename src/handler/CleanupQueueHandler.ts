@@ -1,7 +1,7 @@
 import { Bindings, CleanupMessage } from '../types';
 import config from '../../config.json';
 
-export const queue = async (
+const CleanupQueueHandler = async (
 	batch: MessageBatch<CleanupMessage>,
 	env: Bindings
 ): Promise<void> => {
@@ -21,3 +21,5 @@ export const queue = async (
 		msg.ack();
 	}
 };
+
+export default CleanupQueueHandler;

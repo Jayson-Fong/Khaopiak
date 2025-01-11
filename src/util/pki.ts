@@ -1,17 +1,11 @@
 import { bufferConcat, bufferToNumber, hexToArrayBuffer } from './buffer';
-import { ResponseInitStrictHeader } from '../types';
+import { ExtractionData, ResponseInitStrictHeader } from '../types';
 
 export const decryptServerKeyed = async (
 	input: Uint8Array,
 	privateKey: CryptoKey
-) => {
+): Promise<ArrayBuffer> => {
 	return crypto.subtle.decrypt({ name: 'RSA-OAEP' }, privateKey, input);
-};
-
-export type ExtractionData<T = object> = {
-	version?: number;
-	publicKey?: CryptoKey;
-	data: Promise<T>;
 };
 
 export const extractData = async <T extends object>(
@@ -223,12 +217,15 @@ export const generateResponse = async (
 			await crypto.subtle.encrypt(
 				{ name: 'RSA-OAEP' },
 				publicKey,
-				bufferConcat([
-					responseInitToBytes(responseInit),
-					payload instanceof Uint8Array
-						? payload
-						: textEncoder.encode(JSON.stringify(payload))
-				])
+				bufferConcat(
+					[
+						responseInitToBytes(responseInit),
+						payload instanceof Uint8Array
+							? payload
+							: textEncoder.encode(JSON.stringify(payload))
+					],
+					true
+				)
 			),
 			sanitizeResponseInit({
 				status: responseInit.status,

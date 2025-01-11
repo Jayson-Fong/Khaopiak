@@ -55,21 +55,23 @@ export class FileUpload extends OpenAPIFormRoute {
 		const cipherText = await crypto.subtle.encrypt(
 			{ name: 'AES-GCM', iv: iv },
 			await cryptoKey,
-			bufferConcat([
-				fileToContentPrefix(file),
-				await file.arrayBuffer(),
-				paddingBytes,
-				numberToBuffer(6, padding)
-			])
+			bufferConcat(
+				[
+					fileToContentPrefix(file),
+					await file.arrayBuffer(),
+					paddingBytes,
+					numberToBuffer(6, padding)
+				],
+				true
+			)
 		);
 
 		// Adding in 6 bytes to account for expiry time and 12 bytes to account for the IV
 		const fileExpiryTime = Date.now() + expiry * 1000;
-		const ivInjectedFileBuffer = bufferConcat([
-			msTimeToBuffer(fileExpiryTime),
-			iv,
-			cipherText
-		]);
+		const ivInjectedFileBuffer = bufferConcat(
+			[msTimeToBuffer(fileExpiryTime), iv, cipherText],
+			true
+		);
 
 		// Enqueue the file for deletion if it's configured to be delete-able
 		const theoreticalObject = await bip39.toTheoreticalObject(

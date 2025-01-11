@@ -5,7 +5,7 @@ import { Environment } from '../types';
 import { ClientError } from '../error/ClientError';
 import { PKIError } from '../error/PKIError';
 
-export const httpErrorHandler = (
+export const HttpErrorHandler = (
 	err: Error | HTTPException,
 	c: Context<Environment>
 ): Response | Promise<Response> => {
@@ -32,7 +32,7 @@ export const httpErrorHandler = (
 		);
 	}
 
-	console.log(err);
+	console.error(err);
 	return generateResponse(
 		c.get('extractedData')?.publicKey,
 		c.json,

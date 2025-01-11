@@ -1,15 +1,14 @@
 import { OpenAPIRoute, OpenAPIRouteSchema } from 'chanfana';
-import {
-	extractData,
-	ExtractionData,
-	generateResponse,
-	importServerPrivateKey
-} from './pki';
+import { extractData, generateResponse, importServerPrivateKey } from './pki';
 import { Context } from 'hono';
 import MnemonicExtractor from '../extractor/MnemonicExtractor';
 import BIP39 from './BIP39';
 import { ClientError } from '../error/ClientError';
-import { Environment, ResponseInitStrictHeader } from '../types';
+import {
+	Environment,
+	ExtractionData,
+	ResponseInitStrictHeader
+} from '../types';
 
 type FormSchema = {
 	request: {
@@ -33,7 +32,7 @@ export class OpenAPIFormRoute extends OpenAPIRoute {
 		extractor: (input: Uint8Array) => Promise<T>
 	): Promise<ExtractionData<T>> {
 		// TODO: Make extractors nicer. Run validation through Zod instead of throwing ClientError.
-		const data = await extractData<T>(
+		const data: ExtractionData<T> = await extractData<T>(
 			c.req.header('Content-Type'),
 			c.req.raw.body,
 			extractor,
@@ -49,7 +48,10 @@ export class OpenAPIFormRoute extends OpenAPIRoute {
 		return data;
 	}
 
-	async extractMnemonicOrError(c: Context) {
+	async extractMnemonicOrError(c: Context): Promise<{
+		bip39: BIP39;
+		extractedData: ExtractionData<{ mnemonic: string }>;
+	}> {
 		let extractedData = await this.extractData<{ mnemonic: string }>(
 			c,
 			MnemonicExtractor

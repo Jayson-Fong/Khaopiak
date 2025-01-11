@@ -1,5 +1,3 @@
-import { ExtractionData } from './util/pki';
-
 export interface Bindings {
 	STORAGE: R2Bucket;
 	CLEANUP_QUEUE: Queue;
@@ -9,6 +7,12 @@ export interface Bindings {
 	PRIVATE_KEY_HEX: string;
 	OBJECT_KEY_SECRET: string;
 }
+
+export type ExtractionData<T = object> = {
+	version?: number;
+	publicKey?: CryptoKey;
+	data: Promise<T>;
+};
 
 export interface Variables {
 	extractedData?: ExtractionData;
