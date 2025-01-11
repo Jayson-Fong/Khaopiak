@@ -26,7 +26,6 @@ for template_file in $template_files; do
     integrity_sha512=$(openssl dgst -binary -sha512 "$ASSETS_FOLDER/$integrity_check_file_name" | base64 | tr -d '\n')
     integrity_check_string="sha512-$integrity_sha512"
     template_file_contents=${template_file_contents/"$integrity_check"/"$integrity_check_string"}
-#    template_file_contents=$(echo "$template_file_contents" | sed "s#$integrity_check#$integrity_check_string#")
   done
 
   echo "$template_file_contents" > "$TARGET_FOLDER/$template_file"

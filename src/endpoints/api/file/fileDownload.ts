@@ -1,5 +1,3 @@
-import { Bool, Str } from 'chanfana';
-import { z } from 'zod';
 import { Context } from 'hono';
 import { bufferToNumber } from '../../../util/buffer';
 import {
@@ -7,16 +5,9 @@ import {
 	extractPaddingData,
 	isPDF
 } from '../../../util/format';
-import config from '../../../../config.json';
-import {
-	GENERIC_400,
-	GENERIC_401,
-	GENERIC_HEADER_CLOUDFLARE_ACCESS,
-	MNEMONIC_STRING,
-	RESPONSE_SUCCESS
-} from '../../../util/schema';
 import { OpenAPIFormRoute } from '../../../util/OpenAPIFormRoute';
 import { Environment } from '../../../types';
+import FileDownloadSchema from '../../../schema/FileDownloadSchema';
 
 /**
  * OpenAPI endpoint to download a file based on
@@ -30,73 +21,7 @@ import { Environment } from '../../../types';
  * not exist.
  */
 export class FileDownload extends OpenAPIFormRoute {
-	schema = {
-		tags: ['File'],
-		summary: 'Download a file',
-		request: {
-			query: z.object({
-				noRender: Bool({
-					description: 'Disable rendering PDF files in-browser',
-					default: false,
-					example: true,
-					required: false
-				})
-			}),
-			body: {
-				content: {
-					'multipart/form-data': {
-						schema: z.object({
-							mnemonic: MNEMONIC_STRING
-						})
-					}
-				}
-			},
-			...(config.requireAuth.delete
-				? { headers: GENERIC_HEADER_CLOUDFLARE_ACCESS }
-				: {})
-		},
-		responses: {
-			'200': {
-				description: 'File successfully retrieved',
-				content: {
-					'application/octet-stream': {
-						schema: Str({
-							description:
-								'A binary file, provided when the file Content-Type is not application/pdf, ' +
-								'the file signature is not indicative of a PDF, or when noRender is true',
-							required: true
-						})
-					},
-					'application/pdf': {
-						schema: Str({
-							description:
-								'A binary PDF file, provided when the file Content-Type is application/pdf, ' +
-								'the file signature is indicative of a PDF, and when noRender is not true',
-							required: true
-						})
-					}
-				}
-			},
-			'401': GENERIC_401,
-			'400': GENERIC_400,
-			'404': {
-				description: 'File not found',
-				content: {
-					'application/json': {
-						schema: z.object({
-							success: RESPONSE_SUCCESS(false),
-							error: Str({
-								default: 'Failed to find file by mnemonic',
-								description: 'File not found error',
-								example: 'Failed to find file by mnemonic',
-								required: true
-							})
-						})
-					}
-				}
-			}
-		}
-	};
+	schema = FileDownloadSchema;
 
 	async handle(c: Context<Environment>): Promise<Response> {
 		const data = await this.getValidatedData<typeof this.schema>();

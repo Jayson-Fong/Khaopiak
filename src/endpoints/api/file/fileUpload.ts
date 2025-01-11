@@ -1,5 +1,3 @@
-import { Str } from 'chanfana';
-import { z } from 'zod';
 import { Context } from 'hono';
 import {
 	bufferConcat,
@@ -9,15 +7,11 @@ import {
 } from '../../../util/buffer';
 import { fileToContentPrefix } from '../../../util/format';
 import config from '../../../../config.json';
-import {
-	GENERIC_401,
-	GENERIC_HEADER_CLOUDFLARE_ACCESS,
-	RESPONSE_SUCCESS
-} from '../../../util/schema';
 import { OpenAPIFormRoute } from '../../../util/OpenAPIFormRoute';
 import FileExtractor from '../../../extractor/FileExtractor';
 import BIP39 from '../../../util/BIP39';
 import { Environment } from '../../../types';
+import FileUploadSchema from '../../../schema/FileUploadSchema';
 
 /**
  * Uploads a file to Cloudflare R2 after
@@ -26,77 +20,7 @@ import { Environment } from '../../../types';
  * specified by the client.
  */
 export class FileUpload extends OpenAPIFormRoute {
-	schema = {
-		tags: ['File'],
-		summary: 'Upload a file',
-		request: {
-			body: {
-				content: {
-					'multipart/form-data': {
-						schema: z.object({
-							file: z
-								.instanceof(File)
-								.describe('An uploaded file')
-								.refine((x) => x.size),
-							entropy: z.coerce
-								.number({
-									description:
-										'Bits of entropy for file identification. The highest level of entropy possible will be used for AES-GCM encryption.'
-								})
-								.gte(128)
-								.lte(256)
-								._addCheck({
-									kind: 'multipleOf',
-									value: 32
-								}),
-							expiry: z.coerce
-								.number({
-									description:
-										'The number of seconds the file should be downloadable before the file is made unavailable or deleted.'
-									// TODO: Make the maximum and default (and later, minimum) configurable
-								})
-								.min(
-									config.upload.expiry.allowInfinite
-										? -1
-										: config.upload.expiry.min
-								)
-								// The max queue retry delay is 12 hours, with a max 100 retries
-								// as a result, the absolute maximum expiry is 1200 hours.
-								.max(config.upload.expiry.max)
-								.int()
-								// The max queue retry delay is 12 hours, so let's avoid
-								// using an operation if the user doesn't need to.
-								.default(config.upload.expiry.default),
-							padding: z.coerce.number().nonnegative()
-						})
-					}
-				}
-			},
-			...(config.requireAuth.delete
-				? { headers: GENERIC_HEADER_CLOUDFLARE_ACCESS }
-				: {})
-		},
-		responses: {
-			'200': {
-				description: 'File successfully uploaded',
-				content: {
-					'application/json': {
-						schema: z.object({
-							success: RESPONSE_SUCCESS(true),
-							mnemonic: Str({
-								description:
-									'BIP39 mnemonic used for file retrieval and server-side decryption',
-								required: true,
-								example:
-									'pass frog invite more question expose nose start swarm quality unhappy steak'
-							})
-						})
-					}
-				}
-			},
-			'401': GENERIC_401
-		}
-	};
+	schema = FileUploadSchema;
 
 	async handle(c: Context<Environment>): Promise<Response> {
 		let extractedData = await this.extractData<{

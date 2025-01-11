@@ -1,17 +1,8 @@
-import { Bool, Str } from 'chanfana';
-import { z } from 'zod';
 import { Context } from 'hono';
 import { bufferToNumber } from '../../../util/buffer';
-import config from '../../../../config.json';
-import {
-	GENERIC_400,
-	GENERIC_401,
-	GENERIC_HEADER_CLOUDFLARE_ACCESS,
-	MNEMONIC_STRING,
-	RESPONSE_SUCCESS
-} from '../../../util/schema';
 import { OpenAPIFormRoute } from '../../../util/OpenAPIFormRoute';
 import { Environment } from '../../../types';
+import FileExistsSchema from '../../../schema/FileExistsSchema';
 
 /**
  * Checks if a file exists based on a BIP39
@@ -21,54 +12,7 @@ import { Environment } from '../../../types';
  * as if it did not exist.
  */
 export class FileExists extends OpenAPIFormRoute {
-	schema = {
-		tags: ['File'],
-		summary: 'Check if a file exists',
-		request: {
-			body: {
-				content: {
-					'multipart/form-data': {
-						schema: z.object({
-							// The minimum mnemonic in *English* is 12 space-separated words of 3 characters
-							// The maximum mnemonic in *English* is 24 space-separated words of 8 characters
-							mnemonic: MNEMONIC_STRING
-						})
-					}
-				}
-			},
-			...(config.requireAuth.delete
-				? { headers: GENERIC_HEADER_CLOUDFLARE_ACCESS }
-				: {})
-		},
-		responses: {
-			'200': {
-				description: 'File status successfully queried',
-				content: {
-					'application/json': {
-						schema: z.object({
-							success: RESPONSE_SUCCESS(true),
-							exists: Bool({
-								description:
-									'Whether the file exists at the time of querying',
-								required: true,
-								default: false,
-								example: false
-							})
-						})
-					},
-					'application/octet-stream': {
-						schema: Str({
-							description:
-								'Returned when an encrypted mnemonic is sent to the server. The JSON response is encrypted using the provided public key and contains a single boolean-valued entry named "success" indicating whether the server successfully processed the request; however, does not acknowledge whether the file initially existed.',
-							required: true
-						})
-					}
-				}
-			},
-			'401': GENERIC_401,
-			'400': GENERIC_400
-		}
-	};
+	schema = FileExistsSchema;
 
 	async handle(c: Context<Environment>): Promise<Response> {
 		const { bip39 } = await this.extractMnemonicOrError(c);
